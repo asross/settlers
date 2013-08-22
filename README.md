@@ -7,6 +7,7 @@ of Catan!
 1. `gem install bundler`
 2. `bundle install`
 3. `ruby webapp.rb` or `ruby textbased.rb`
+4. If you run into problems, ensure you have Ruby 1.9 installed (check with `ruby --version`)
 
 ## Setbacks
 
