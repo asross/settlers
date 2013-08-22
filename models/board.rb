@@ -3,15 +3,14 @@ class Board
   HEX_TYPES = %w(ore)*3 + %w(brick)*3 + %w(sheep)*4 + %w(wheat)*4 + %w(wood)*4 + %w(desert)
   attr_accessor :settlements, :roads, :hexes, :robbed_coords, :longest_road_player, :longest_road_length, :size
 
-  def self.create
+  def self.create(side_length=3)
     hexes = []
     tokens = TOKENS.dup.cycle
     hex_types = HEX_TYPES.dup.shuffle.cycle
 
-    side_length = 3
-    
     size = side_length*2+1
     size.times do |i|
+      hex_row = []
       size.times do |j|
         if (side_length+1..side_length*3-1).include?(i+j) && ([0,size-1] & [i,j]).size == 0
           type = hex_types.next
@@ -20,8 +19,9 @@ class Board
           type = 'water'
           token = nil
         end
-        hexes << Hex.new(i, j, token, type, (type == 'desert'))
+        hex_row << Hex.new(i, j, token, type, (type == 'desert'))
       end
+      hexes << hex_row
     end
     
     new(hexes, size)
@@ -30,7 +30,7 @@ class Board
   def initialize(hexes, size)
     @hexes = hexes
     @size = size
-    @robbed_hex = hexes.select{|h| h.type == 'desert'}.first
+    @robbed_hex = hexes.flatten.select{|h| h.type == 'desert'}.first
     @settlements = []
     @roads = []
     @longest_road_player = nil

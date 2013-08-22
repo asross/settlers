@@ -53,7 +53,7 @@
     height: 100px;
   }
 
-  <% @board.hexes.each do |hex| %>
+  <% @board.hexes.flatten.each do |hex| %>
     <%= "#h#{hex.x}-#{hex.y}" %> {
       position: absolute;
       top: <%= "#{100*hex.y+50*hex.x-50*((@board.size-1)/2)}px" %>;
@@ -62,7 +62,7 @@
   <% end %>
 </style>
 
-<% @board.hexes.each do |hex| %>
+<% @board.hexes.flatten.each do |hex| %>
   <% next if hex.x + hex.y < (@board.size - 1) / 2 %>
   <% next if hex.x + hex.y > 3*((@board.size - 1) / 2) %>
 
