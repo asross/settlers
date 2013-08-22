@@ -12,7 +12,7 @@ of Catan!
 
 I wrote most of this code before I had learned anything about Ruby.
 
-## Spec
+## Settings
 
 * `models/` directory contains abstract logic for playing catan.
 * `webapp.rb` exposes that logic through a web interface
