@@ -14,11 +14,6 @@ class Hex
   end
   
   def adjacent?(hex)
-    case y
-    when hex.y     then (x - hex.x).abs == 1
-    when hex.y + 1 then [hex.x, hex.x - 1].include? x
-    when hex.y - 1 then [hex.x, hex.x + 1].include? x
-    else false
-    end
+    [1,0,-1].permutation(2).include?([x-hex.x, y-hex.y])
   end
 end
