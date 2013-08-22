@@ -1,8 +1,35 @@
 class Board
-  attr_accessor :settlements, :roads, :hexes, :robbed_coords, :longest_road_player, :longest_road_length
+  TOKENS = [5, 2, 6, 3, 8, 10, 9, 12, 11, 4, 8, 10, 9, 4, 5, 6, 3, 11]
+  HEX_TYPES = %w(ore)*3 + %w(brick)*3 + %w(sheep)*4 + %w(wheat)*4 + %w(wood)*4 + %w(desert)
+  attr_accessor :settlements, :roads, :hexes, :robbed_coords, :longest_road_player, :longest_road_length, :size
+
+  def self.create
+    hexes = []
+    tokens = TOKENS.dup.cycle
+    hex_types = HEX_TYPES.dup.shuffle.cycle
+
+    side_length = 3
+    
+    size = side_length*2+1
+    size.times do |i|
+      size.times do |j|
+        if (side_length+1..side_length*3-1).include?(i+j) && ([0,size-1] & [i,j]).size == 0
+          type = hex_types.next
+          token = (tokens.next unless type == 'desert')
+        else
+          type = 'water'
+          token = nil
+        end
+        hexes << Hex.new(i, j, token, type, (type == 'desert'))
+      end
+    end
+    
+    new(hexes, size)
+  end
   
-  def initialize(hexes)
+  def initialize(hexes, size)
     @hexes = hexes
+    @size = size
     @robbed_hex = hexes.select{|h| h.type == 'desert'}.first
     @settlements = []
     @roads = []
