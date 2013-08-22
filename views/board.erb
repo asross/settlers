@@ -9,7 +9,7 @@
     background-color: cornflowerblue;
   }
   .tile.wheat {
-    background-color: wheat;
+    background-color: goldenrod;
   }
   .tile.sheep {
     background-color: yellowgreen;
@@ -21,10 +21,10 @@
     background-color: darkgray;
   }
   .tile.brick {
-    background-color: coral;
+    background-color: brown;
   }
   .tile.desert {
-    background-color: black;
+    background-color: wheat;
   }
   .tile.first {
     -webkit-transform: rotateZ(60deg);
@@ -37,8 +37,8 @@
     top: -200px;
   }
   .number {
-    width: 110px;
-    height: 100px;
+    width: 50px;
+    height: 50px;
     line-height: 100px;
     font-size: 2em;
     position: relative;
@@ -46,11 +46,25 @@
     vertical-align: middle;
     top: -300px;
     color: white;
-    left: 0px;
+    left: 33px;
     background-color: transparent;
   }
   .hex {
-    height: 100px;
+    height: 0px;
+  }
+  #chat {
+    position: absolute;
+    top: <%= "#{@board.size*100}px" %>;
+    width: 630px; /* todo: figure out based on board size */
+    height: 200px;
+    border-top: 1px solid #ccc;
+  }
+  #chat #message-area {
+    height: 175px;
+    width: 100%;
+  }
+  #chat form input {
+    width: 100%;
   }
 
   <% @board.hexes.flatten.each do |hex| %>
@@ -62,10 +76,27 @@
   <% end %>
 </style>
 
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+      $('.tile, .number').click(function() {
+        console.log($(this).closest('.hex').attr('id'));
+      });
+  });
+</script>
+
+<div id='players'>
+</div>
+
 <% @board.hexes.flatten.each do |hex| %>
   <% next if hex.x + hex.y < (@board.size - 1) / 2 %>
   <% next if hex.x + hex.y > 3*((@board.size - 1) / 2) %>
-
   <%= erb :hex, layout: false, locals: { hex: hex } %>
-
 <% end %>
+
+<div id='chat'>
+  <div id='message-area'></div>
+  <form action='/messages'>
+    <input type='text' placeholder='message...'>
+  </form>
+</div>
