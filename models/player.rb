@@ -22,7 +22,7 @@ class Player
     send("#{resource}=", send(resource)+n)
   end
 
-  def trade_in(n, resource1, resource2)
+  def trade_in(resource1, resource2, n)
     error 'Not enough resources to trade' unless send(resource1) >= n
     increment(resource1, -n)
     increment(resource2, 1)
@@ -31,6 +31,7 @@ class Player
   def build_settlement(hex1, hex2, hex3, startTurn=false)
     error 'Already built 5 settlements' if n_settlements >= 5
     error 'Too close to existing settlement/city' if board.settlement_near?(hex1, hex2, hex3)
+    error 'Hexes are not adjacent' unless [hex1, hex2, hex3].combination(2).all?{|h1, h2| h1.adjacent?(h2) }
     unless startTurn
       error 'No road leading to settlement' unless board.road_to?(hex1, hex2, hex3, color)
       error 'Not enough resources to build settlement' unless [sheep, wheat, brick, wood].all?{|r| r >= 1}
