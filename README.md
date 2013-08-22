@@ -1,17 +1,23 @@
 # Settlers
 
+of Catan!
+
 ## Setup
 
-`gem install bundler`
-`bundle install`
-`ruby webapp.rb` or `ruby textbased.rb`
+1. `gem install bundler`
+2. `bundle install`
+3. `ruby webapp.rb` or `ruby textbased.rb`
+
+## Setbacks
+
+* I wrote most of this code before I had learned anything about Ruby.
 
 ## Spec
 
 * `models/` directory contains abstract logic for playing catan.
 * `webapp.rb` exposes that logic through a web interface
+* `textbased.rb` exposes the logic through a text-based interface
 * `views/` directory contains the HTML/javascript/CSS required for the web interface
-* `textbased.rb` exposes Catan logic through a text-based interface
 * `test/` directory contains tests that run with a gem called [minitest](https://github.com/seattlerb/minitest)
 * `test/unit/` directory contains unit tests for models
 * `test/webapp/` directory contains integration tests for the web app
