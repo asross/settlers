@@ -1,6 +1,6 @@
 require 'sinatra'
 require 'pry'
-Dir.glob('./models/*.rb').each { |f| require_relative f }
+Dir.glob('./models/*.rb').each { |f| require f }
 
 $board = Board.create(3)
 
