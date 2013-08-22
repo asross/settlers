@@ -10,7 +10,7 @@ of Catan!
 
 ## Setbacks
 
-I wrote most of this code before I had learned anything about Ruby.
+A lot of this code is very old.
 
 ## Settings
 
