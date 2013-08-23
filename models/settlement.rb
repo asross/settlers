@@ -6,7 +6,6 @@ class Settlement
     @player = player
     @size = 1
     @color = player.color
-    @player = player
   end
   
   def rolled(roll)

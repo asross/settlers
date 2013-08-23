@@ -92,7 +92,7 @@ describe Player do
       raises('Not enough resources') { @player.build_road(@hex1, @hex2) }
     end
 
-    it 'succeeds if all else is met' do
+    it 'succeeds otherwise' do
       @board.roads << Road.new(@hex1, @hex3, @player.color)
       @player.wood = 1
       @player.brick = 1
@@ -104,6 +104,39 @@ describe Player do
   end
 
   describe '#build_city' do
-  end
+    before do
+      @hex1 = @board.hexes[3][2]
+      @hex2 = @board.hexes[4][2]
+      @hex3 = @board.hexes[3][3]
+    end
 
+    it 'errors if there is no settlement at the location' do
+      raises('No settlement at location') { @player.build_city(@hex1, @hex2, @hex3) } 
+    end
+
+    it 'errors if there is a settlement but not yours' do
+      other_player = Player.new(@board, 'magenta')
+      @board.settlements << Settlement.new(@hex1, @hex2, @hex3, other_player)
+      raises('No settlement at location') { @player.build_city(@hex1, @hex2, @hex3) }
+    end
+
+    it 'errors if you lack resources' do
+      @board.settlements << Settlement.new(@hex1, @hex2, @hex3, @player)
+      raises('Not enough resources') { @player.build_city(@hex1, @hex2, @hex3) }
+
+    end
+
+    it 'succeeds otherwise' do
+      @board.settlements << Settlement.new(@hex1, @hex2, @hex3, @player)
+      @player.ore = 3
+      @player.wheat = 2
+      @player.points = 1
+      @player.n_settlements = 1
+      @player.build_city(@hex1, @hex2, @hex3)
+      @player.points.must_equal 2
+      @player.ore.must_equal 0
+      @player.wheat.must_equal 0
+      @player.n_settlements.must_equal 0
+    end
+  end
 end

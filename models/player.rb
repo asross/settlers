@@ -55,12 +55,12 @@ class Player
   end
 
   def build_city(hex1, hex2, hex3)
-    error 'No settlement at location' unless board.settlement_at?(hex1, hex2, hex3, color=color, just_settlements=true)
+    error 'No settlement at location' unless board.settlement_at?(hex1, hex2, hex3, color, true)
     error 'Not enough resources to build city' unless ore >= 3 && wheat >= 2
-    ore -= 3
-    wheat -= 2
+    @ore -= 3
+    @wheat -= 2
     board.upgrade_settlement(hex1, hex2, hex3)
-    n_settlements -= 1
-    points += 1
+    @n_settlements -= 1
+    @points += 1
   end
 end
