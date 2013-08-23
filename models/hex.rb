@@ -12,8 +12,12 @@ class Hex
     @type = type
     @robbed = robbed
   end
+
+  def adjacencies
+    [1,0,-1].permutation(2).map{|i,j| [x+i, y+j] }
+  end
   
   def adjacent?(hex)
-    [1,0,-1].permutation(2).include?([x-hex.x, y-hex.y])
+    adjacencies.include?([hex.x, hex.y])
   end
 end

@@ -53,37 +53,14 @@ class Board
     end
     robbable
   end
-  
-  def hexes_adjacent_to(hex1, hex2=nil) # returns hexes adjacent to both hex1 and hex2
-    # assume hex1 and hex2 are adjacent. could put in a safeguard easily with hex1.adjacent?(hex2)
 
-    if hex2.nil?
-      if hex.y > 0 and hex.x > 0
-        return [@hexes[hex1.x][hex1.y+1], @hexes[hex1.x][hex1.y-1], @hexes[hex1.x+1][hex1.y], @hexes[hex1.x+1][hex1.y-1], @hexes[hex1.x-1][hex1.y], @hexes[hex1.x-1][hex1.y+1]]
-      elsif hex.y == 0 and hex.x > 0
-        return [@hexes[hex1.x][hex1.y+1], @hexes[hex1.x+1][hex1.y], @hexes[hex1.x-1][hex1.y], @hexes[hex1.x-1][hex1.y+1]]
-      elsif hex.x == y and hex.y > 0
-        return [@hexes[hex1.x][hex1.y+1], @hexes[hex1.x][hex1.y-1], @hexes[hex1.x+1][hex1.y], @hexes[hex1.x+1][hex1.y-1]]
-      else
-        return [@hexes[hex1.x][hex1.y+1], @hexes[hex1.x+1][hex1.y]]
-      end
+  def hexes_adjacent_to(hex1, hex2=nil)
+    if hex2
+      positions = hex1.adjacencies & hex2.adjacencies
     else
-      if hex1.y == hex2.y
-        if hex1.y == 0
-          return [nil, @hexes[[hex1.x,hex2.x].min][hex1.y+1]]
-        else
-          return [@hexes[[hex1.x,hex2.x].max][hex1.y-1], @hexes[[hex1.x,hex2.x].min][hex1.y+1]]
-        end
-      elsif hex1.x == hex2.x
-        if hex1.x == 0
-          return [nil, @hexes[hex1.x+1][[hex1.y,hex2.y].min]]
-        else
-          return [@hexes[hex1.x-1][[hex1.y,hex2.y].max], @hexes[hex1.x+1][[hex1.y,hex2.y].min]]
-        end
-      else
-        return [@hexes[[hex1.x,hex2.x].max][[hex1.y,hex2.y].max], @hexes[[hex1.x,hex2.x].min][[hex1.y,hex2.y].min]]
-      end
+      positions = hex1.adjacencies
     end
+    positions.reject{|x,y| x >= size || y >= size}.map{|x,y| @hexes[x][y] }
   end
   
   def road_to?(hex1, hex2, hex3, color) 
