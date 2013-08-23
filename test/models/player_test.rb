@@ -7,11 +7,6 @@ describe Player do
     @player = Player.new(@board, 'puce')
   end
 
-  def raises(msg, &block)
-    error = assert_raises(RuntimeError, &block)
-    error.message.must_match /#{msg}/
-  end
-
   describe '#trade_in' do
     it 'raises an error when there are not enough resources' do
       raises('Not enough resources') { @player.trade_in('ore', 'wheat', 4) }

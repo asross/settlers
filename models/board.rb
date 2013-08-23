@@ -1,7 +1,7 @@
 class Board
   TOKENS = [5, 2, 6, 3, 8, 10, 9, 12, 11, 4, 8, 10, 9, 4, 5, 6, 3, 11]
   HEX_TYPES = %w(ore)*3 + %w(brick)*3 + %w(sheep)*4 + %w(wheat)*4 + %w(wood)*4 + %w(desert)
-  attr_accessor :settlements, :roads, :hexes, :robbed_coords, :longest_road_player, :longest_road_length, :size
+  attr_accessor :settlements, :roads, :hexes, :robbed_hex, :longest_road_player, :longest_road_length, :size
 
   def self.create(side_length=3)
     hexes = []
@@ -26,6 +26,10 @@ class Board
     
     new(hexes, size)
   end
+
+  def error(msg)
+    raise msg
+  end
   
   def initialize(hexes, size)
     @hexes = hexes
@@ -41,10 +45,12 @@ class Board
     settlements.each{|s| s.rolled(roll) }
   end
   
-  def move_robber_to(hex, player)
-    robbed_hex.robbed = false
-    robbed_hex = hex
-    robbed_hex.robbed = true
+  def move_robber_to(x, y, player)
+    error 'invalid robber location' unless hexes[x] && hex = hexes[x][y]
+    error 'cannot pick same location' if hex == @robbed_hex
+    @robbed_hex.robbed = false
+    @robbed_hex = hex
+    @robbed_hex.robbed = true
     robbable = []
     for s in settlements
       if s.hexes.include?(hex) && s.player != player && !robbable.include?(s.player)
