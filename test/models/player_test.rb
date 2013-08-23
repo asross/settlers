@@ -1,7 +1,7 @@
 require_relative '../test_helper'
 
 describe Player do
-  
+
   before do
     @board = Board.create
     @player = Player.new(@board, 'puce')
@@ -63,10 +63,44 @@ describe Player do
       raises('Not enough resources') { @player.build_settlement(@hex1, @hex2, @hex3) }
       @player.wood = 1
       @player.build_settlement(@hex1, @hex2, @hex3)
+      [:sheep, :wheat, :brick, :wood].each do |attr|
+        @player.send(attr).must_equal 0
+      end
     end
   end
 
   describe '#build_road' do
+    before do
+      @hex1 = @board.hexes[3][2]
+      @hex2 = @board.hexes[4][2]
+      @hex3 = @board.hexes[3][3]
+    end
+
+    it 'raises an error if 15 roads are already built' do
+      @player.n_roads = 15
+      raises('Already built 15') { @player.build_road(@hex1, @hex2) }
+    end
+
+    it 'raises an error if no settlement or road leads to the road' do
+      raises('Road not buildable there') { @player.build_road(@hex1, @hex2) }
+      @board.roads << Road.new(@hex2, @hex3, 'orange')
+      raises('Road not buildable there') { @player.build_road(@hex1, @hex2) }
+    end
+
+    it 'raises an error if there are not sufficient resources' do
+      @board.roads << Road.new(@hex1, @hex3, @player.color)
+      raises('Not enough resources') { @player.build_road(@hex1, @hex2) }
+    end
+
+    it 'succeeds if all else is met' do
+      @board.roads << Road.new(@hex1, @hex3, @player.color)
+      @player.wood = 1
+      @player.brick = 1
+      @player.build_road(@hex1, @hex2)
+      [:brick, :wood].each do |attr|
+        @player.send(attr).must_equal 0
+      end
+    end
   end
 
   describe '#build_city' do
