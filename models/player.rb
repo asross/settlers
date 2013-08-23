@@ -1,5 +1,5 @@
 class Player
-  attr_accessor :sheep, :wheat, :brick, :wood, :ore, :color, :points, :n_settlements, :n_roads
+  attr_accessor :sheep, :wheat, :brick, :wood, :ore, :color, :points, :n_settlements, :n_roads, :board
   
   def initialize(board, color)
     @board = board
@@ -39,8 +39,8 @@ class Player
     [sheep, wheat, brick, wood].each{|r| r -= 1 }
     settlement = Settlement.new(hex1, hex2, hex3, self)
     board.settlements << settlement
-    n_settlements += 1
-    points += 1
+    @n_settlements += 1
+    @points += 1
   end
 
   def build_road(hex1, hex2, startTurn=false)

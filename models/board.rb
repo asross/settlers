@@ -118,7 +118,7 @@ class Board
   
   def settlement_at?(hex1, hex2, hex3, color=nil, just_settlements=false)
     result = false
-    for city in cities
+    for city in settlements
       if [hex1, hex2, hex3] & city.hexes == [hex1, hex2, hex3]
         if color.nil? or city.color == color
           if !just_settlements or city.size == 1
@@ -168,7 +168,7 @@ class Board
   end
   
   def upgrade_settlement(hex1, hex2, hex3)
-    for city in cities
+    for city in settlements
       if [hex1, hex2, hex3] & city.hexes == [hex1, hex2, hex3]
         # could assert city.size = 1 here
         city.size = 2   # if ruby really works by reference, this should stick.
