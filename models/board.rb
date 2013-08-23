@@ -55,12 +55,9 @@ class Board
   end
 
   def hexes_adjacent_to(hex1, hex2=nil)
-    if hex2
-      positions = hex1.adjacencies & hex2.adjacencies
-    else
-      positions = hex1.adjacencies
-    end
-    positions.reject{|x,y| x >= size || y >= size}.map{|x,y| @hexes[x][y] }
+    positions = hex1.adjacencies
+    positions = hex2.adjacencies & positions if hex2
+    positions.reject{|x,y| x >= size || y >= size}.map{|x,y| hexes[x][y] }
   end
   
   def road_to?(hex1, hex2, hex3, color) 
