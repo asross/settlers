@@ -13,7 +13,6 @@ describe Player do
   end
 
   describe '#trade_in' do
-
     it 'raises an error when there are not enough resources' do
       raises('Not enough resources') { @player.trade_in('ore', 'wheat', 4) }
     end
@@ -63,6 +62,8 @@ describe Player do
       raises('Not enough resources') { @player.build_settlement(@hex1, @hex2, @hex3) }
       @player.wood = 1
       @player.build_settlement(@hex1, @hex2, @hex3)
+      @player.points.must_equal 1
+      @player.n_settlements.must_equal 1
       [:sheep, :wheat, :brick, :wood].each do |attr|
         @player.send(attr).must_equal 0
       end
@@ -123,7 +124,6 @@ describe Player do
     it 'errors if you lack resources' do
       @board.settlements << Settlement.new(@hex1, @hex2, @hex3, @player)
       raises('Not enough resources') { @player.build_city(@hex1, @hex2, @hex3) }
-
     end
 
     it 'succeeds otherwise' do

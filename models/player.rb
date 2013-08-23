@@ -36,7 +36,10 @@ class Player
       error 'No road leading to settlement' unless board.road_to?(hex1, hex2, hex3, color)
       error 'Not enough resources to build settlement' unless [sheep, wheat, brick, wood].all?{|r| r >= 1}
     end
-    [:sheep, :wheat, :brick, :wood].each{|r| increment(r, -1) }
+    @sheep -= 1
+    @wheat -= 1
+    @brick -= 1
+    @wood -= 1
     settlement = Settlement.new(hex1, hex2, hex3, self)
     board.settlements << settlement
     @n_settlements += 1
@@ -47,7 +50,8 @@ class Player
     error 'Already built 15 roads' if n_roads >= 15
     error 'Road not buildable there' unless board.road_buildable_at?(hex1, hex2, color)
     error 'Not enough resources to build road' unless startTurn || (wood >= 1 && brick >= 1)
-    [:brick, :wood].each{|r| increment(r, -1) }
+    @brick -= 1
+    @wood -= 1
     road = Road.new(hex1, hex2, color)
     board.roads << road
     @n_roads += 1
