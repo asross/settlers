@@ -1,6 +1,6 @@
 class Board
-  TOKENS = [5, 2, 6, 3, 8, 10, 9, 12, 11, 4, 8, 10, 9, 4, 5, 6, 3, 11]
-  HEX_TYPES = %w(ore)*3 + %w(brick)*3 + %w(sheep)*4 + %w(wheat)*4 + %w(wood)*4 + %w(desert)
+  NUMBER_TOKENS = [5, 2, 6, 3, 8, 10, 9, 12, 11, 4, 8, 10, 9, 4, 5, 6, 3, 11]
+  HEX_TYPES = %w(ore brick)*3 + %w(sheep wheat wood)*4 + %w(desert)
   attr_accessor :settlements, :roads, :hexes, :robbed_hex, :longest_road_player, :longest_road_length, :side_length
 
   def self.on_island?(i,j,l)
@@ -10,7 +10,7 @@ class Board
   end
 
   def self.create(side_length=3)
-    tokens = TOKENS.dup.cycle
+    tokens = NUMBER_TOKENS.dup.cycle
     hex_types = HEX_TYPES.dup.shuffle.cycle
 
     hexes = \
