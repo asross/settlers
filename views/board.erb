@@ -1,9 +1,15 @@
 <style type="text/css">
+  <% height = 100.0 %>
+  <% width = height/Math.sqrt(3) %>
+  <% margin = 5 + height/4.0 %>
+  body {
+    margin: 0;
+  }
   .tile {
     position: relative;
-    width: 56px;
-    height: 100px;
-    margin-left: 2em;
+    width: <%= width %>px;
+    height: <%= height %>px;
+    margin-left: <%= margin %>px;
   }
   .tile.water {
     background-color: cornflowerblue;
@@ -31,22 +37,22 @@
   }
   .tile.second {
     -webkit-transform: rotateZ(-60deg);
-    top: -100px;
+    top: <%= -1*height %>px;
   }
   .tile.third {
-    top: -200px;
+    top: <%= -2*height %>px;
   }
   .number {
-    width: 50px;
-    height: 50px;
-    line-height: 100px;
+    width: <%= height/2.0 %>px;
+    height: <%= height/2.0 %>px;
+    line-height: <%= height %>px;
     font-size: 2em;
     position: relative;
     text-align: center;
     vertical-align: middle;
-    top: -300px;
+    top: <%= -3*height %>px;
     color: white;
-    left: 33px;
+    left: <%= height/3.0 %>px;
     background-color: transparent;
   }
   .hex {
@@ -54,24 +60,33 @@
   }
   #chat {
     position: absolute;
-    top: <%= "#{(1+@board.side_length*2)*100}px" %>;
-    width: 630px; /* todo: figure out based on board size */
+    top: <%= (1+@board.side_length*2)*height %>px;
+    width: <%= 2*margin + 10*width %>px;
     height: 200px;
     border-top: 1px solid #ccc;
   }
   #chat #message-area {
     height: 175px;
     width: 100%;
+    background-color: #eee;
   }
   #chat form input {
     width: 100%;
+  }
+  #players {
+    position: absolute;
+    left: <%= 2*margin + 10*width %>px;
+    top: 0;
+    height: <%= 200 + (1+@board.side_length*2)*height %>px;
+    border-left: 1px solid #ccc;
+    width: 500px;
   }
 
   <% @board.hexes.flatten.each do |hex| %>
     <%= "#h#{hex.x}-#{hex.y}" %> {
       position: absolute;
-      top: <%= "#{100*hex.y+50*hex.x-50*@board.side_length}px" %>;
-      left: <%= "#{86.6*hex.x}px" %>;
+      top: <%= hex.y*height + (hex.x-@board.side_length)*(height/2.0) %>px;
+      left: <%= hex.x*height*Math.sqrt(3)/2.0 %>px;
     }
   <% end %>
 </style>
