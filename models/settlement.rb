@@ -1,11 +1,14 @@
 class Settlement
-  attr_accessor :size, :color, :hexes, :player
+  attr_accessor :size, :hexes, :player
   
   def initialize(hex1, hex2, hex3, player)
     @hexes = [hex1, hex2, hex3]
     @player = player
     @size = 1
-    @color = player.color
+  end
+
+  def color
+    player.color
   end
   
   def rolled(roll)

@@ -10,13 +10,13 @@ class Board
   end
 
   def self.create(side_length=3)
+    types = HEX_TYPES.dup.shuffle.cycle
     tokens = NUMBER_TOKENS.dup.cycle
-    hex_types = HEX_TYPES.dup.shuffle.cycle
 
     hexes = \
     0.upto(side_length*2).map do |i|
       0.upto(side_length*2).map do |j|
-        type  = (on_island?(i, j, side_length) ? hex_types.next : 'water')
+        type  = (on_island?(i, j, side_length) ? types.next : 'water')
         token = (tokens.next unless %w(water desert).include?(type))
         Hex.new(i, j, token, type)
       end
@@ -95,27 +95,19 @@ class Board
     return false if just_settlements && settlement.size != 1
     true
   end
+
+  def road_at(hex1, hex2)
+    roads.select{|r| r.hexes - [hex1, hex2] == []}.first
+  end
   
   def road_buildable_at?(hex1, hex2, color)
-    # if there's already a road at h1, h2, return false
-    for road in roads
-      if [hex1, hex2] & road.hexes == [hex1, hex2]
-        #puts "Oops! Already a road here."
-        return false
-      end
+    return false if road_at(hex1, hex2)
+    for hex in hexes_adjacent_to(hex1, hex2)
+      trio = [hex1, hex2, hex]
+      return true if settlement_at?(*trio, color)
+      return true if road_to?(*trio, color) && !settlement_at?(*trio)
     end
-    # find the adjacent hexes
-    hex3s = hexes_adjacent_to(hex1, hex2)
-    # if there's a settlement nearby, return true
-    if settlement_at?(hex1, hex2, hex3s[0], color) or settlement_at?(hex1, hex2, hex3s[1], color)
-      #puts "Can build road because of a nearby settlement! Woohoo!"
-      return true
-    end   
-    # if there's a road of our color leading to this one (not blocked by a settlement), return true
-    if (road_to?(hex1, hex2, hex3s[0], color) and !settlement_at?(hex1, hex2, hex3s[0])) or (road_to?(hex1, hex2, hex3s[1], color) and !settlement_at?(hex1, hex2, hex3s[1]))
-      #puts "Can build road because of a leading road. Woohoo!"
-      return true
-    end
+    false
   end
   
   def settlement_near?(hex1, hex2, hex3)

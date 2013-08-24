@@ -116,7 +116,52 @@ describe Board do
       @board.settlement_at?(h(2,3),h(3,2),h(3,3),'gray',true).must_equal false
     end
   end
-  #describe '#road_buildable_at?'
+
+  describe '#road_buildable_at?' do
+    it 'returns true if a same-color road leads there' do
+      @board.roads << Road.new(h(2,3), h(2,4), 'red')
+      @board.road_buildable_at?(h(1,4), h(2,4), 'red').must_equal true
+      @board.road_buildable_at?(h(2,3), h(3,3), 'red').must_equal true
+      @board.road_buildable_at?(h(2,4), h(3,3), 'red').must_equal true
+      @board.road_buildable_at?(h(1,4), h(2,3), 'red').must_equal true
+      @board.road_buildable_at?(h(1,4), h(2,3), 'black').must_equal false
+    end
+
+    it 'returns true if a same-color settlement is adjacent' do
+      player = Player.new(@board, 'sienna')
+      @board.settlements << Settlement.new(h(1,4),h(2,4),h(1,5),player)
+      @board.road_buildable_at?(h(1,4),h(2,4),'sienna').must_equal true
+      @board.road_buildable_at?(h(1,5),h(2,4),'sienna').must_equal true
+      @board.road_buildable_at?(h(1,5),h(1,4),'sienna').must_equal true
+      @board.road_buildable_at?(h(1,5),h(1,4),'ochre').must_equal false
+    end
+
+    it 'returns false if a road already exists (regardless of color)' do
+      player = Player.new(@board, 'sienna')
+      @board.settlements << Settlement.new(h(1,4),h(2,4),h(1,5),player)
+      @board.roads << Road.new(h(1,4), h(2,4), 'red')
+      @board.road_buildable_at?(h(1,4),h(2,4),'red').must_equal false
+      @board.road_buildable_at?(h(1,4),h(2,4),'sienna').must_equal false
+    end
+
+    it 'returns false if there is nothing nearby' do
+      @board.roads << Road.new(h(2,3), h(2,4), 'red')
+      @board.road_buildable_at?(h(3,2), h(3,3), 'red').must_equal false
+    end
+
+    it 'returns false if a leading road is blocked by an off-color settlement' do
+      player1 = Player.new(@board, 'red')
+      player2 = Player.new(@board, 'sienna')
+      @board.roads << Road.new(h(2,3), h(2,4), 'red')
+      settlement = Settlement.new(h(2,3),h(2,4),h(1,4),player2)
+      @board.settlements << settlement
+      @board.road_buildable_at?(h(1,4), h(2,4), 'red').must_equal false
+      @board.road_buildable_at?(h(1,4), h(2,3), 'red').must_equal false
+      settlement.player = player1
+      @board.road_buildable_at?(h(1,4), h(2,4), 'red').must_equal true
+      @board.road_buildable_at?(h(1,4), h(2,3), 'red').must_equal true
+    end
+  end
   #describe '#settlement_near?'
   #describe '#upgrade_settlement'
   #describe '#check_for_longest_road'
