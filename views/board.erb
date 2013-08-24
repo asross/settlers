@@ -60,7 +60,7 @@
   }
   #chat {
     position: absolute;
-    top: <%= (1+@board.side_length*2)*height %>px;
+    top: <%= @board.size*height %>px;
     width: <%= 2*margin + 10*width %>px;
     height: 200px;
     border-top: 1px solid #ccc;
@@ -83,7 +83,7 @@
     position: absolute;
     left: <%= 2*margin + 10*width %>px;
     top: 0;
-    height: <%= 200 + (1+@board.side_length*2)*height %>px;
+    height: <%= 200 + @board.size*height %>px;
     border-left: 1px solid #ccc;
     width: 500px;
   }
