@@ -10,6 +10,10 @@ describe Board do
     @board.hexes[x][y]
   end
 
+  def assert_similar(array1, array2)
+    (array1 - array2).must_equal []
+  end
+
   describe '#move_robber_to' do
     it 'returns a list of all players the robber could affect' do
       player = Player.new(@board, 'green')
@@ -34,22 +38,59 @@ describe Board do
 
   describe '#hexes_adjacent_to' do
     it 'works with one' do
-      @board.hexes_adjacent_to(h(2,3)).size.must_equal 6
-      (@board.hexes_adjacent_to(h(2,3)).map{|h| [h.x, h.y]} -
-        [[1,3],[2,2],[3,2],[3,3],[2,4],[1,4]]).must_equal []
+      hexes = @board.hexes_adjacent_to h(2,3)
+      hexes.size.must_equal 6
+      assert_similar hexes, [h(1,3),h(2,2),h(3,2),h(3,3),h(2,4),h(1,4)]
     end
 
     it 'works with two' do
-      @board.hexes_adjacent_to(h(2,3), h(3,2)).size.must_equal 2
-      (@board.hexes_adjacent_to(h(2,3), h(3,2)).map{|h| [h.x, h.y]} -
-        [[2,2],[3,3]]).must_equal []
+      hexes = @board.hexes_adjacent_to(h(2,3), h(3,2))
+      hexes.size.must_equal 2
+      assert_similar hexes, [h(2,2), h(3,3)]
     end
   end
 
-  describe '#road_to?' do
+  describe '#roads_to and #road_to?' do
+    before do
+      @rg1 = Road.new(h(2,3), h(2,4), 'green')
+      @rb1 = Road.new(h(2,3), h(3,3), 'black')
+      @rg2 = Road.new(h(1,3), h(2,3), 'green')
+      @rb2 = Road.new(h(2,4), h(3,4), 'black')
+      @board.roads = [@rg1, @rb1, @rg2, @rb2]
+    end
 
+    it 'considers color' do
+      green = @board.roads_to(h(2,3), h(2,4), h(3,3), 'green')
+      black = @board.roads_to(h(2,3), h(2,4), h(3,3), 'black')
+      assert_similar green, [@rg1]
+      assert_similar black, [@rb1, @rb2]
+    end
+
+    it "doesn't get confused by nearby roads" do
+      arg1 = [h(2,2), h(2,3), h(3,2), 'green']
+      arg2 = [h(2,2), h(1,3), h(1,2), 'green']
+      arg3 = [h(0,4), h(1,3), h(1,4), 'green']
+      arg4 = [h(2,3), h(1,3), h(1,4), 'green']
+      arg5 = [h(2,2), h(1,3), h(2,3), 'green']
+      @board.roads_to(*arg1).must_equal []
+      @board.roads_to(*arg2).must_equal []
+      @board.roads_to(*arg3).must_equal []
+      @board.roads_to(*arg4).must_equal [@rg2]
+      @board.roads_to(*arg5).must_equal [@rg2]
+      @board.road_to?(*arg1).must_equal false
+      @board.road_to?(*arg2).must_equal false
+      @board.road_to?(*arg3).must_equal false
+      @board.road_to?(*arg4).must_equal true
+      @board.road_to?(*arg5).must_equal true
+    end
   end
-  #describe '#roads_to'
+
+  #describe '#road_to?' do
+    #before do
+      #@
+    #end
+
+  #end
   #describe '#settlement_at?'
   #describe '#road_buildable_at?'
   #describe '#settlement_near?'

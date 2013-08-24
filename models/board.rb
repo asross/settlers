@@ -59,6 +59,10 @@ class Board
     robbable
   end
 
+  def size
+    side_length*2 + 1
+  end
+
   def hexes_adjacent_to(hex1, hex2=nil)
     positions = hex1.adjacencies
     positions = hex2.adjacencies & positions if hex2
@@ -66,33 +70,17 @@ class Board
   end
   
   def road_to?(hex1, hex2, hex3, color) 
-    for road in roads
-      r1 = road.hexes - [hex1, hex2] # true if there's a road between hex1 and hex2
-      r2 = road.hexes - [hex1, hex3] # true if there's a road between hex1 and hex3
-      r3 = road.hexes == [hex2, hex3] # true if there's a road between hex2 and hex3
-      next unless r1 || r2 || r3
-      return true if road.color == color
-    end
-    false
+    roads_to(hex1, hex2, hex3, color).any?
   end
   
   def roads_to(hex1, hex2, hex3, color)
     result = []
-    # if there's a settlement not of our color, longest road is blocked so don't return anything
-    if settlement_at?(hex1, hex2, hex3) and !settlement_at?(hex1, hex2, hex3, color=color)
-      return result
-    end
     for road in roads
-      r1 = [hex1, hex2] & road.hexes == [hex1, hex2] # true if there's a road between hex1 and hex2
-      r2 = [hex1, hex3] & road.hexes == [hex1, hex3] # true if there's a road between hex1 and hex3
-      r3 = [hex2, hex3] & road.hexes == [hex2, hex3] # true if there's a road between hex2 and hex3
-      if r1 or (r2 or r3)
-        if road.color == color
-          result << road
-        end
-      end
+      next unless road.color == color
+      next unless [hex1, hex2, hex3].permutation(2).include?(road.hexes)
+      result << road
     end
-    return result
+    result
   end
   
   def settlement_at?(hex1, hex2, hex3, color=nil, just_settlements=false)
@@ -120,12 +108,12 @@ class Board
     # find the adjacent hexes
     hex3s = hexes_adjacent_to(hex1, hex2)
     # if there's a settlement nearby, return true
-    if settlement_at?(hex1, hex2, hex3s[0], color=color) or settlement_at?(hex1, hex2, hex3s[1], color=color)
+    if settlement_at?(hex1, hex2, hex3s[0], color) or settlement_at?(hex1, hex2, hex3s[1], color)
       #puts "Can build road because of a nearby settlement! Woohoo!"
       return true
     end   
     # if there's a road of our color leading to this one (not blocked by a settlement), return true
-    if (road_to?(hex1, hex2, hex3s[0], color=color) and !settlement_at?(hex1, hex2, hex3s[0])) or (road_to?(hex1, hex2, hex3s[1], color=color) and !settlement_at?(hex1, hex2, hex3s[1]))
+    if (road_to?(hex1, hex2, hex3s[0], color) and !settlement_at?(hex1, hex2, hex3s[0])) or (road_to?(hex1, hex2, hex3s[1], color) and !settlement_at?(hex1, hex2, hex3s[1]))
       #puts "Can build road because of a leading road. Woohoo!"
       return true
     end
