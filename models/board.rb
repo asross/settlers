@@ -10,7 +10,6 @@ class Board
   end
 
   def self.create(side_length=3)
-    hexes = []
     tokens = TOKENS.dup.cycle
     hex_types = HEX_TYPES.dup.shuffle.cycle
 

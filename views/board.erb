@@ -67,8 +67,14 @@
   }
   #chat #message-area {
     height: 175px;
-    width: 100%;
     background-color: #eee;
+    padding: 1em;
+    overflow: scroll;
+  }
+  #chat #message-area ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
   #chat form input {
     width: 100%;
@@ -110,8 +116,14 @@
 <% end %>
 
 <div id='chat'>
-  <div id='message-area'></div>
-  <form action='/messages'>
-    <input type='text' placeholder='message...'>
+  <div id='message-area'>
+    <ul>
+      <% @messages.each do |message| %>
+        <li> <%= message %> </li>
+      <% end %>
+    </ul>
+  </div>
+  <form action='/messages' method='post'>
+    <input type='text' name='message' placeholder='message...'>
   </form>
 </div>
