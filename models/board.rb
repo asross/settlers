@@ -52,9 +52,10 @@ class Board
     @robbed_hex.robbed = true
     robbable = []
     for s in settlements
-      if s.hexes.include?(hex) && s.player != player && !robbable.include?(s.player)
-        robbable << s.player
-      end
+      next unless s.hexes.include?(hex)
+      next if s.player == player
+      next if robbable.include? player
+      robbable << s.player
     end
     robbable
   end
@@ -82,19 +83,17 @@ class Board
     end
     result
   end
+
+  def settlement_at(hex1, hex2, hex3)
+    settlements.select{|s| s.hexes - [hex1, hex2, hex3] == []}.first
+  end
   
   def settlement_at?(hex1, hex2, hex3, color=nil, just_settlements=false)
-    result = false
-    for city in settlements
-      if [hex1, hex2, hex3] & city.hexes == [hex1, hex2, hex3]
-        if color.nil? or city.color == color
-          if !just_settlements or city.size == 1
-            result = true
-          end
-        end
-      end
-    end
-    return result
+    settlement = settlement_at(hex1, hex2, hex3)
+    return false unless settlement
+    return false if color && color != settlement.color
+    return false if just_settlements && settlement.size != 1
+    true
   end
   
   def road_buildable_at?(hex1, hex2, color)

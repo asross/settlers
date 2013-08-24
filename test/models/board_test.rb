@@ -15,6 +15,14 @@ describe Board do
   end
 
   describe '#move_robber_to' do
+    before do
+      # Initialize the robber at a particular location
+      # to prevent sporadic failures
+      @board.robbed_hex.robbed = false
+      @board.robbed_hex = h(1,1)
+      @board.robbed_hex.robbed = true
+    end
+
     it 'returns a list of all players the robber could affect' do
       player = Player.new(@board, 'green')
       raises('invalid robber location') { @board.move_robber_to(20,20,player) }
@@ -85,13 +93,29 @@ describe Board do
     end
   end
 
-  #describe '#road_to?' do
-    #before do
-      #@
-    #end
+  describe '#settlement_at?' do
+    before do
+      @player = Player.new(@board, 'gray')
+      @settlement = Settlement.new(h(2,3),h(3,2),h(3,3), @player)
+      @board.settlements << @settlement
+    end
 
-  #end
-  #describe '#settlement_at?'
+    it 'returns true only if a settlement is there' do
+      @board.settlement_at?(h(2,3),h(3,2),h(2,2)).must_equal false
+      @board.settlement_at?(h(2,3),h(3,2),h(3,3)).must_equal true
+    end
+
+    it 'considers color' do
+      @board.settlement_at?(h(2,3),h(3,2),h(3,3),'black').must_equal false
+      @board.settlement_at?(h(2,3),h(3,2),h(3,3),'gray').must_equal true
+    end
+
+    it 'can consider city status' do
+      @board.settlement_at?(h(2,3),h(3,2),h(3,3),'gray',true).must_equal true
+      @settlement.size = 2
+      @board.settlement_at?(h(2,3),h(3,2),h(3,3),'gray',true).must_equal false
+    end
+  end
   #describe '#road_buildable_at?'
   #describe '#settlement_near?'
   #describe '#upgrade_settlement'
