@@ -54,7 +54,7 @@
   }
   #chat {
     position: absolute;
-    top: <%= "#{@board.size*100}px" %>;
+    top: <%= "#{(1+@board.side_length*2)*100}px" %>;
     width: 630px; /* todo: figure out based on board size */
     height: 200px;
     border-top: 1px solid #ccc;
@@ -70,7 +70,7 @@
   <% @board.hexes.flatten.each do |hex| %>
     <%= "#h#{hex.x}-#{hex.y}" %> {
       position: absolute;
-      top: <%= "#{100*hex.y+50*hex.x-50*((@board.size-1)/2)}px" %>;
+      top: <%= "#{100*hex.y+50*hex.x-50*@board.side_length}px" %>;
       left: <%= "#{86.6*hex.x}px" %>;
     }
   <% end %>
@@ -89,8 +89,8 @@
 </div>
 
 <% @board.hexes.flatten.each do |hex| %>
-  <% next if hex.x + hex.y < (@board.size - 1) / 2 %>
-  <% next if hex.x + hex.y > 3*((@board.size - 1) / 2) %>
+  <% next if hex.x + hex.y < @board.side_length %>
+  <% next if hex.x + hex.y > 3*@board.side_length %>
   <%= erb :hex, layout: false, locals: { hex: hex } %>
 <% end %>
 

@@ -1,40 +1,40 @@
 class Board
   TOKENS = [5, 2, 6, 3, 8, 10, 9, 12, 11, 4, 8, 10, 9, 4, 5, 6, 3, 11]
   HEX_TYPES = %w(ore)*3 + %w(brick)*3 + %w(sheep)*4 + %w(wheat)*4 + %w(wood)*4 + %w(desert)
-  attr_accessor :settlements, :roads, :hexes, :robbed_hex, :longest_road_player, :longest_road_length, :size
+  attr_accessor :settlements, :roads, :hexes, :robbed_hex, :longest_road_player, :longest_road_length, :side_length
+
+  def self.on_island?(i,j,l)
+    return false unless (l+1..l*3-1).include?(i+j)
+    return false unless ([0,l*2] & [i,j]).size == 0
+    true
+  end
 
   def self.create(side_length=3)
     hexes = []
     tokens = TOKENS.dup.cycle
     hex_types = HEX_TYPES.dup.shuffle.cycle
 
-    size = side_length*2+1
-    size.times do |i|
-      hex_row = []
-      size.times do |j|
-        if (side_length+1..side_length*3-1).include?(i+j) && ([0,size-1] & [i,j]).size == 0
-          type = hex_types.next
-          token = (tokens.next unless type == 'desert')
-        else
-          type = 'water'
-          token = nil
-        end
-        hex_row << Hex.new(i, j, token, type, (type == 'desert'))
+    hexes = \
+    0.upto(side_length*2).map do |i|
+      0.upto(side_length*2).map do |j|
+        type  = (on_island?(i, j, side_length) ? hex_types.next : 'water')
+        token = (tokens.next unless %w(water desert).include?(type))
+        Hex.new(i, j, token, type)
       end
-      hexes << hex_row
     end
     
-    new(hexes, size)
+    new(hexes, side_length)
   end
 
   def error(msg)
     raise msg
   end
   
-  def initialize(hexes, size)
+  def initialize(hexes, side_length)
     @hexes = hexes
-    @size = size
+    @side_length = side_length
     @robbed_hex = hexes.flatten.select{|h| h.type == 'desert'}.first
+    @robbed_hex.robbed = true
     @settlements = []
     @roads = []
     @longest_road_player = nil
