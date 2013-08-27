@@ -21,14 +21,14 @@ class Board
         Hex.new(i, j, token, type)
       end
     end
-    
+
     new(hexes, side_length)
   end
 
   def error(msg)
     raise msg
   end
-  
+
   def initialize(hexes, side_length)
     @hexes = hexes
     @side_length = side_length
@@ -39,11 +39,11 @@ class Board
     @longest_road_player = nil
     @longest_road_length = 0
   end
-  
+
   def rolled(roll)
     settlements.each{|s| s.rolled(roll) }
   end
-  
+
   def move_robber_to(x, y, player)
     error 'invalid robber location' unless hexes[x] && hex = hexes[x][y]
     error 'cannot pick same location' if hex == @robbed_hex
@@ -69,11 +69,11 @@ class Board
     positions = hex2.adjacencies & positions if hex2
     positions.reject{|x,y| x >= size || y >= size}.map{|x,y| hexes[x][y] }
   end
-  
-  def road_to?(hex1, hex2, hex3, color) 
+
+  def road_to?(hex1, hex2, hex3, color)
     roads_to(hex1, hex2, hex3, color).any?
   end
-  
+
   def roads_to(hex1, hex2, hex3, color)
     result = []
     for road in roads
@@ -87,7 +87,7 @@ class Board
   def settlement_at(hex1, hex2, hex3)
     settlements.select{|s| s.hexes - [hex1, hex2, hex3] == []}.first
   end
-  
+
   def settlement_at?(hex1, hex2, hex3, color=nil, just_settlements=false)
     settlement = settlement_at(hex1, hex2, hex3)
     return false unless settlement
@@ -99,7 +99,7 @@ class Board
   def road_at(hex1, hex2)
     roads.select{|r| r.hexes - [hex1, hex2] == []}.first
   end
-  
+
   def road_buildable_at?(hex1, hex2, color)
     return false if road_at(hex1, hex2)
     for hex in hexes_adjacent_to(hex1, hex2)
@@ -109,80 +109,52 @@ class Board
     end
     false
   end
-  
+
   def settlement_near?(hex1, hex2, hex3)
-    hex12s = hexes_adjacent_to(hex1, hex2)
-    hex13s = hexes_adjacent_to(hex1, hex3)
-    hex23s = hexes_adjacent_to(hex2, hex3)
-    if settlement_at?(hex1, hex2, hex12s[0]) or settlement_at?(hex1, hex2, hex12s[1])
-      return true
-    elsif settlement_at?(hex1, hex3, hex13s[0]) or settlement_at?(hex1, hex3, hex13s[1])
-      return true
-    elsif settlement_at?(hex2, hex3, hex23s[0]) or settlement_at?(hex2, hex3, hex23s[1])
-      return true
-    else
-      return false
+    [hex1, hex2, hex3].combination(2).each do |h1, h2|
+      return true if hexes_adjacent_to(h1,h2).any?{|h| settlement_at?(h,h1,h2) }
     end
+    false
   end
-  
-  def upgrade_settlement(hex1, hex2, hex3)
-    for city in settlements
-      if [hex1, hex2, hex3] & city.hexes == [hex1, hex2, hex3]
-        # could assert city.size = 1 here
-        city.size = 2   # if ruby really works by reference, this should stick.
+
+  def longest_road_length(color)
+    roads.select{|r| r.color == color}.map{|r| longest_path_from(r)}.max
+  end
+
+  def longest_path_from(road, visited=[road], last_vertex=[])
+    successors = []
+
+    hexes_adjacent_to(*road.hexes).each do |hex|
+      vertex = road.hexes + [hex]
+      settle = settlement_at(*vertex)
+
+      next if settle && settle.color != road.color
+      next if vertex - last_vertex == []
+
+      roads_to(*vertex, road.color).each do |r|
+        next if visited.include?(r)
+        successors << [r,vertex]
       end
     end
+
+    return visited.length unless successors.any?
+
+    successors.map do |r,vertex|
+      longest_path_from(r, visited+[r], vertex)
+    end.max
   end
-  
-  
+
+
   def check_for_longest_road(player)
-    #puts "entering check_for_longest_road"
-    # first define recursive function used to find length of road chain
-    def find_length(rhode, color, previous_roads=[rhode])
-      #puts "entering find_length"
-      adjHexes = hexes_adjacent_to(rhode.hexes[0], rhode.hexes[1])
-      rhodes = roads_to(rhode.hexes[0], rhode.hexes[1], adjHexes[0], color)
-      rhodes.concat(roads_to(rhode.hexes[0], rhode.hexes[1], adjHexes[1], color))
-      #puts "rhodes.empty? is #{rhodes.empty?}"
-      new_roads = []
-      for rowed in rhodes
-        if ([rowed] & previous_roads).empty?
-          new_roads << rowed
-        end
-      end
-      #puts "new_roads.empty? is #{new_roads.empty?}"
-      result = 0
-      for rowed in new_roads
-        temp_result = 1 + find_length(rowed, color, previous_roads + [rowed])
-        result = [result, temp_result].max
-      end
-      return result
-    end
-    # now call that recursive function for all the player's roads.
-    color = player.color
-    length = 0
-    for road in @roads
-      if road.color == color
-        l = find_length(road, color) + 1
-        #puts "l is #{l}"
-        if l > length
-          length = l
-        end
-      end
-    end
-    # if its result is longer than 5 and longer than the current longest road, give our player longest road
+    length = longest_road_length(player.color)
+
     if length >= 5 and length > @longest_road_length
-      if @longest_road_player != player
-        if !@longest_road_player.nil?
-          @longest_road_player.points -= 2
-        end
-        player.points += 2
+      unless @longest_road_player == player
+        @longest_road_player.points -= 2 if @longest_road_player
         @longest_road_player = player
-        puts "\n!!!!! Longest road obtained by #{color} !!!!!\n"
+        @longest_road_player.points += 2
       end
       @longest_road_length = length
     end
   end
 end
-
-

@@ -63,7 +63,8 @@ class Player
     error 'Not enough resources to build city' unless ore >= 3 && wheat >= 2
     @ore -= 3
     @wheat -= 2
-    board.upgrade_settlement(hex1, hex2, hex3)
+    s = board.settlement_at(hex1, hex2, hex3)
+    s.size = 2
     @n_settlements -= 1
     @points += 1
   end

@@ -122,12 +122,15 @@ describe Player do
     end
 
     it 'succeeds otherwise' do
-      @board.settlements << Settlement.new(@hex1, @hex2, @hex3, @player)
+      s = Settlement.new(@hex1, @hex2, @hex3, @player)
+      @board.settlements << s
       @player.ore = 3
       @player.wheat = 2
       @player.points = 1
       @player.n_settlements = 1
+      s.size.must_equal 1
       @player.build_city(@hex1, @hex2, @hex3)
+      s.size.must_equal 2
       @player.points.must_equal 2
       @player.ore.must_equal 0
       @player.wheat.must_equal 0

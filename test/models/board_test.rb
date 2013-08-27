@@ -162,8 +162,124 @@ describe Board do
       @board.road_buildable_at?(h(1,4), h(2,3), 'red').must_equal true
     end
   end
-  #describe '#settlement_near?'
-  #describe '#upgrade_settlement'
-  #describe '#check_for_longest_road'
 
+  describe '#settlement_near?' do
+    before do
+      player = Player.new(@board, 'emerald')
+      @board.settlements << Settlement.new(h(2,5),h(3,4),h(2,4), player)
+    end
+
+    it 'returns true for locations 0 and 1 away, false otherwise' do
+      @board.settlement_near?(h(2,5),h(3,4),h(2,4)).must_equal true
+
+      @board.settlement_near?(h(2,5),h(1,5),h(2,4)).must_equal true
+      @board.settlement_near?(h(2,5),h(3,4),h(3,5)).must_equal true
+      @board.settlement_near?(h(3,3),h(3,4),h(2,4)).must_equal true
+
+      @board.settlement_near?(h(1,4),h(1,5),h(2,4)).must_equal false
+      @board.settlement_near?(h(2,5),h(2,6),h(3,5)).must_equal false
+      @board.settlement_near?(h(3,3),h(3,4),h(4,3)).must_equal false
+    end
+  end
+
+  describe '#max_road_length' do
+
+  end
+
+  describe '#check_for_longest_road' do
+    it 'straightish line' do
+      @board.roads << (r1 = Road.new(h(2,5),h(3,5),'blue')) #  /
+      @board.roads << (r2 = Road.new(h(2,5),h(3,4),'blue')) # /
+      @board.roads << (r3 = Road.new(h(2,4),h(3,4),'blue')) # \
+                                                            #  \
+      @board.longest_path_from(r1).must_equal 3             #  /
+      @board.longest_path_from(r2).must_equal 2             # /
+      @board.longest_path_from(r3).must_equal 3
+    end
+
+    it 'line with offshoots' do
+      @board.roads << (r1 = Road.new(h(2,5),h(3,5),'blue')) # \
+      @board.roads << (r2 = Road.new(h(3,4),h(3,5),'blue')) #  \  _ _
+      @board.roads << (r3 = Road.new(h(2,5),h(3,4),'blue')) #  /
+                                                            # /
+      @board.longest_path_from(r1).must_equal 2
+      @board.longest_path_from(r2).must_equal 2
+      @board.longest_path_from(r3).must_equal 2
+    end
+
+    it 'straight line with multiple colors' do
+      @board.roads << (rb1 = Road.new(h(2,2),h(3,1),'red'))
+      @board.roads << (rb2 = Road.new(h(3,2),h(3,1),'red'))
+      @board.roads << (rb3 = Road.new(h(3,2),h(4,1),'red'))
+      @board.roads << (rb4 = Road.new(h(4,2),h(4,1),'red'))
+      @board.roads << (ru1 = Road.new(h(4,2),h(5,1),'blue'))
+
+      @board.longest_path_from(rb1).must_equal 4
+      @board.longest_path_from(rb2).must_equal 3
+      @board.longest_path_from(rb3).must_equal 3
+      @board.longest_path_from(rb4).must_equal 4
+      @board.longest_path_from(ru1).must_equal 1
+    end
+
+    it 'halts at (offcolor) settlements' do
+      red_player = Player.new(@board, 'red')
+      blue_player = Player.new(@board, 'blue')
+      @board.roads << (rb1 = Road.new(h(2,2),h(3,1),'red'))
+      @board.roads << (rb2 = Road.new(h(3,2),h(3,1),'red'))
+      @board.settlements << Settlement.new(h(3,2),h(3,1),h(4,1),red_player)
+      @board.roads << (rb3 = Road.new(h(3,2),h(4,1),'red'))
+      @board.roads << (rb4 = Road.new(h(4,2),h(4,1),'red'))
+      @board.settlements << Settlement.new(h(4,2),h(4,1),h(5,1),blue_player)
+      @board.roads << (rb5 = Road.new(h(4,2),h(5,1),'red'))
+
+      @board.longest_path_from(rb1).must_equal 4
+      @board.longest_path_from(rb2).must_equal 3
+      @board.longest_path_from(rb3).must_equal 3
+      @board.longest_path_from(rb4).must_equal 4
+      @board.longest_path_from(rb5).must_equal 1
+
+      @board.longest_road_length('red').must_equal 4
+    end
+
+    it 'simple cycle' do
+      @board.roads << (r1 = Road.new(h(2,5),h(3,4),'topaz'))
+      @board.roads << (r2 = Road.new(h(3,5),h(3,4),'topaz'))
+      @board.roads << (r3 = Road.new(h(4,4),h(3,4),'topaz'))
+      @board.roads << (r4 = Road.new(h(4,3),h(3,4),'topaz'))
+      @board.roads << (r5 = Road.new(h(3,3),h(3,4),'topaz'))
+      @board.roads << (r6 = Road.new(h(2,4),h(3,4),'topaz'))
+      @board.roads << (r7 = Road.new(h(2,4),h(2,5),'topaz'))
+
+      @board.longest_path_from(r1).must_equal 7
+      @board.longest_path_from(r2).must_equal 6
+      @board.longest_path_from(r3).must_equal 6
+      @board.longest_path_from(r4).must_equal 6
+      @board.longest_path_from(r5).must_equal 6
+      @board.longest_path_from(r6).must_equal 7
+      @board.longest_path_from(r7).must_equal 7
+
+      @board.longest_road_length('topaz').must_equal 7
+    end
+
+    it 'complex cycle' do
+      @board.roads << (r1 = Road.new(h(2,5),h(3,4),'aquamarine'))
+      @board.roads << (r2 = Road.new(h(3,5),h(3,4),'aquamarine'))
+      @board.roads << (r3 = Road.new(h(4,4),h(3,4),'aquamarine'))
+      @board.roads << (r4 = Road.new(h(4,3),h(3,4),'aquamarine'))
+      @board.roads << (r5 = Road.new(h(3,3),h(3,4),'aquamarine'))
+      @board.roads << (r6 = Road.new(h(2,4),h(3,4),'aquamarine'))
+      @board.roads << (r7 = Road.new(h(4,4),h(4,3),'aquamarine'))
+      @board.roads << (r8 = Road.new(h(5,3),h(4,3),'aquamarine'))
+      @board.roads << (r9 = Road.new(h(5,2),h(4,3),'aquamarine'))
+      @board.roads << (r10 = Road.new(h(4,2),h(4,3),'aquamarine'))
+      @board.roads << (r11 = Road.new(h(3,3),h(4,3),'aquamarine'))
+      @board.roads << (r12 = Road.new(h(3,3),h(4,2),'aquamarine'))
+      @board.roads << (r13 = Road.new(h(5,3),h(5,2),'aquamarine'))
+      @board.roads << (r14 = Road.new(h(6,2),h(5,2),'aquamarine'))
+
+      @board.longest_path_from(r14).must_equal 12
+
+      @board.longest_road_length('aquamarine').must_equal 12
+    end
+  end
 end
