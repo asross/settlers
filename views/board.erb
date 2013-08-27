@@ -85,7 +85,17 @@
     top: 0;
     height: <%= 200 + @board.size*height %>px;
     border-left: 1px solid #ccc;
-    width: 500px;
+    border-right: 1px solid #ccc;
+    width: 300px;
+  }
+  #players .player {
+    width: 100%;
+    background-color: #f8f8f8;
+    border-top: 1px solid #ccc;
+    padding: 1em 0;
+  }
+  #players .player .name {
+    padding: 0 1em;
   }
 
   <% @board.hexes.flatten.each do |hex| %>
@@ -107,6 +117,14 @@
 </script>
 
 <div id='players'>
+  <div class='player'>
+    <span class='name'><%= %w(Waldo Jim Nancy Brutus Margaret Cynthia).sample %></span>
+  </div>
+  <div class='player'>
+    <span class='name'><%= %w(Hungarius Murdock Sandy Greta Fred).sample %></span>
+  </div>
+  <div class='active-player'>
+  </div>
 </div>
 
 <% @board.hexes.flatten.each do |hex| %>
