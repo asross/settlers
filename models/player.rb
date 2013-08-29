@@ -22,6 +22,18 @@ class Player
     send("#{resource}=", send(resource)+n)
   end
 
+  def resource_cards
+    %w(sheep wheat brick wood ore).map{|r| [r]*send(r)}.flatten
+  end
+
+  def steal_from(other)
+    error 'Cannot steal from yourself' if other == self
+    if resource = other.resource_cards.shuffle.first
+      self.increment(resource, 1)
+      other.increment(resource, -1)
+    end
+  end
+
   def trade_in(resource1, resource2, n)
     error 'Not enough resources to trade' unless send(resource1) >= n
     increment(resource1, -n)

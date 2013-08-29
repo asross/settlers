@@ -99,6 +99,29 @@ describe Player do
     end
   end
 
+  describe 'steal' do
+    before do
+      @player.wood = 2
+      @player.brick = 1
+      @player.ore = 1
+    end
+
+    it '#resource_cards' do
+      @player.resource_cards.must_equal %w(brick wood wood ore)
+    end
+
+    it '#steal_from' do
+      other_player = Player.new(@board, 'umber')
+      4.times { other_player.steal_from(@player) }
+      @player.wood.must_equal 0
+      @player.brick.must_equal 0
+      @player.ore.must_equal 0
+      other_player.wood.must_equal 2
+      other_player.brick.must_equal 1
+      other_player.ore.must_equal 1
+    end
+  end
+
   describe '#build_city' do
     before do
       @hex1 = @board.hexes[3][2]
