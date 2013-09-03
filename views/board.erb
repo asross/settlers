@@ -142,7 +142,10 @@
       <span class='name'>
         <%= player.color %>
       </span>
-      <%= player.points %> 
+      <%= player.points %> VP
+      <span class='name'>
+        <%= player.resource_cards.count %> resources
+      </span>
 
       <% if player == @player %>
         <div class='info'>
