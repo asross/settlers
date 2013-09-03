@@ -1,6 +1,19 @@
-<div class='hex' id='<%= "h#{hex.x}-#{hex.y}" %>'>
-  <div class='tile first <%= hex.type %>'></div>
-  <div class='tile second <%= hex.type %>'></div>
-  <div class='tile third <%= hex.type %>'></div>
+<% here    = [hex.x,   hex.y  ] %>
+<% top     = [hex.x,   hex.y-1] %>
+<% topleft = [hex.x-1, hex.y  ] %>
+<% botleft = [hex.x-1, hex.y+1] %>
+
+<div class='hex' data-coords='<%= here %>'>
+  <div class='tile first <%= hex.type %>'>
+    <div class='road-marker botleft' data-coords='<%= [here, botleft] %>'></div>
+  </div>
+  <div class='tile second <%= hex.type %>'>
+    <div class='city-marker' data-coords='<%= [here, topleft, botleft] %>'></div>
+    <div class='road-marker' data-coords='<%= [here, topleft] %>'></div>
+  </div>
+  <div class='tile third <%= hex.type %>'>
+    <div class='city-marker' data-coords='<%= [here, top, topleft] %>'></div>
+    <div class='road-marker' data-coords='<%= [here, top] %>'></div>
+  </div>
   <div class='number'><%= hex.number %></div>
 </div>

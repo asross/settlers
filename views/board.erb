@@ -11,6 +11,31 @@
     height: <%= height %>px;
     margin-left: <%= margin %>px;
   }
+  <% road_height = 15 %>
+  .road-marker {
+    position: relative;
+    top: <%= -road_height/2.0 %>px;
+    height: <%= road_height %>px;
+    width: <%= width - road_height %>px;
+    margin: 0 auto;
+    z-index: 2;
+  }
+  .road-marker.botleft {
+    top: <%= height - road_height/2.0 %>px;
+  }
+
+  <% city_height = 30 %>
+  .city-marker {
+    float: left;
+    z-index: 3;
+    position: relative;
+    top: <%= -city_height/2 %>px;
+    left: <%= -city_height/2 %>px;
+    width: <%= city_height %>px;
+    height: <%= city_height %>px;
+    border-radius: <%= city_height %>px;
+  }
+
   .tile.water {
     background-color: cornflowerblue;
   }
@@ -31,6 +56,12 @@
   }
   .tile.desert {
     background-color: moccasin;
+  }
+  .hex.hover .tile {
+    background-color: #ccc;
+  }
+  .hex:hover .tile {
+    background-color: #ccc;
   }
   .tile.first {
     -webkit-transform: rotateZ(60deg);
@@ -105,7 +136,7 @@
   }
 
   <% @board.hexes.flatten.each do |hex| %>
-    <%= "#h#{hex.x}-#{hex.y}" %> {
+    .hex[data-coords=<%= "\"#{[hex.x, hex.y]}\""%>] {
       position: absolute;
       top: <%= hex.y*height + (hex.x-@board.side_length)*(height/2.0) %>px;
       left: <%= hex.x*height*Math.sqrt(3)/2.0 %>px;
@@ -128,8 +159,25 @@
 <script type="text/javascript">
   $(document).ready(function() {
       $('.tile, .number').click(function() {
-        console.log($(this).closest('.hex').attr('id'));
+        console.log($(this).closest('.hex').data('coords'));
       });
+
+      function hex(coords) {
+        return $('.hex[data-coords="['+coords[0]+', '+coords[1]+']"]');
+      }
+
+      $('.city-marker, .road-marker').hover(
+        function() {
+          coords = $(this).data('coords');
+          for (i = 0; i < coords.length; i++)
+            hex(coords[i]).addClass('hover');
+        },
+        function () {
+          coords = $(this).data('coords');
+          for (i = 0; i < coords.length; i++)
+            hex(coords[i]).removeClass('hover');
+        }
+      );
   });
 </script>
 
