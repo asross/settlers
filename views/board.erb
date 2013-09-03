@@ -90,12 +90,18 @@
   }
   #players .player {
     width: 100%;
-    background-color: #f8f8f8;
+    <%#background-color: #f8f8f8;%>
     border-top: 1px solid #ccc;
     padding: 1em 0;
   }
   #players .player .name {
     padding: 0 1em;
+  }
+  #players .player ul {
+    list-style: none;
+  }
+  #players .player .buttons {
+    padding-left: 2em;
   }
 
   <% @board.hexes.flatten.each do |hex| %>
@@ -103,6 +109,17 @@
       position: absolute;
       top: <%= hex.y*height + (hex.x-@board.side_length)*(height/2.0) %>px;
       left: <%= hex.x*height*Math.sqrt(3)/2.0 %>px;
+    }
+  <% end %>
+
+  #players .player.current {
+  }
+  #players .player.active {
+    border: 2px solid red;
+  }
+  <% @game.players.each_with_index do |player, i| %>
+    <%= "#p#{i}" %> {
+      background-color: <%= player.color %>;
     }
   <% end %>
 </style>
@@ -117,14 +134,39 @@
 </script>
 
 <div id='players'>
-  <div class='player'>
-    <span class='name'><%= %w(Waldo Jim Nancy Brutus Margaret Cynthia).sample %></span>
-  </div>
-  <div class='player'>
-    <span class='name'><%= %w(Hungarius Murdock Sandy Greta Fred).sample %></span>
-  </div>
-  <div class='active-player'>
-  </div>
+
+  <% @game.players.each_with_index do |player, i| %>
+
+    <div id='p<%=i%>' class='player <%= 'active' if player == @game.active_player %> <%= 'current' if player == @player %>'>
+
+      <span class='name'>
+        <%= player.color %>
+      </span>
+      <%= player.points %> 
+
+      <% if player == @player %>
+        <div class='info'>
+          <ul>
+            <% %w(ore wheat sheep wood brick).each do |resource| %>
+              <li>
+                <%= player.send(resource) %>
+                <%= resource %>
+              </li>
+            <% end %>
+          </ul>
+          <div class='buttons'>
+            <button>road</button>
+            <button>settlement</button>
+            <button>city</button>
+            <button>trade</button>
+          </div>
+        </div>
+      <% end %>
+
+    </div>
+
+  <% end %>
+
 </div>
 
 <% @board.hexes.flatten.each do |hex| %>
