@@ -32,7 +32,7 @@ class Board
   def initialize(hexes, side_length)
     @hexes = hexes
     @side_length = side_length
-    @robbed_hex = hexes.flatten.select{|h| h.type == 'desert'}.first
+    @robbed_hex = hexes.flatten.detect{|h| h.type == 'desert'}
     @robbed_hex.robbed = true
     @settlements = []
     @roads = []
@@ -85,7 +85,7 @@ class Board
   end
 
   def settlement_at(hex1, hex2, hex3)
-    settlements.select{|s| s.hexes - [hex1, hex2, hex3] == []}.first
+    settlements.detect{|s| s.hexes - [hex1, hex2, hex3] == []}
   end
 
   def settlement_at?(hex1, hex2, hex3, color=nil, just_settlements=false)
@@ -97,7 +97,7 @@ class Board
   end
 
   def road_at(hex1, hex2)
-    roads.select{|r| r.hexes - [hex1, hex2] == []}.first
+    roads.detect{|r| r.hexes - [hex1, hex2] == []}
   end
 
   def road_buildable_at?(hex1, hex2, color)
