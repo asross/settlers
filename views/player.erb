@@ -1,0 +1,36 @@
+<% i = @game.players.index(player) %>
+
+<div id='p<%=i%>' class='player <%= 'active' if player == @game.active_player %> <%= 'current' if player == @player %>'>
+
+  <span class='name'>
+    <%= player.color %>
+  </span>
+  <%= player.points %> VP
+  <span class='name'>
+    <%= player.resource_cards.count %> resources
+  </span>
+
+  <% if player == @player %>
+    <div class='info'>
+      <ul>
+        <% %w(ore wheat sheep wood brick).each do |resource| %>
+          <li>
+          <%= player.send(resource) %>
+          <%= resource %>
+          </li>
+        <% end %>
+      </ul>
+      <div class='buttons'>
+        <div class='road-image'></div>
+        <div class='settlement-image'></div>
+        <div class='city-image'></div>
+        <%#<button>road</button>%>
+        <%#<button>settlement</button>%>
+        <%#<button>city</button>%>
+        <button>trade</button>
+      </div>
+    </div>
+  <% end %>
+
+</div>
+

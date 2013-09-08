@@ -182,42 +182,9 @@
 </script>
 
 <div id='players'>
-
-  <% @game.players.each_with_index do |player, i| %>
-
-    <div id='p<%=i%>' class='player <%= 'active' if player == @game.active_player %> <%= 'current' if player == @player %>'>
-
-      <span class='name'>
-        <%= player.color %>
-      </span>
-      <%= player.points %> VP
-      <span class='name'>
-        <%= player.resource_cards.count %> resources
-      </span>
-
-      <% if player == @player %>
-        <div class='info'>
-          <ul>
-            <% %w(ore wheat sheep wood brick).each do |resource| %>
-              <li>
-                <%= player.send(resource) %>
-                <%= resource %>
-              </li>
-            <% end %>
-          </ul>
-          <div class='buttons'>
-            <button>road</button>
-            <button>settlement</button>
-            <button>city</button>
-            <button>trade</button>
-          </div>
-        </div>
-      <% end %>
-
-    </div>
-
+  <% @game.players.each do |player| %>
+    <%= erb :player, layout: false, locals: { player: player } %>
   <% end %>
-
 </div>
 
 <% @board.hexes.flatten.each do |hex| %>
