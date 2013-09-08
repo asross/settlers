@@ -13,8 +13,6 @@ before do
 end
 
 get '/' do
-  @board = @game.board
-  @messages = @game.messages
   erb :board
 end
 

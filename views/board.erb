@@ -97,7 +97,7 @@
   }
   #chat {
     position: absolute;
-    top: <%= @board.size*height %>px;
+    top: <%= @game.board.size*height %>px;
     width: <%= 2*margin + 10*width %>px;
     height: 200px;
     border-top: 1px solid #ccc;
@@ -120,7 +120,7 @@
     position: absolute;
     left: <%= 2*margin + 10*width %>px;
     top: 0;
-    height: <%= 200 + @board.size*height %>px;
+    height: <%= 200 + @game.board.size*height %>px;
     border-left: 1px solid #ccc;
     border-right: 1px solid #ccc;
     width: 300px;
@@ -147,10 +147,10 @@
     content: '*';
   }
 
-  <% @board.hexes.flatten.each do |hex| %>
+  <% @game.board.hexes.flatten.each do |hex| %>
     .hex[data-coords=<%= "\"#{[hex.x, hex.y]}\""%>] {
       position: absolute;
-      top: <%= hex.y*height + (hex.x-@board.side_length)*(height/2.0) %>px;
+      top: <%= hex.y*height + (hex.x-@game.board.side_length)*(height/2.0) %>px;
       left: <%= hex.x*height*Math.sqrt(3)/2.0 %>px;
     }
   <% end %>
@@ -197,16 +197,16 @@
   <% end %>
 </div>
 
-<% @board.hexes.flatten.each do |hex| %>
-  <% next if hex.x + hex.y < @board.side_length %>
-  <% next if hex.x + hex.y > 3*@board.side_length %>
+<% @game.board.hexes.flatten.each do |hex| %>
+  <% next if hex.x + hex.y < @game.board.side_length %>
+  <% next if hex.x + hex.y > 3*@game.board.side_length %>
   <%= erb :hex, layout: false, locals: { hex: hex } %>
 <% end %>
 
 <div id='chat'>
   <div id='message-area'>
     <ul>
-      <% @messages.each do |message| %>
+      <% @game.messages.each do |message| %>
         <% if message.is_a?(Array) %>
           <li> <%= message.join(': ') %> </li>
         <% else %>
