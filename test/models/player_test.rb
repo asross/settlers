@@ -68,6 +68,25 @@ describe Player do
         @player.send(attr).must_equal 0
       end
     end
+
+    it "does not require roads or resources on turn1" do
+      @player.build_settlement(@hex1, @hex2, @hex3, true)
+      @player.points.must_equal 1
+      @player.n_settlements.must_equal 1
+      @player.sheep.must_equal 0
+      @player.wheat.must_equal 0
+      @player.wood.must_equal 0
+      @player.brick.must_equal 0
+    end
+
+    it "awards resources on turn2" do
+      @player.build_settlement(@hex1, @hex2, @hex3, false, true)
+      @player.points.must_equal 1
+      @player.n_settlements.must_equal 1
+      expected_total = 3
+      expected_total = 2 if [@hex1, @hex2, @hex3].map(&:type).include?('desert')
+      [@player.sheep, @player.wheat, @player.wood, @player.brick].inject(:+).must_equal expected_total
+    end
   end
 
   describe '#build_road' do
@@ -101,6 +120,13 @@ describe Player do
       [:brick, :wood].each do |attr|
         @player.send(attr).must_equal 0
       end
+    end
+
+    it 'does not require resources on a start turn' do
+      @board.roads << Road.new(@hex1, @hex3, @player.color)
+      @player.build_road(@hex1, @hex2, true)
+      @player.brick.must_equal 0
+      @player.wood.must_equal 0
     end
   end
 
