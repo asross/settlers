@@ -198,7 +198,11 @@
   <div id='message-area'>
     <ul>
       <% @messages.each do |message| %>
-        <li> <%= message %> </li>
+        <% if message.is_a?(Array) %>
+          <li> <%= message.join(': ') %> </li>
+        <% else %>
+          <li> <%= message %> </li>
+        <% end %>
       <% end %>
     </ul>
   </div>
