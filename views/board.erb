@@ -125,7 +125,7 @@
     border-top: 1px solid #ccc;
     padding: 1em 0;
   }
-  #players .player .name {
+  #players .player span {
     padding: 0 1em;
   }
   #players .player ul {
@@ -133,6 +133,12 @@
   }
   #players .player .buttons {
     padding-left: 2em;
+  }
+  #players .player.active .name {
+    font-weight: bold;
+  }
+  #players .player.active .name:before {
+    content: '*';
   }
 
   <% @board.hexes.flatten.each do |hex| %>
@@ -143,11 +149,6 @@
     }
   <% end %>
 
-  #players .player.current {
-  }
-  #players .player.active {
-    border: 2px solid red;
-  }
   <% @game.players.each_with_index do |player, i| %>
     <%= "#p#{i}" %> {
       background-color: <%= player.color %>;
