@@ -117,9 +117,8 @@ describe Player do
       @player.wood = 1
       @player.brick = 1
       @player.build_road(@hex1, @hex2)
-      [:brick, :wood].each do |attr|
-        @player.send(attr).must_equal 0
-      end
+      @player.brick.must_equal 0
+      @player.wood.must_equal 0
     end
 
     it 'does not require resources on a start turn' do
