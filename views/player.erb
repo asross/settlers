@@ -13,7 +13,7 @@
   <% if player == @player %>
     <div class='info'>
       <ul>
-        <% %w(ore wheat sheep wood brick).each do |resource| %>
+        <% Player::RESOURCE_CARDS.each do |resource| %>
           <li>
           <%= player.send(resource) %>
           <%= resource %>
