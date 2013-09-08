@@ -159,6 +159,9 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script type="text/javascript">
   $(document).ready(function() {
+      chat = document.getElementById('message-area');
+      chat.scrollTop = chat.scrollHeight;
+
       $('.tile, .number').click(function() {
         console.log($(this).closest('.hex').data('coords'));
       });
