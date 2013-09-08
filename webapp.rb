@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'pry'
+require_relative 'models/catan'
 Dir.glob('./models/*.rb').each { |f| require f }
 
 $game = Game.new

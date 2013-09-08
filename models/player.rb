@@ -1,5 +1,5 @@
-class Player
   attr_accessor :sheep, :wheat, :brick, :wood, :ore, :color, :points, :n_settlements, :n_roads, :board
+class Player < Catan
   
   def initialize(board, color)
     @board = board
@@ -14,8 +14,8 @@ class Player
     @ore = 0
   end
 
-  def error(msg)
-    raise msg
+  def inspect
+    "<Player: #{color}>"
   end
   
   def increment(resource, n)

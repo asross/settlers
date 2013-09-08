@@ -1,3 +1,4 @@
+require_relative 'models/catan'
 Dir.glob('./models/*.rb').each { |f| require f }
 
 
