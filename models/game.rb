@@ -1,9 +1,8 @@
-class Game
-
-  attr_accessor :messages
-  attr_accessor :board, :players, :turn
-  attr_accessor :state
-  attr_reader :last_roll
+class Game < Catan
+  STATES = [:preroll, :postroll, :robbing1, :robbing2, :start_turn1, :start_turn2]
+  ACTIONS = %w(roll build_settlement build_city build_road trade_in pass_turn move_robber rob_player)
+  attr_accessor :messages, :board, :players, :turn, :last_roll
+  attr_reader :state
   
   def initialize(board=nil, players=nil)
     @board = board || Board.create
@@ -12,6 +11,7 @@ class Game
     end
     @turn = 0
     @messages = []
+    @state = :start_turn1
   end
 
   def round
@@ -24,31 +24,35 @@ class Game
 
   def available_actions(player)
     return [] unless player == active_player  # eventually, could "accept trade request"
-    return r1_actions(player) if round == 1
-    return r2_actions(player) if round == 2
     
     case state
-    when :preroll  then %w(roll)
-    when :postroll then %w(build_settlement build_city build_road trade_in pass_turn)
-    when :robbing1 then %w(move_robber)
-    when :robbing2 then %w(rob_player)
+    when :preroll     then %w(roll)
+    when :postroll    then %w(build_settlement build_city build_road trade_in pass_turn)
+    when :robbing1    then %w(move_robber)
+    when :robbing2    then %w(rob_player)
+    when :start_turn1 then %w(build_settlement)
+    when :start_turn2 then %w(build_road)
+    else []
     end
   end
 
-  def error(msg)
-    raise msg
-  end
-
-  def perform_action(player, action, *args)
+  def perform_action(player, action, args)
     unless available_actions(player).include?(action)
       error "#{player.color} cannot perform #{action} at this time"
     end
     send(action, *args)
   end
 
+  def state=(s)
+    raise ArgumentError, "invalid state #{s}" unless STATES.include?(s)
+    @state = s
+  end
+
+
+  private
+
   def roll
-    @last_roll = 2 +rand(6) + rand(6)
-    @board.rolled(@last_roll)
+    @board.rolled(@last_roll = 2 +rand(6) + rand(6))
     if @last_roll == 7
       state = :robbing1
     else
@@ -56,66 +60,56 @@ class Game
     end
   end
 
-  def move_robber(x, y)
-    robbable = @board.move_robber_to(x, y, active_player)
-    
+  def rob_player(color)
+    robbee = @robbable.detect{|p| p.color == color}
+    error "invalid selection #{color} (must pick one of #{@robbable.join(', ')})" unless robbee
+    active_player.steal_from(robbee)
+    state = :postroll
+  end
+
+  def move_robber(v)
+    robbable = @board.move_robber_to(*v, active_player)
     case robbable.size
     when 0
-      state = :main
+      state = :postroll
     when 1
       active_player.steal_from(robbable.first)
-      state = :main
+      state = :postroll
     else
       @robbable = robbable
-      state = :choosing_robbee
+      state = :robbing2
     end
   end
 
-  def rob_player(color)
-    active_player.steal_from(players.detect{|p| p.color == color})
+  def build_road(v1, v2)
+    active_player.build_road(h(*v1), h(*v2), state == :start_turn2)
 
-    state = :main
+    if state == :start_turn2
+      @turn += 1
+      state = (round > 2) ? :preroll : :start_turn1
+    end
+  end
+
+  def build_city(v1, v2, v3)
+    active_player.build_city(h(*v1), h(*v2), h(*v3))
+  end
+
+  def build_settlement(v1, v2, v3)
+    active_player.build_settlement(h(*v1), h(*v2), h(*v3), round == 1, round == 2)
+
+    state = :start_turn2 if state == :start_turn1
+  end
+
+  def trade_in(r1, r2)
+    active_player.trade_in(r1, r2, 4) # TODO: make this dependent on ports
+  end
+
+  def pass_turn
+    @turn += 1
+    state = :preroll
   end
 
   def h(x, y)
     @board.hexes[x][y]
   end
-
-  def build_settlement(x1, y1, x2, y2, x3, y3)
-    active_player.build_settlement(h(x1,y1), h(x2,y2), h(x3,y3))
-  end
-
-
-  #state_transitions do
-    #within :pre_roll do
-      ## transition_from :play_knight => :pre_roll
-      #transition_from :roll => :main, :unless => ->(g) { g.roll == 7 }
-      #transition_from :roll => :place_robber, :
-    #end
-   
-    #within :main do
-      ## transition_from :play_card => :main, :unless => ->(g) { g.played_card_yet? }
-      #transition_from :build_settlement => :main
-      #transition_from :build_city => :main
-      #transition_from :build_road => :main
-      #transition_from :trade_in => :main
-      #transition_from 
-
-    #end
-    #transition_from 
-  #end
-  # (play knight)
-  # roll
-  # build settlement
-  # build city
-  # build road
-  # trade in
-  # (trade request)
-  # (buy card)
-  # (play card)
-  # pass turn
-  #
-  # move robber
-  # select player to steal from
-
 end
