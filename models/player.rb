@@ -1,5 +1,6 @@
-  attr_accessor :sheep, :wheat, :brick, :wood, :ore, :color, :points, :n_settlements, :n_roads, :board
 class Player < Catan
+  RESOURCE_CARDS = %w(sheep wheat brick wood ore)
+  attr_accessor *RESOURCE_CARDS, :color, :points, :n_settlements, :n_roads, :board
   
   def initialize(board, color)
     @board = board
@@ -7,11 +8,7 @@ class Player < Catan
     @points = 0
     @n_settlements = 0
     @n_roads = 0
-    @sheep = 0
-    @wheat = 0
-    @brick = 0
-    @wood = 0
-    @ore = 0
+    RESOURCE_CARDS.each{|r| instance_variable_set "@#{r}", 0 }
   end
 
   def inspect
@@ -19,11 +16,12 @@ class Player < Catan
   end
   
   def increment(resource, n)
+    error 'Bad resource card' unless RESOURCE_CARDS.include?(resource)
     send("#{resource}=", send(resource)+n)
   end
 
   def resource_cards
-    %w(sheep wheat brick wood ore).map{|r| [r]*send(r)}.flatten
+    RESOURCE_CARDS.map{|r| [r]*send(r)}.flatten
   end
 
   def steal_from(other)
@@ -35,6 +33,7 @@ class Player < Catan
   end
 
   def trade_in(resource1, resource2, n)
+    error 'Bad resource card' unless [resource1, resource2].all?{|r| RESOURCE_CARDS.include?(r) }
     error 'Not enough resources to trade' unless send(resource1) >= n
     increment(resource1, -n)
     increment(resource2, 1)

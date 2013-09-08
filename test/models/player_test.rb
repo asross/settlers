@@ -12,6 +12,11 @@ describe Player do
       raises('Not enough resources') { @player.trade_in('ore', 'wheat', 4) }
     end
 
+    it 'raises an error on invalid input' do
+      @player.points = 10
+      raises('Bad resource card') { @player.trade_in('points', 'wheat', 4) }
+    end
+
     it 'works if there are enough' do
       @player.sheep = 5
       @player.trade_in('sheep', 'wood', 3)
