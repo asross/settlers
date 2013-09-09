@@ -15,11 +15,11 @@ class Game < Catan
   end
 
   def round
-    turn % players.size
+    turn / players.size
   end
 
   def active_player
-    players[round]
+    players[turn % players.size]
   end
 
   def available_actions(player)
@@ -54,9 +54,9 @@ class Game < Catan
   def roll
     @board.rolled(@last_roll = 2 +rand(6) + rand(6))
     if @last_roll == 7
-      state = :robbing1
+      self.state = :robbing1
     else
-      state = :postroll
+      self.state = :postroll
     end
   end
 
@@ -64,20 +64,20 @@ class Game < Catan
     robbee = @robbable.detect{|p| p.color == color}
     error "invalid selection #{color} (must pick one of #{@robbable.join(', ')})" unless robbee
     active_player.steal_from(robbee)
-    state = :postroll
+    self.state = :postroll
   end
 
   def move_robber(v)
     robbable = @board.move_robber_to(*v, active_player)
     case robbable.size
     when 0
-      state = :postroll
+      self.state = :postroll
     when 1
       active_player.steal_from(robbable.first)
-      state = :postroll
+      self.state = :postroll
     else
       @robbable = robbable
-      state = :robbing2
+      self.state = :robbing2
     end
   end
 
@@ -86,7 +86,7 @@ class Game < Catan
 
     if state == :start_turn2
       @turn += 1
-      state = (round > 2) ? :preroll : :start_turn1
+      self.state = (round >= 2) ? :preroll : :start_turn1
     end
   end
 
@@ -95,9 +95,9 @@ class Game < Catan
   end
 
   def build_settlement(v1, v2, v3)
-    active_player.build_settlement(h(*v1), h(*v2), h(*v3), round == 1, round == 2)
+    active_player.build_settlement(h(*v1), h(*v2), h(*v3), round == 0, round == 1)
 
-    state = :start_turn2 if state == :start_turn1
+    self.state = :start_turn2 if state == :start_turn1
   end
 
   def trade_in(r1, r2)
@@ -106,7 +106,7 @@ class Game < Catan
 
   def pass_turn
     @turn += 1
-    state = :preroll
+    self.state = :preroll
   end
 
   def h(x, y)
