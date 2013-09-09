@@ -25,13 +25,13 @@ describe Game do
   describe 'round 1' do
     describe '#build_settlement' do
       before do
-        @game.turn = 0
         @game.perform_action(@player1, 'build_settlement', [[3,3],[3,2],[2,3]])
       end
 
       it 'updates state and board' do
         @board.settlements.count.must_equal 1
         @board.settlements.first.player.must_equal @player1
+        @player1.resource_cards.must_equal []
         @game.state.must_equal :start_turn2
         @game.turn.must_equal 0
         @game.round.must_equal 0
@@ -58,9 +58,38 @@ describe Game do
   end
 
   describe 'round 2' do
-    it '#build_settlement'
-    it 'nonfinal #build_road'
-    it 'final #build_road'
+    before do
+      @game.turn = 3
+      @game.active_player.must_equal @player1
+      @game.available_actions(@player1).must_equal %w(build_settlement)
+    end
+
+    describe '#build_settlement' do
+      before do
+        @game.perform_action(@player1, 'build_settlement', [[4,3],[4,4],[3,4]])
+      end
+
+      it 'updates state and board and awards resources' do
+        @board.settlements.count.must_equal 1
+        @board.settlements.first.player.must_equal @player1
+        assert @player1.resource_cards.count >= 2
+        @game.state.must_equal :start_turn2
+      end
+    end
+
+    describe 'final #build_road' do
+      before do
+        @game.turn = 5
+        @game.active_player.must_equal @player3
+        @game.perform_action(@player3, 'build_settlement', [[4,3],[4,4],[3,4]])
+        @game.state.must_equal :start_turn2
+        @game.perform_action(@player3, 'build_road', [[4,3],[4,4]])
+      end
+
+      it 'transitions to main game state machine' do
+        @game.state.must_equal :preroll
+      end
+    end
   end
 
   describe 'later rounds' do
