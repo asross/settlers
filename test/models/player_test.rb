@@ -83,9 +83,8 @@ describe Player do
       @player.build_settlement(@hex1, @hex2, @hex3, false, true)
       @player.points.must_equal 1
       @player.n_settlements.must_equal 1
-      expected_total = 3
-      expected_total = 2 if [@hex1, @hex2, @hex3].map(&:type).include?('desert')
-      [@player.sheep, @player.wheat, @player.wood, @player.brick].inject(:+).must_equal expected_total
+      expected_total = [@hex1, @hex2, @hex3].count{|h| Player::RESOURCE_CARDS.include?(h.type) }
+      [@player.ore, @player.sheep, @player.wheat, @player.wood, @player.brick].inject(:+).must_equal expected_total
     end
   end
 
