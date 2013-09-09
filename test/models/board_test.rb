@@ -6,14 +6,6 @@ describe Board do
     @board = Board.create
   end
 
-  def h(x,y)
-    @board.hexes[x][y]
-  end
-
-  def assert_similar(array1, array2)
-    (array1 - array2).must_equal []
-  end
-
   describe '#move_robber_to' do
     before do
       # Initialize the robber at a particular location
