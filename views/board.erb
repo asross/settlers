@@ -182,13 +182,11 @@
       $('.city-marker, .road-marker').hover(
         function() {
           coords = $(this).data('coords');
-          for (i = 0; i < coords.length; i++)
-            hex(coords[i]).addClass('hover');
+          for (i = 0; i < coords.length; i++) hex(coords[i]).addClass('hover');
         },
         function () {
           coords = $(this).data('coords');
-          for (i = 0; i < coords.length; i++)
-            hex(coords[i]).removeClass('hover');
+          for (i = 0; i < coords.length; i++) hex(coords[i]).removeClass('hover');
         }
       );
   });
