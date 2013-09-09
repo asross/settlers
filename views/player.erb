@@ -21,13 +21,14 @@
         <% end %>
       </ul>
       <div class='buttons'>
-        <div class='road-image'></div>
-        <div class='settlement-image'></div>
-        <div class='city-image'></div>
-        <%#<button>road</button>%>
-        <%#<button>settlement</button>%>
-        <%#<button>city</button>%>
-        <button>trade</button>
+        <% available = @game.available_actions(@player) %>
+        <% Game::ACTIONS.each do |action| %>
+          <% if available.include?(action) %>
+            <button id='<%= action %>'> <%= action %> </button>
+          <% else %>
+            <button disabled='disabled'> <%= action %> </button>
+          <% end %>
+        <% end %>
       </div>
     </div>
   <% end %>
