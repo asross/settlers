@@ -1,7 +1,7 @@
 class Game < Catan
   STATES = [:preroll, :postroll, :robbing1, :robbing2, :start_turn1, :start_turn2]
   ACTIONS = %w(roll build_settlement build_city build_road trade_in pass_turn move_robber rob_player)
-  attr_accessor :messages, :board, :players, :turn, :last_roll
+  attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable
   attr_reader :state
   
   def initialize(board=nil, players=nil)
@@ -69,6 +69,7 @@ class Game < Catan
     robbee = @robbable.detect{|p| p.color == color}
     error "invalid selection #{color} (must pick one of #{@robbable.join(', ')})" unless robbee
     active_player.steal_from(robbee)
+    @robbable = nil
     self.state = :postroll
   end
 

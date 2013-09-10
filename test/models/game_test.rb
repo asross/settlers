@@ -129,12 +129,53 @@ describe Game do
       end
     end
 
+    describe '#move_robber' do
+      before do
+        @game.state = :robbing1
+        @board.robbed_hex.type.must_equal 'desert'
+        @board.move_robber_to(3, 5, @player1) unless h(3,5).robbed
+        @board.settlements << Settlement.new(h(3,3), h(3,4), h(4,3), @player1)
+        @board.settlements << Settlement.new(h(3,3), h(3,2), h(4,2), @player2)
+        @board.settlements << Settlement.new(h(3,3), h(2,3), h(2,4), @player3)
+        @player2.ore = 1
+        @player3.ore = 1
+      end
+
+      it 'transitions to postroll when there are no robbable players' do
+        @game.perform_action(@player1, 'move_robber', [[3,1]])
+        @game.state.must_equal :postroll
+        @board.robbed_hex.must_equal h(3,1)
+        h(3,5).robbed.must_equal false
+        h(3,1).robbed.must_equal true
+        @player1.ore.must_equal 0
+        @player2.ore.must_equal 1
+      end
+
+      it 'steals and transitions to postroll when there is only one' do
+        @game.perform_action(@player1, 'move_robber', [[3,2]])
+        @game.state.must_equal :postroll
+        @board.robbed_hex.must_equal h(3,2)
+        h(3,5).robbed.must_equal false
+        h(3,2).robbed.must_equal true
+        @player1.ore.must_equal 1
+        @player2.ore.must_equal 0
+      end
+
+      it 'transitions to robbing2 when there are multiple robbable players' do
+        @game.perform_action(@player1, 'move_robber', [[3,3]])
+        @game.state.must_equal :robbing2
+        @board.robbed_hex.must_equal h(3,3)
+        h(3,5).robbed.must_equal false
+        h(3,3).robbed.must_equal true
+        assert_similar @game.robbable, [@player2, @player3]
+      end
+    end
+
     it '#build_settlement'
     it '#build_city'
     it '#build_road'
     it '#trade_in'
     it '#pass_turn'
-    it '#move_robber'
     it '#rob_player'
   end
 
