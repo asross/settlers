@@ -36,7 +36,7 @@ class Game < Catan
     end
   end
 
-  def perform_action(player, action, args)
+  def perform_action(player, action, args=[])
     unless available_actions(player).include?(action)
       error "#{player.color} cannot perform #{action} at this time"
     end
@@ -51,8 +51,13 @@ class Game < Catan
 
   private
 
+  def random_dieroll
+    2 +rand(6) + rand(6)
+  end
+
   def roll
-    @board.rolled(@last_roll = 2 +rand(6) + rand(6))
+    @last_roll = random_dieroll
+    @board.rolled(@last_roll)
     if @last_roll == 7
       self.state = :robbing1
     else

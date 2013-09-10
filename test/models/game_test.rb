@@ -93,7 +93,42 @@ describe Game do
   end
 
   describe 'later rounds' do
-    it '#roll'
+    before do
+      @game.turn = 6
+      @game.state = :preroll
+      @game.active_player.must_equal @player1
+      @game.available_actions(@player1).must_equal %w(roll)
+    end
+
+    describe '#roll' do
+      before do
+        @game.last_roll.must_equal nil
+        @board.settlements << Settlement.new(h(3,3), h(3,4), h(4,3), @player1)
+        @hex = [h(3,3), h(3,4), h(4,3)].detect{|h| h.type != 'desert'}
+        @player1.send(@hex.type).must_equal 0
+      end
+
+      it 'awards resources and transitions to postroll on non-7s' do
+        $hex_number = @hex.number
+        def @game.random_dieroll
+          $hex_number
+        end
+        @game.perform_action(@player1, 'roll')
+        @game.last_roll.must_equal @hex.number
+        @game.state.must_equal :postroll
+        @player1.send(@hex.type).must_equal 1
+      end
+
+      it 'transitions to robbing1 on 7s' do
+        def @game.random_dieroll
+          7
+        end
+        @game.perform_action(@player1, 'roll')
+        @game.last_roll.must_equal 7
+        @game.state.must_equal :robbing1
+      end
+    end
+
     it '#build_settlement'
     it '#build_city'
     it '#build_road'
