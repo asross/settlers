@@ -6,9 +6,36 @@
     chat = document.getElementById('message-area');
     chat.scrollTop = chat.scrollHeight;
 
+    // %w(roll build_settlement build_city build_road trade_in pass_turn move_robber rob_player)
+    <% Game::ACTIONS.each do |action| %>
+      $('#<%= action %>').click(function() {
+        $('body').removeClass('hex-select');
+        $('body').removeClass('road-select');
+        $('body').removeClass('city-select');
+        $('body').removeClass('player-select');
+        window.currentAction = '<%= action %>';
+        <% case action
+           when 'build_settlement', 'build_city' %>
+          $('body').addClass('city-select');
+        <% when 'build_road' %>
+          $('body').addClass('road-select');
+        <% when 'move_robber' %>
+          $('body').addClass('hex-select');
+        <% when 'rob_player' %>
+          $('body').addClass('player-select');
+        <% when 'pass_turn' %>
+          performAction('pass_turn', []);
+        <% end %>
+      });
+    <% end %>
+
+    window.currentAction = null;
 
     function hex(coords) {
       return $('.hex[data-coords="['+coords[0]+', '+coords[1]+']"]');
+    }
+
+    function performAction(action, args) {
     }
 
     $('.city-marker, .road-marker').hover(function() {
@@ -19,5 +46,14 @@
       for (i = 0; i < coords.length; i++) hex(coords[i]).removeClass('hover');
     });
 
+    $('.city-marker, .road-marker').click(function() {
+      performAction(window.currentAction, $(this).data('coords'));
+    });
+
+    $('.tile, .number').click(function() {
+      if ($('body').hasClass('hex-select')) {
+        performAction(window.currentAction, $(this).closest('.hex').data('coords'));
+      }
+    });
   });
 </script>

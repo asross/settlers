@@ -34,6 +34,23 @@
     height: <%= city_height %>px;
     border-radius: <%= city_height %>px;
   }
+  .city-marker, .road-marker {
+    display: none;
+    cursor: pointer;
+  }
+  body.city-select .city-marker {
+    display: block;
+  }
+  body.road-select .road-marker {
+    display: block;
+  }
+  body.hex-select .hex:hover .tile {
+    cursor: pointer;
+    background-color: #ccc;
+  }
+  .hex.hover .tile {
+    background-color: #ccc;
+  }
   .tile.water {
     background-color: cornflowerblue;
   }
@@ -55,18 +72,6 @@
   .tile.desert {
     background-color: moccasin;
   }
-  .hex.hover .tile {
-    background-color: #ccc;
-  }
-  .hex:hover .tile {
-    background-color: #ccc;
-  }
-  /*
-  .city-marker:hover, .road-marker:hover {
-    background-color: yellow;
-    opacity: 0.15;
-    border-radius: <%= city_height %>px;
-  }*/
   .tile.first {
     -webkit-transform: rotateZ(60deg);
   }
