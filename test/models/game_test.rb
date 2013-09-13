@@ -183,11 +183,18 @@ describe Game do
       end
     end
 
+    it '#pass_turn' do
+      old_turn = @game.turn
+      @game.state = :postroll
+      @game.perform_action(@player1, 'pass_turn')
+      @game.active_player.must_equal @player2
+      @game.turn.must_equal old_turn + 1
+    end
+
     it '#build_settlement'
     it '#build_city'
     it '#build_road'
     it '#trade_in'
-    it '#pass_turn'
   end
 
 end
