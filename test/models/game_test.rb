@@ -20,8 +20,6 @@ describe Game do
     @game.available_actions(@player3).must_equal []
   end
 
-  # %w(roll build_settlement build_city build_road trade_in
-  #    pass_turn move_robber rob_player)
   describe 'round 1' do
     describe '#build_settlement' do
       before do
@@ -57,45 +55,37 @@ describe Game do
     end
   end
 
-  describe 'round 2' do
+  describe 'round 2 #build_settlement' do
     before do
       @game.turn = 3
+      @game.perform_action(@player1, 'build_settlement', [[4,3],[4,4],[3,4]])
+    end
+
+    it 'updates state and board and awards resources' do
+      @board.settlements.count.must_equal 1
+      @board.settlements.first.player.must_equal @player1
+      assert @player1.resource_cards.count >= 2
+      @game.state.must_equal :start_turn2
+    end
+  end
+
+  describe 'final #build_road of pregame' do
+    before do
+      @game.turn = 5
+      @game.perform_action(@player3, 'build_settlement', [[4,3],[4,4],[3,4]])
+      @game.perform_action(@player3, 'build_road', [[4,3],[4,4]])
+    end
+
+    it 'transitions to main game state machine' do
+      @game.turn.must_equal 6
+      @game.state.must_equal :preroll
       @game.active_player.must_equal @player1
-      @game.available_actions(@player1).must_equal %w(build_settlement)
-    end
-
-    describe '#build_settlement' do
-      before do
-        @game.perform_action(@player1, 'build_settlement', [[4,3],[4,4],[3,4]])
-      end
-
-      it 'updates state and board and awards resources' do
-        @board.settlements.count.must_equal 1
-        @board.settlements.first.player.must_equal @player1
-        assert @player1.resource_cards.count >= 2
-        @game.state.must_equal :start_turn2
-      end
-    end
-
-    describe 'final #build_road' do
-      before do
-        @game.turn = 5
-        @game.active_player.must_equal @player3
-        @game.perform_action(@player3, 'build_settlement', [[4,3],[4,4],[3,4]])
-        @game.state.must_equal :start_turn2
-        @game.perform_action(@player3, 'build_road', [[4,3],[4,4]])
-      end
-
-      it 'transitions to main game state machine' do
-        @game.state.must_equal :preroll
-      end
     end
   end
 
   describe 'later rounds' do
     before do
       @game.turn = 6
-      @game.active_player.must_equal @player1
     end
 
     describe '#roll' do
