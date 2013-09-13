@@ -1,0 +1,23 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript">
+
+  $(document).ready(function() {
+    // Display latest messages first
+    chat = document.getElementById('message-area');
+    chat.scrollTop = chat.scrollHeight;
+
+
+    function hex(coords) {
+      return $('.hex[data-coords="['+coords[0]+', '+coords[1]+']"]');
+    }
+
+    $('.city-marker, .road-marker').hover(function() {
+      coords = $(this).data('coords');
+      for (i = 0; i < coords.length; i++) hex(coords[i]).addClass('hover');
+    }, function () {
+      coords = $(this).data('coords');
+      for (i = 0; i < coords.length; i++) hex(coords[i]).removeClass('hover');
+    });
+
+  });
+</script>
