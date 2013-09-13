@@ -161,12 +161,33 @@ describe Game do
       end
     end
 
+    describe '#rob_player' do
+      before do
+        @game.robbable = [@player2, @player3]
+        @game.state = :robbing2
+        @player2.wood = 1
+      end
+
+      it 'only allows stealing from robbable' do
+        raises('invalid selection') { @game.perform_action(@player1, 'rob_player', @player1.color) }
+      end
+
+      it 'takes a resource away, unsets robbable, and transitions' do
+        @player1.wood.must_equal 0
+        @player2.wood.must_equal 1
+        @game.perform_action(@player1, 'rob_player', @player2.color)
+        @player1.wood.must_equal 1
+        @player2.wood.must_equal 0
+        @game.robbable.must_equal nil
+        @game.state.must_equal :postroll
+      end
+    end
+
     it '#build_settlement'
     it '#build_city'
     it '#build_road'
     it '#trade_in'
     it '#pass_turn'
-    it '#rob_player'
   end
 
 end
