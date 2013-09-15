@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'json'
 require 'pry'
 require_relative 'models/catan'
 Dir.glob('./models/*.rb').each { |f| require f }
@@ -15,6 +16,16 @@ end
 post '/messages' do
   $game.messages << [current_player.color, params['message']] if params['message']
   redirect request.referer
+end
+
+post '/actions' do
+  data = JSON.parse(params[:data])
+  begin
+    $game.perform_action(current_player, data['action'], data['args'])
+  rescue CatanError => e
+    status 400
+    body e.message
+  end
 end
 
 def old_params
