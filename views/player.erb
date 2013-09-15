@@ -2,6 +2,7 @@
 
 <div id='p<%=i%>' class='player <%= 'active' if player == @game.active_player %> <%= 'current' if player == @player %>'>
 
+  <span style='float: right;'><a href='/?color=<%= player.color %>'>be</a></span>
   <span class='name'>
     <%= player.color %>
   </span>
