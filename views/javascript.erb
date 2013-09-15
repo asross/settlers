@@ -23,6 +23,8 @@
           $('body').addClass('hex-select');
         <% when 'rob_player' %>
           $('body').addClass('player-select');
+        <% when 'roll' %>
+          performAction('roll', []);
         <% when 'pass_turn' %>
           performAction('pass_turn', []);
         <% end %>
