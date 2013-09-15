@@ -63,7 +63,7 @@
 
     $('.tile, .number').click(function() {
       if ($('body').hasClass('hex-select')) {
-        performAction(window.currentAction, $(this).closest('.hex').data('coords'));
+        performAction(window.currentAction, [$(this).closest('.hex').data('coords')]);
       }
     });
   });
