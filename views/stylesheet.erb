@@ -13,7 +13,7 @@
     height: <%= height %>px;
     margin-left: <%= margin %>px;
   }
-  .road-marker {
+  .road-marker, .road {
     position: relative;
     top: <%= -road_height/2.0 %>px;
     height: <%= road_height %>px;
@@ -21,10 +21,10 @@
     margin: 0 auto;
     z-index: 2;
   }
-  .road-marker.botleft {
+  .road-marker.botleft, .road.botleft {
     top: <%= height - road_height/2.0 %>px;
   }
-  .city-marker {
+  .city-marker, .city, .settlement {
     float: left;
     z-index: 3;
     position: relative;
@@ -160,7 +160,7 @@
     }
   <% end %>
   <% @game.players.each_with_index do |player, i| %>
-    <%= "#p#{i}" %> {
+    <%= "#p#{i}, .#{player.color}" %> {
       background-color: <%= player.color %>;
     }
   <% end %>
