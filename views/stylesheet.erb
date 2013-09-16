@@ -166,8 +166,8 @@
       left: <%= hex.x*height*Math.sqrt(3)/2.0 %>px;
     }
   <% end %>
-  <% @game.players.each_with_index do |player, i| %>
-    <%= "#p#{i}, .#{player.color}" %> {
+  <% @game.players.each_with_index do |player| %>
+    <%= ".#{player.color}" %> {
       background-color: <%= player.color %>;
     }
   <% end %>
