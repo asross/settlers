@@ -15,5 +15,9 @@
     <%= erb :city, layout: false, locals: { coords: [here, top, topleft] } %>
     <%= erb :road, layout: false, locals: { coords: [here, top] } %>
   </div>
-  <div class='number'><%= hex.number %></div>
+  <% if hex.robbed %>
+    <div class='number robbed'> R </div>
+  <% else %>
+    <div class='number'><%= hex.number %></div>
+  <% end %>
 </div>
