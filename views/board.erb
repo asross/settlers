@@ -7,6 +7,8 @@
   <% end %>
 </div>
 
+<div id='last-roll'> <%= @game.last_roll %> </div>
+
 <% @game.board.hexes.flatten.each do |hex| %>
   <% next if hex.x + hex.y < @game.board.side_length %>
   <% next if hex.x + hex.y > 3*@game.board.side_length %>
