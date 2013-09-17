@@ -1,8 +1,8 @@
 <% if settlement = @game.board.settlement_at(*coords.map{|v| @game.send(:h, *v)}) %>
   <% if settlement.size == 1 %>
-    <div class='settlement <%= settlement.color %>'></div>
+    <div class='settlement' data-color='<%= settlement.color %>'></div>
   <% elsif settlement.size == 2 %>
-    <div class='city <%= settlement.color %>'></div>
+    <div class='city' data-color='<%= settlement.color %>'></div>
   <% end %>
 <% else %>
   <div class='city-marker' data-coords='<%= coords %>'></div>

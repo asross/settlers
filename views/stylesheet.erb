@@ -167,7 +167,7 @@
     }
   <% end %>
   <% @game.players.each_with_index do |player| %>
-    <%= ".#{player.color}" %> {
+    [data-color='<%= player.color %>'] {
       background-color: <%= player.color %>;
     }
   <% end %>

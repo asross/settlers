@@ -1,9 +1,8 @@
 <% div_class = 'player' %>
-<% div_class += " #{player.color}" %>
 <% div_class += ' active' if player == @game.active_player %>
 <% div_class += ' current' if player == @player %>
 
-<div class='<%= div_class %>'>
+<div class='<%= div_class %>' data-color='<%= player.color %>'>
   <span style='float: right;'><a href='/?color=<%= player.color %>'>be</a></span>
   <span class='name'>
     <%= player.color %>
