@@ -133,8 +133,18 @@
     height: 200px;
     border-top: 1px solid #ccc;
   }
+  #chat #error-area {
+    height: 3em;
+    background-color: #f8f8f8;
+  }
+  #chat #error-area #error {
+    line-height: 3em;
+    padding-left: 1em;
+    color: darkred;
+  }
   #chat #message-area {
-    height: 175px;
+    border-top: 1px solid #ccc;
+    height: 100px;
     background-color: #eee;
     padding: 1em;
     overflow: scroll;
@@ -151,7 +161,7 @@
     position: absolute;
     left: <%= 2*margin + 10*width %>px;
     top: 0;
-    height: <%= 200 + @game.board.size*height %>px;
+    height: <%= 185 + @game.board.size*height %>px;
     border-left: 1px solid #ccc;
     border-right: 1px solid #ccc;
     width: 300px;

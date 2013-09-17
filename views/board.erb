@@ -17,6 +17,9 @@
 <% end %>
 
 <div id='chat'>
+  <div id='error-area'>
+    <span id='error'></span>
+  </div>
   <div id='message-area'>
     <ul>
       <% @game.messages.each do |message| %>
