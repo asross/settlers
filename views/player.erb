@@ -4,9 +4,7 @@
 
 <div class='<%= div_class %>' data-color='<%= player.color %>'>
   <span style='float: right;'><a href='/?color=<%= player.color %>'>be</a></span>
-  <span class='name'>
-    <%= player.color %>
-  </span>
+  <span class='name'><%= player.color %></span>
   <%= player.points %> VP
   <span>
     <%= player.resource_cards.count %> resources

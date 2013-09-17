@@ -66,5 +66,11 @@
         performAction(window.currentAction, [$(this).closest('.hex').data('coords')]);
       }
     });
+
+    $('.player .name').click(function() {
+      if ($('body').hasClass('player-select')) {
+        performAction(window.currentAction, $(this).closest('.player').data('color'));
+      }
+    });
   });
 </script>
