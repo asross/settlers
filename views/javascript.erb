@@ -57,7 +57,7 @@
       for (i = 0; i < coords.length; i++) hex(coords[i]).removeClass('hover');
     });
 
-    $('.city-marker, .road-marker').click(function() {
+    $('.city-marker, .road-marker, .settlement').click(function() {
       performAction(window.currentAction, $(this).data('coords'));
     });
 
