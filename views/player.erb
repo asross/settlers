@@ -29,6 +29,21 @@
             <button disabled='disabled'> <%= action %> </button>
           <% end %>
         <% end %>
+
+        <div id='trade-widget'>
+          <select name='resource1'>
+            <% Player::RESOURCE_CARDS.each do |resource| %>
+              <option><%= resource %></option>
+            <% end %>
+          </select>
+          &mdash;&gt;
+          <select name='resource2'>
+            <% Player::RESOURCE_CARDS.each do |resource| %>
+              <option><%= resource %></option>
+            <% end %>
+          </select>
+          <button id='trade-submit'>submit</button>
+        </div>
       </div>
     </div>
   <% end %>

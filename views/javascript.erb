@@ -13,6 +13,7 @@
         $('body').removeClass('road-select');
         $('body').removeClass('city-select');
         $('body').removeClass('player-select');
+        $('body').removeClass('trade-select');
         window.currentAction = '<%= action %>';
         <% case action
            when 'build_settlement', 'build_city' %>
@@ -23,6 +24,8 @@
           $('body').addClass('hex-select');
         <% when 'rob_player' %>
           $('body').addClass('player-select');
+        <% when 'trade_in' %>
+          $('body').addClass('trade-select');
         <% when 'roll' %>
           performAction('roll', []);
         <% when 'pass_turn' %>
@@ -59,6 +62,12 @@
 
     $('.city-marker, .road-marker, .settlement').click(function() {
       performAction(window.currentAction, $(this).data('coords'));
+    });
+
+    $('#trade-submit').click(function() {
+      resource1 = $('#trade-widget select[name="resource1"]').val();
+      resource2 = $('#trade-widget select[name="resource2"]').val();
+      performAction('trade_in', [resource1, resource2]);
     });
 
     $('.tile, .number').click(function() {
