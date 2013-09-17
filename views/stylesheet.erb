@@ -156,20 +156,20 @@
   }
   #chat form input {
     padding: 1em;
-    width: 100%;
+    width: <%= 2*margin + 10*width + 300 %>px;
   }
   #players {
     position: absolute;
     left: <%= 2*margin + 10*width %>px;
     top: 0;
-    height: <%= 222 + @game.board.size*height %>px;
+    height: <%= 183 + @game.board.size*height %>px;
     border-left: 1px solid #ccc;
     border-right: 1px solid #ccc;
     width: 300px;
+    background-color: #e8e8e8;
   }
   #players .player {
     width: 100%;
-    <%#background-color: #f8f8f8;%>
     border-top: 1px solid #ccc;
     padding: 1em 0;
   }
