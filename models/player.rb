@@ -1,5 +1,5 @@
 class Player < Catan
-  RESOURCE_CARDS = %w(sheep wheat brick wood ore)
+  RESOURCE_CARDS = %w(brick wood sheep wheat ore)
   attr_accessor *RESOURCE_CARDS, :color, :points, :n_settlements, :n_roads, :board
   
   def initialize(board, color)
