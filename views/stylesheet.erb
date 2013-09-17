@@ -155,13 +155,14 @@
     list-style: none;
   }
   #chat form input {
+    padding: 1em;
     width: 100%;
   }
   #players {
     position: absolute;
     left: <%= 2*margin + 10*width %>px;
     top: 0;
-    height: <%= 185 + @game.board.size*height %>px;
+    height: <%= 222 + @game.board.size*height %>px;
     border-left: 1px solid #ccc;
     border-right: 1px solid #ccc;
     width: 300px;
