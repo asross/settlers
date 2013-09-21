@@ -8,7 +8,7 @@ of Catan!
 2. `bundle install`
 3. `ruby test/run.rb`
 4. `ruby webapp.rb` or `ruby textbased.rb`
-5. If you run into problems, ensure you have Ruby 1.9 installed (check with `ruby --version`)
+5. If you run into problems, ensure you have Ruby 1.9 installed (check with `ruby --version`) and Firefox for Selenium.
 
 ## Setbacks
 
