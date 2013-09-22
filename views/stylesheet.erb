@@ -44,6 +44,13 @@
     height: <%= city_height %>px;
     border-radius: <%= city_height %>px;
   }
+  <% city_city_height = city_height + 10 %>
+  .city {
+    width: <%= city_city_height %>px;
+    height: <%= city_city_height %>px;
+    top: <%= -city_city_height/2 %>px;
+    left: <%= -city_city_height/2 %>px;
+  }
   .city-marker, .road-marker {
     display: none;
     cursor: pointer;
