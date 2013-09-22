@@ -69,4 +69,9 @@ describe 'board.erb' do
   it 'allows X-for-1 resource trading'
   it 'allows turn passing'
   it 'allows robber moving'
+
+  def click_on_coords(*coords)
+    coords.sort_by!{|el| el[0]+el[1] + 0.1*el[0]}
+    find("[data-coords='#{coords}']").click
+  end
 end

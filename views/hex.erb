@@ -5,15 +5,15 @@
 
 <div class='hex' data-coords='<%= here %>'>
   <div class='tile first <%= hex.type %>'>
-    <%= erb :road, layout: false, locals: { coords: [here, botleft], botleft: true } %>
+    <%= erb :road, layout: false, locals: { coords: [botleft, here], botleft: true } %>
   </div>
   <div class='tile second <%= hex.type %>'>
-    <%= erb :city, layout: false, locals: { coords: [here, topleft, botleft] } %>
-    <%= erb :road, layout: false, locals: { coords: [here, topleft] } %>
+    <%= erb :city, layout: false, locals: { coords: [topleft, botleft, here] } %>
+    <%= erb :road, layout: false, locals: { coords: [topleft, here] } %>
   </div>
   <div class='tile third <%= hex.type %>'>
-    <%= erb :city, layout: false, locals: { coords: [here, top, topleft] } %>
-    <%= erb :road, layout: false, locals: { coords: [here, top] } %>
+    <%= erb :city, layout: false, locals: { coords: [topleft, top, here] } %>
+    <%= erb :road, layout: false, locals: { coords: [top, here] } %>
   </div>
   <% if hex.robbed %>
     <div class='number robbed'> r </div>
