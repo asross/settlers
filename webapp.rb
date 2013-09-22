@@ -22,6 +22,7 @@ post '/actions' do
   data = JSON.parse(params[:data])
   begin
     $game.perform_action(current_player, data['action'], data['args'])
+    status 200
   rescue CatanError => e
     status 400
     body e.message
