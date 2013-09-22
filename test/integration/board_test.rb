@@ -84,10 +84,29 @@ describe 'board.erb' do
   it 'allows city building'
   it 'allows X-for-1 resource trading'
   it 'allows turn passing'
-  it 'allows robber moving'
+  it 'allows robber moving' do
+    def $game.random_dieroll; 7; end
+    @board.settlements << Settlement.new(h(4,4), h(4,3), h(5,3), @player2)
+    @board.settlements << Settlement.new(h(4,3), h(3,4), h(3,3), @player3)
+    @player3.ore = 1
+    find('#roll').click
+    find('#move_robber').click
+    click_on_coords([4,3])
+    find('#rob_player').click
+    find(".player[data-color='#{@player3.color}'] .name").click
+    within(".player[data-color='red']") do
+      page.must_have_content '1 ore'
+    end
+    @player3.ore.must_equal 0
+  end
 
   def click_on_coords(*coords)
-    coords.sort_by!{|el| el[0]+el[1] + 0.1*el[0]}
-    find("[data-coords='#{coords}']").click
+    if coords.size == 1
+      # Need to click inside the hex
+      find("[data-coords='#{coords.first}'] .number").click
+    else
+      coords.sort_by!{|el| el[0]+el[1] + 0.1*el[0]}
+      find("[data-coords='#{coords}']").click
+    end
   end
 end
