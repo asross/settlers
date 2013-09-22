@@ -81,9 +81,6 @@ describe 'board.erb' do
     within('#error') { page.must_have_content 'Not enough resources' }
   end
 
-  it 'allows city building'
-  it 'allows X-for-1 resource trading'
-  it 'allows turn passing'
   it 'allows robber moving' do
     def $game.random_dieroll; 7; end
     @board.settlements << Settlement.new(h(4,4), h(4,3), h(5,3), @player2)
@@ -98,6 +95,39 @@ describe 'board.erb' do
       page.must_have_content '1 ore'
     end
     @player3.ore.must_equal 0
+  end
+
+  it 'allows city building' do
+    @player1.ore = 3
+    @player1.wheat = 2
+    $game.state = :postroll
+    visit '/?color=red'
+    page.must_have_css '.city', count: 0
+    find('#build_city').click
+    click_on_coords([2,2],[2,3],[3,2])
+    page.must_have_css '.city', count: 1
+  end
+
+  it 'allows X-for-1 resource trading' do
+    @player1.wheat = 4
+    $game.state = :postroll
+    visit '/?color=red'
+    find('#trade_in').click
+    select 'wheat', from: 'resource1'
+    select 'sheep', from: 'resource2'
+    find('#trade-submit').click
+    within('.player[data-color="red"]') do
+      page.must_have_content '1 sheep'
+    end
+  end
+
+  it 'allows turn passing' do
+    $game.state = :postroll
+    visit '/?color=red'
+    page.must_have_css('.player.active[data-color="red"]')
+    find('#pass_turn').click
+    page.wont_have_css('.player.active[data-color="red"]')
+    page.must_have_css(".player.active[data-color='#{@player2.color}']")
   end
 
   def click_on_coords(*coords)
