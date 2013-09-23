@@ -29,5 +29,5 @@ post '/actions' do
 end
 
 def current_player
-  @player ||= $game.players.detect{|p| p.color == params['color']}
+  @current_player ||= $game.players.detect{|p| p.color == params['color']}
 end

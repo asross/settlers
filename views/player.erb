@@ -1,6 +1,6 @@
 <% div_class = 'player' %>
 <% div_class += ' active' if player == @game.active_player %>
-<% div_class += ' current' if player == @player %>
+<% div_class += ' current' if player == @current_player %>
 
 <div class='<%= div_class %>' data-color='<%= player.color %>'>
   <span style='float: right;'><a href='/?color=<%= player.color %>'>be</a></span>
@@ -10,7 +10,7 @@
     <%= player.resource_cards.count %> resources
   </span>
 
-  <% if player == @player %>
+  <% if player == @current_player %>
     <div class='info'>
       <ul>
         <% Player::RESOURCE_CARDS.each do |resource| %>
@@ -21,7 +21,7 @@
         <% end %>
       </ul>
       <div class='buttons'>
-        <% available = @game.available_actions(@player) %>
+        <% available = @game.available_actions(@current_player) %>
         <% Game::ACTIONS.each do |action| %>
           <% if available.include?(action) %>
             <button id='<%= action %>'> <%= action %> </button>
