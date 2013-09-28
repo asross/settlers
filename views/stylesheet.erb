@@ -200,6 +200,12 @@
   #players .player.active .name:before {
     content: '*';
   }
+  #players .player .info {
+    display: none;
+  }
+  #players .player[data-color='<%= @current_player.color %>'] .info {
+    display: block;
+  }
   <% @game.board.hexes.flatten.each do |hex| %>
     .hex[data-coords=<%= "\"#{[hex.x, hex.y]}\""%>] {
       position: absolute;

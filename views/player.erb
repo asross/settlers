@@ -1,6 +1,5 @@
 <% div_class = 'player' %>
 <% div_class += ' active' if player == @game.active_player %>
-<% div_class += ' current' if player == @current_player %>
 
 <div class='<%= div_class %>' data-color='<%= player.color %>'>
   <span style='float: right;'><a href='/?color=<%= player.color %>'>be</a></span>
@@ -10,41 +9,39 @@
     <%= player.resource_cards.count %> resources
   </span>
 
-  <% if player == @current_player %>
-    <div class='info'>
-      <ul>
-        <% Player::RESOURCE_CARDS.each do |resource| %>
-          <li>
-          <%= player.send(resource) %>
-          <%= resource %>
-          </li>
+  <div class='info'>
+    <ul>
+      <% Player::RESOURCE_CARDS.each do |resource| %>
+        <li>
+        <%= player.send(resource) %>
+        <%= resource %>
+        </li>
+      <% end %>
+    </ul>
+    <div class='buttons'>
+      <% available = @game.available_actions(player) %>
+      <% Game::ACTIONS.each do |action| %>
+        <% if available.include?(action) %>
+          <button id='<%= action %>'> <%= action %> </button>
+        <% else %>
+          <button disabled='disabled'> <%= action %> </button>
         <% end %>
-      </ul>
-      <div class='buttons'>
-        <% available = @game.available_actions(@current_player) %>
-        <% Game::ACTIONS.each do |action| %>
-          <% if available.include?(action) %>
-            <button id='<%= action %>'> <%= action %> </button>
-          <% else %>
-            <button disabled='disabled'> <%= action %> </button>
-          <% end %>
-        <% end %>
+      <% end %>
 
-        <div id='trade-widget'>
-          <select name='resource1'>
-            <% Player::RESOURCE_CARDS.each do |resource| %>
-              <option><%= resource %></option>
-            <% end %>
-          </select>
-          &mdash;&gt;
-          <select name='resource2'>
-            <% Player::RESOURCE_CARDS.each do |resource| %>
-              <option><%= resource %></option>
-            <% end %>
-          </select>
-          <button id='trade-submit'>submit</button>
-        </div>
+      <div id='trade-widget'>
+        <select name='resource1'>
+          <% Player::RESOURCE_CARDS.each do |resource| %>
+            <option><%= resource %></option>
+          <% end %>
+        </select>
+        &mdash;&gt;
+        <select name='resource2'>
+          <% Player::RESOURCE_CARDS.each do |resource| %>
+            <option><%= resource %></option>
+          <% end %>
+        </select>
+        <button id='trade-submit'>submit</button>
       </div>
     </div>
-  <% end %>
+  </div>
 </div>
