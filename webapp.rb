@@ -10,24 +10,25 @@ $game = Game.new
 $channel = EM::Channel.new
 
 class App < Sinatra::Base
-  get '/' do
+  before do
     @game = $game
-    redirect "/?color=#{$game.players.sample.color}" unless current_player
+  end
+
+  get '/' do
+    redirect "/?color=#{@game.players.sample.color}" unless current_player
     erb :game
   end
 
   post '/messages' do
-    @game = $game
-    $game.messages << [current_player.color, params['message']]
+    @game.messages << [current_player.color, params['message']]
     broadcast('message', html: erb(:messages))
     redirect request.referer
   end
 
   post '/actions' do
-    @game = $game
     data = JSON.parse(params[:data])
     begin
-      $game.perform_action(current_player, data['action'], data['args'])
+      @game.perform_action(current_player, data['action'], data['args'])
       broadcast('action', html: erb(:board))
       status 200
     rescue CatanError => e
@@ -37,7 +38,7 @@ class App < Sinatra::Base
   end
 
   def current_player
-    @current_player ||= $game.players.detect{|p| p.color == params['color']}
+    @current_player ||= @game.players.detect{|p| p.color == params['color']}
   end
 
   def broadcast(event, data)
