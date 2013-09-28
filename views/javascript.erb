@@ -45,8 +45,6 @@
         url: '/actions',
         type: 'POST',
         data: { color: '<%= @current_player.color %>', data: JSON.stringify({ action: action, args: args }) }
-      }).success(function(data, textStatus, jqXHR) {
-        window.location.reload(true);
       }).error(function(jqXHR, textStatus, errorThrown) {
         console.log(jqXHR.responseText);
         $('#error').text(jqXHR.responseText);
@@ -84,5 +82,18 @@
         performAction(window.currentAction, $(this).closest('.player').data('color'));
       }
     });
+
+    ws = new WebSocket('ws://' + location.hostname + ':8080');
+
+    ws.onmessage = function(evt) {
+      response = JSON.parse(evt.data);
+      event = response[0];
+      data = response[1];
+      if (event == 'action') {
+        $('#board').html(data.html);
+      } else if (event == 'message') {
+        $('#message-area').html(data.html);
+      }
+    }
   });
 </script>
