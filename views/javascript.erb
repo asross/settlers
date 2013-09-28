@@ -45,6 +45,8 @@
         url: '/actions',
         type: 'POST',
         data: { color: '<%= @current_player.color %>', data: JSON.stringify({ action: action, args: args }) }
+      }).success(function(data, textStatus, jqXHR) {
+        <%= 'window.location.reload(true);' if ENV['RACK_ENV'] == 'test' %>
       }).error(function(jqXHR, textStatus, errorThrown) {
         console.log(jqXHR.responseText);
         $('#error').text(jqXHR.responseText);

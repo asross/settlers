@@ -1,3 +1,4 @@
+ENV['RACK_ENV'] = 'test'
 require_relative '../webapp.rb'
 require 'minitest'
 require 'minitest/pride'
@@ -15,7 +16,7 @@ class Minitest::Test
   end
 end
 
-Capybara.app = Sinatra::Application
+Capybara.app = App
 
 def raises(msg, &block)
   error = assert_raises(CatanError, &block)
