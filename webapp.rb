@@ -9,7 +9,7 @@ $game = Game.new
 get '/' do
   @game = $game
   redirect "/?color=#{$game.players.sample.color}" unless current_player
-  erb :board
+  erb :game
 end
 
 post '/messages' do
