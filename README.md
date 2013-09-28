@@ -2,25 +2,58 @@
 
 of Catan!
 
+# Summary
+
+Play Settlers of Catan on your home computer with your friends by running the server on one machine and having others connect to it either through a web or text interface.
+
+# Development
+
+## Overview
+
+Abstract logic for the game is contained in plain old ruby objects defined in `/models`.
+
+An HTTP server exposing this logic is defined in `webapp.rb`. It has three endpoints:
+
+`GET /`
+`POST /actions`
+`POST /messages`
+
+There are two clients, one HTML-based, and one text-based. My plan at this point is for both to use this API, but the server will send back different representations (e.g. HTML to the web client, and a printable string to the textbased client) based on Accept headers or MIME types.
+
 ## Setup
 
+0. Ensure you have Ruby 1.9 installed, and Firefox for running selenium tests
 1. `gem install bundler`
 2. `bundle install`
 3. `ruby test/run.rb`
-4. `ruby webapp.rb` or `ruby textbased.rb`
-5. If you run into problems, ensure you have Ruby 1.9 installed (check with `ruby --version`) and Firefox for Selenium.
+4. `ruby webapp.rb`
+5. Visit `localhost:4567`
 
-## Setbacks
+## TODO
 
-A lot of this code is very old.
+- Ports
+- Development cards
+- Text-based client / server interactions
+- Websockets
 
-## Settings
+# License
 
-* `models/` directory contains abstract logic for playing catan.
-* `webapp.rb` exposes that logic through a web interface
-* `textbased.rb` exposes the logic through a text-based interface
-* `views/` directory contains the HTML/javascript/CSS required for the web interface
-* `test/` directory contains tests that run with a gem called [minitest](https://github.com/seattlerb/minitest)
-* `test/unit/` directory contains unit tests for models
-* `test/webapp/` directory contains integration tests for the web app
-* `test/textbased/` directory contains integration tests for the text-based interface
+Copyright (c) 2013 Andrew Ross
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
