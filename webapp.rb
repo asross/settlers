@@ -42,22 +42,20 @@ class App < Sinatra::Base
   end
 
   def broadcast(event, data)
-    $channel.push JSON.generate([event, data]) unless ENV['RACK_ENV'] == 'test'
+    $channel.push JSON.generate([event, data])
   end
 end
 
-unless ENV['RACK_ENV'] == 'test'
-  EM.run do
-    EM::WebSocket.start(host: '0.0.0.0', port: 8080) { |ws|
-      ws.onopen {
-        sid = $channel.subscribe { |msg| ws.send msg }
+EM.run do
+  EM::WebSocket.start(host: '0.0.0.0', port: 8080) { |ws|
+    ws.onopen {
+      sid = $channel.subscribe { |msg| ws.send msg }
 
-        ws.onclose {
-          $channel.unsubscribe(sid)
-        }
+      ws.onclose {
+        $channel.unsubscribe(sid)
       }
     }
+  }
 
-    Thin::Server.start(App, '0.0.0.0', 4567)
-  end
+  Thin::Server.start(App, '0.0.0.0', 4567)
 end

@@ -1,5 +1,7 @@
-ENV['RACK_ENV'] = 'test'
+require 'em-websocket'
+def EM.run; end
 require_relative '../webapp.rb'
+
 require 'minitest'
 require 'minitest/pride'
 require 'minitest/autorun'
