@@ -1,7 +1,4 @@
-require 'em-websocket'
-def EM.run; end
-require_relative '../webapp.rb'
-
+require_relative '../catan_server.rb'
 require 'minitest'
 require 'minitest/pride'
 require 'minitest/autorun'
@@ -18,7 +15,7 @@ class Minitest::Test
   end
 end
 
-Capybara.app = App
+Capybara.app = CatanServer
 
 def raises(msg, &block)
   error = assert_raises(CatanError, &block)

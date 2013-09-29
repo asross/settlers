@@ -9,7 +9,7 @@ Dir.glob('./models/*.rb').each { |f| require f }
 $game = Game.new
 $channel = EM::Channel.new
 
-class App < Sinatra::Base
+class CatanServer < Sinatra::Base
   before do
     @game = $game
   end
@@ -44,18 +44,4 @@ class App < Sinatra::Base
   def broadcast(event, data)
     $channel.push JSON.generate([event, data])
   end
-end
-
-EM.run do
-  EM::WebSocket.start(host: '0.0.0.0', port: 8080) { |ws|
-    ws.onopen {
-      sid = $channel.subscribe { |msg| ws.send msg }
-
-      ws.onclose {
-        $channel.unsubscribe(sid)
-      }
-    }
-  }
-
-  Thin::Server.start(App, '0.0.0.0', 4567)
 end
