@@ -138,7 +138,7 @@
   #chat {
     position: absolute;
     top: <%= @game.board.size*height %>px;
-    width: <%= 2*margin + 10*width %>px;
+    width: <%= 2*margin + (@game.board.size + @game.board.side_length)*width %>px;
     height: 200px;
     border-top: 1px solid #ccc;
   }
@@ -165,11 +165,11 @@
   }
   #chat form input {
     padding: 1em;
-    width: <%= 2*margin + 10*width + 300 %>px;
+    width: <%= 2*margin + (@game.board.size + @game.board.side_length)*width + 300 %>px;
   }
   #players {
     position: absolute;
-    left: <%= 2*margin + 10*width %>px;
+    left: <%= 2*margin + (@game.board.size + @game.board.side_length)*width %>px;
     top: 0;
     height: <%= 183 + @game.board.size*height %>px;
     border-left: 1px solid #ccc;
