@@ -1,0 +1,9 @@
+<ul>
+  <% @game.messages.each do |message| %>
+    <% if message.is_a?(Array) %>
+      <li> <%= message.join(': ') %> </li>
+    <% else %>
+      <li> <%= message %> </li>
+    <% end %>
+  <% end %>
+</ul>

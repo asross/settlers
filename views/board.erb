@@ -1,7 +1,3 @@
-<%= erb :jquery %>
-<%= erb :javascript %>
-<%= erb :stylesheet %>
-
 <div id='players'>
   <% @game.players.each do |player| %>
     <%= erb :player, layout: false, locals: { player: player } %>
@@ -15,24 +11,3 @@
   <% next if hex.x + hex.y > 3*@game.board.side_length %>
   <%= erb :hex, layout: false, locals: { hex: hex } %>
 <% end %>
-
-<div id='chat'>
-  <div id='error-area'>
-    <span id='error'></span>
-  </div>
-  <div id='message-area'>
-    <ul>
-      <% @game.messages.each do |message| %>
-        <% if message.is_a?(Array) %>
-          <li> <%= message.join(': ') %> </li>
-        <% else %>
-          <li> <%= message %> </li>
-        <% end %>
-      <% end %>
-    </ul>
-  </div>
-  <form action='/messages' method='post'>
-    <input type='text' name='message' placeholder='message...'>
-    <input type='hidden' name='color' value='<%= @current_player.color %>'>
-  </form>
-</div>
