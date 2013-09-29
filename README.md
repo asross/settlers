@@ -26,7 +26,7 @@ There are two clients, one HTML-based, and one text-based. My plan at this point
 1. `gem install bundler`
 2. `bundle install`
 3. `ruby test/run.rb`
-4. `ruby webapp.rb`
+4. `ruby app.rb`
 5. Visit `localhost:4567`
 
 ## TODO
@@ -34,7 +34,6 @@ There are two clients, one HTML-based, and one text-based. My plan at this point
 - Ports
 - Development cards
 - Text-based client / server interactions
-- Websockets
 
 # License
 
