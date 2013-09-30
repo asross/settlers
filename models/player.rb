@@ -32,8 +32,9 @@ class Player < Catan
     end
   end
 
-  def trade_in(resource1, resource2, n)
+  def trade_in(resource1, resource2)
     error 'Bad resource card' unless [resource1, resource2].all?{|r| RESOURCE_CARDS.include?(r) }
+    n = 4 # TODO: ports
     error 'Not enough resources to trade' unless send(resource1) >= n
     increment(resource1, -n)
     increment(resource2, 1)

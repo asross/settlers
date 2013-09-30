@@ -111,7 +111,7 @@ class Game < Catan
   end
 
   def trade_in(r1, r2)
-    active_player.trade_in(r1, r2, 4) # TODO: make this dependent on ports
+    active_player.trade_in(r1, r2)
   end
 
   def pass_turn
