@@ -32,9 +32,25 @@ class Player < Catan
     end
   end
 
+  def settlements
+    board.settlements.select{|s| s.player == self }
+  end
+
+  def trade_in_ratio_for(resource)
+    n = 4
+    settlements.each do |settlement|
+      settlement.hexes.each do |hex|
+        next unless hex.port_borders?(settlement)
+        next unless (m = hex.port_accepts?(resource))
+        n = [n,m].min
+      end
+    end
+    n
+  end
+
   def trade_in(resource1, resource2)
     error 'Bad resource card' unless [resource1, resource2].all?{|r| RESOURCE_CARDS.include?(r) }
-    n = 4 # TODO: ports
+    n = trade_in_ratio_for(resource1)
     error 'Not enough resources to trade' unless send(resource1) >= n
     increment(resource1, -n)
     increment(resource2, 1)

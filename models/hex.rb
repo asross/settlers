@@ -1,5 +1,5 @@
-class Hex
-  attr_accessor :x, :y, :number, :type, :robbed
+class Hex < Catan
+  attr_accessor :x, :y, :number, :type, :robbed, :port_type, :port_direction
 
   def inspect
     "<Hex: #{type} (#{number}) [#{x},#{y}]>"
@@ -23,5 +23,21 @@ class Hex
   
   def adjacent?(hex)
     adjacencies.include?(hex.coordinates)
+  end
+
+  def directions
+    Hash[%w(botright topright bottom top botleft topleft).zip(adjacencies)]
+  end
+
+  def port_borders?(settlement)
+    return false unless port_direction
+    return false unless settlement.vertex.include?(coordinates)
+    settlement.vertex.include?(directions[port_direction])
+  end
+
+  def port_accepts?(resource)
+    return 3 if port_type == '3:1'
+    return 2 if port_type == resource
+    false
   end
 end

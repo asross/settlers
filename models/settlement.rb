@@ -19,4 +19,8 @@ class Settlement
       player.increment(hex.type, 1)
     end
   end
+
+  def vertex
+    hexes.map(&:coordinates)
+  end
 end
