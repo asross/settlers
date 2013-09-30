@@ -23,6 +23,26 @@ describe Player do
       @player.sheep.must_equal 1
       @player.wood.must_equal 1
     end
+
+    it 'requires only three on a 3:1' do
+      @board.settlements << Settlement.new(h(2,1), h(2,2), h(3,1), @player)
+      h(2,1).port_type = '3:1'
+      h(2,1).port_direction = :down
+      @player.sheep = 3
+      @player.trade_in('sheep', 'wood')
+      @player.sheep.must_equal 0
+      @player.wood.must_equal 1
+    end
+
+    it 'requires only two on a 2:1 of the right type' do
+      @board.settlements << Settlement.new(h(2,1), h(2,2), h(3,1), @player)
+      h(2,1).port_type = 'sheep'
+      h(2,1).port_direction = :down
+      @player.sheep = 2
+      @player.trade_in('sheep', 'wood')
+      @player.sheep.must_equal 0
+      @player.wood.must_equal 1
+    end
   end
 
   describe '#build_settlement' do
