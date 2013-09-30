@@ -5,11 +5,13 @@ class Hex < Catan
     "<Hex: #{type} (#{number}) [#{x},#{y}]>"
   end
   
-  def initialize(x, y, number, type, robbed=false)
+  def initialize(x, y, number, type, port_type=nil, port_direction=nil, robbed=false)
     @x = x
     @y = y
     @number = number
     @type = type
+    @port_type = port_type
+    @port_direction = port_direction
     @robbed = robbed
   end
 
@@ -27,6 +29,10 @@ class Hex < Catan
 
   def directions
     Hash[%w(botright topright bottom top botleft topleft).zip(adjacencies)]
+  end
+
+  def port?
+    port_type && port_direction && type == 'water'
   end
 
   def port_borders?(settlement)
