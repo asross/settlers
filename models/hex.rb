@@ -13,11 +13,15 @@ class Hex
     @robbed = robbed
   end
 
+  def coordinates
+    [x, y]
+  end
+
   def adjacencies
     [1,0,-1].permutation(2).map{|i,j| [x+i, y+j] }
   end
   
   def adjacent?(hex)
-    adjacencies.include?([hex.x, hex.y])
+    adjacencies.include?(hex.coordinates)
   end
 end
