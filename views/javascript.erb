@@ -68,8 +68,8 @@
     });
 
     $(document).on('click', '#trade-submit', function() {
-      resource1 = $('#trade-widget select[name="resource1"]').val();
-      resource2 = $('#trade-widget select[name="resource2"]').val();
+      resource1 = $('select[name="resource1"]:visible').val();
+      resource2 = $('select[name="resource2"]:visible').val();
       performAction('trade_in', [resource1, resource2]);
     });
 
