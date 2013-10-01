@@ -17,6 +17,9 @@
   </div>
   <% if hex.robbed %>
     <div class='number robbed'> r </div>
+  <% elsif hex.port? %>
+    <div class='port-label'><%= hex.port_type %></div>
+    <div class='port <%= hex.port_direction %>'></div>
   <% else %>
     <div class='number'><%= hex.number %></div>
   <% end %>

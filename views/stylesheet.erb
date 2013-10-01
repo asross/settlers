@@ -116,7 +116,7 @@
   .tile.third {
     top: <%= -2*height %>px;
   }
-  .number {
+  .number, .port-label {
     width: <%= height/2.0 %>px;
     height: <%= height/2.0 %>px;
     line-height: <%= height %>px;
@@ -129,6 +129,29 @@
     left: <%= height/3.0 %>px;
     background-color: transparent;
   }
+
+  <% port_height = width/5.0 %>
+  <% port_color = 'white' %>
+  .port-label {
+    font-size: 1.2em;
+    color: <%= port_color %>;
+  }
+  .port {
+    width: <%= width %>px;
+    height: <%= port_height %>px;
+    background-color: <%= port_color %>;
+    position: relative;
+    top: <%= -3.5*height %>px; /* .number{}'s top + height */
+    left: <%= width/2.0 %>px;
+    border-bottom-left-radius: 1000px;
+    border-bottom-right-radius: 1000px;
+    -webkit-transform-origin-y: <%= height/2.0 %>px;
+  }
+  <% %w(top topright botright bottom botleft topleft).each_with_index do |direction, i| %>
+    .port.<%= direction %> {
+      -webkit-transform: rotateZ(<%= i*60 %>deg);
+    }
+  <% end %>
   .robbed {
     color: black;
   }
