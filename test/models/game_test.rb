@@ -55,25 +55,39 @@ describe Game do
     end
   end
 
-  describe 'round 2 #build_settlement' do
-    before do
-      @game.turn = 3
-      @game.perform_action(@player1, 'build_settlement', [[4,3],[4,4],[3,4]])
+  describe 'round 2' do
+    describe '#active_player' do
+      it 'should go in reverse order' do
+        @game.turn = 2
+        @game.active_player.must_equal @player3
+        @game.turn = 3
+        @game.active_player.must_equal @player3
+        @game.turn = 4
+        @game.active_player.must_equal @player2
+        @game.turn = 5
+        @game.active_player.must_equal @player1
+        @game.turn = 6
+        @game.active_player.must_equal @player1
+      end
     end
 
-    it 'updates state and board and awards resources' do
-      @board.settlements.count.must_equal 1
-      @board.settlements.first.player.must_equal @player1
-      assert @player1.resource_cards.count >= 2
-      @game.state.must_equal :start_turn2
+    describe '#build_settlement' do
+      it 'updates state and board and awards resources' do
+        @game.turn = 3
+        @game.perform_action(@player3, 'build_settlement', [[4,3],[4,4],[3,4]])
+        @board.settlements.count.must_equal 1
+        @board.settlements.first.player.must_equal @player3
+        assert @player3.resource_cards.count >= 2
+        @game.state.must_equal :start_turn2
+      end
     end
   end
 
   describe 'final #build_road of pregame' do
     before do
       @game.turn = 5
-      @game.perform_action(@player3, 'build_settlement', [[4,3],[4,4],[3,4]])
-      @game.perform_action(@player3, 'build_road', [[4,3],[4,4]])
+      @game.perform_action(@player1, 'build_settlement', [[4,3],[4,4],[3,4]])
+      @game.perform_action(@player1, 'build_road', [[4,3],[4,4]])
     end
 
     it 'transitions to main game state machine' do

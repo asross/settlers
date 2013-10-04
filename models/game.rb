@@ -19,7 +19,11 @@ class Game < Catan
   end
 
   def active_player
-    players[turn % players.size]
+    if round == 1
+      players[players.size - turn % players.size - 1]
+    else
+      players[turn % players.size]
+    end
   end
 
   def available_actions(player)
