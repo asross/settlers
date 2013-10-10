@@ -204,11 +204,99 @@ describe Game do
       @game.active_player.must_equal @player2
       @game.turn.must_equal old_turn + 1
     end
-
-    it '#build_settlement'
-    it '#build_city'
-    it '#build_road'
-    it '#trade_in'
   end
 
+  describe 'development cards' do
+    before do
+      @game.turn = 6
+      @game.state = :postroll
+      @game.active_player.must_equal @player1
+    end
+
+    it 'pre-roll knight' do
+      @game.state = :preroll
+      @player1.development_cards << DevCard.new(:knight)
+      @board.settlements << Settlement.new(h(1,4), h(2,3), h(2,4), @player2)
+      @board.settlements << Settlement.new(h(1,3), h(2,3), h(2,2), @player3)
+      @player1.ore = 0
+      @player2.ore = 1
+      assert_similar @game.available_actions(@player1), %w(knight roll)
+      @game.perform_action(@player1, 'knight')
+      @game.state.must_equal :robbing1
+      @game.perform_action(@player1, 'move_robber', [[2,3]])
+      @game.state.must_equal :robbing2
+      @game.perform_action(@player1, 'rob_player', @player2.color)
+      @game.state.must_equal :preroll
+      @player1.ore.must_equal 1
+      @player2.ore.must_equal 0
+    end
+
+    it 'post-roll knight' do
+      @game.state = :postroll
+      @player1.development_cards << DevCard.new(:knight)
+      @board.settlements << Settlement.new(h(1,4), h(2,3), h(2,4), @player2)
+      @board.settlements << Settlement.new(h(1,3), h(2,3), h(2,2), @player3)
+      @game.perform_action(@player1, 'knight')
+      @game.state.must_equal :robbing1
+      @game.perform_action(@player1, 'move_robber', [[2,3]])
+      @game.state.must_equal :robbing2
+      @game.perform_action(@player1, 'rob_player', @player2.color)
+      @game.state.must_equal :postroll
+    end
+
+    it 'monopoly' do
+      @player1.development_cards << DevCard.new(:monopoly)
+      @game.available_actions(@player1).must_include 'monopoly'
+      @player1.wheat = 0
+      @player2.wheat = 3
+      @player3.wheat = 1
+      @game.perform_action(@player1, 'monopoly', 'wheat')
+      @game.state.must_equal :postroll
+      @player1.wheat.must_equal 4
+      @player2.wheat.must_equal 0
+      @player3.wheat.must_equal 0
+    end
+
+    it 'year of plenty' do
+      @player1.development_cards << DevCard.new(:year_of_plenty)
+      @game.available_actions(@player1).must_include 'year_of_plenty'
+      @player1.wheat = 0
+      @game.perform_action(@player1, 'year_of_plenty', %w(wheat wheat))
+      @game.state.must_equal :postroll
+      @player1.wheat.must_equal 2
+    end
+
+    it 'road building' do
+      @player1.development_cards << DevCard.new(:road_building)
+      @board.settlements << Settlement.new(h(3,3), h(3,4), h(4,3), @player1)
+      @game.available_actions(@player1).must_include 'road_building'
+      @game.perform_action(@player1, 'road_building')
+      @game.state.must_equal :road_building1
+      @game.available_actions(@player1).must_equal %w(build_road)
+      @game.perform_action(@player1, 'build_road', [[3,3],[3,4]])
+      @game.state.must_equal :road_building2
+      @game.perform_action(@player1, 'build_road', [[3,4],[2,4]])
+      @game.state.must_equal :postroll
+      @player1.roads.count.must_equal 2
+    end
+
+    it 'does not allow more than one card per turn' do
+      @player1.development_cards << DevCard.new(:monopoly)
+      @player1.development_cards << DevCard.new(:road_building)
+      @game.available_actions(@player1).must_include 'road_building'
+      @game.perform_action(@player1, 'monopoly', 'wheat')
+      @game.available_actions(@player1).wont_include 'road_building'
+    end
+
+    it 'does not allow replaying of played cards' do
+      monopoly = DevCard.new(:monopoly)
+      monopoly.played?.must_equal false
+      @player1.development_cards << monopoly
+      @game.perform_action(@player1, 'monopoly', 'wheat')
+      monopoly.played?.must_equal true
+    end
+
+    it 'victory points'
+    it 'largest army'
+  end
 end

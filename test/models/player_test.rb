@@ -220,4 +220,10 @@ describe Player do
       @player.settlements.count.must_equal 0
     end
   end
+
+  describe '#buy_dev_card' do
+    it 'errors if you lack resources'
+    it 'errors if no cards are left'
+    it 'succeeds otherwise'
+  end
 end
