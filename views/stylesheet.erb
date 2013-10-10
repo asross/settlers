@@ -144,26 +144,16 @@
       -moz-transform: rotateZ(<%= i*60 %>deg);
     }
   <% end %>
-  .port div {
+  .port .label {
+    color: white;
     background-color: #ccc;
+    text-align: center;
     position: relative;
     top: <%= - height/2.0 + port_height %>px;
-  }
-  .port .label {
-    text-align: center;
-    color: white;
   }
   .port.bottom .label {
     -webkit-transform: inherit;
     -moz-transform: inherit;
-  }
-  .port .arm {
-    position: absolute;
-    width: <%= port_height / 2 %>px;
-    height: <%= port_height + 1 %>px;
-  }
-  .port .arm2 {
-    right: 0;
   }
   .robbed {
     color: black;
