@@ -9,18 +9,38 @@ describe Player do
 
   describe '#trade_in' do
     it 'raises an error when there are not enough resources' do
-      raises('Not enough resources') { @player.trade_in('ore', 'wheat', 4) }
+      raises('Not enough resources') { @player.trade_in('ore', 'wheat') }
     end
 
     it 'raises an error on invalid input' do
       @player.points = 10
-      raises('Bad resource card') { @player.trade_in('points', 'wheat', 4) }
+      raises('Bad resource card') { @player.trade_in('points', 'wheat') }
     end
 
     it 'works if there are enough' do
       @player.sheep = 5
-      @player.trade_in('sheep', 'wood', 3)
-      @player.sheep.must_equal 2
+      @player.trade_in('sheep', 'wood')
+      @player.sheep.must_equal 1
+      @player.wood.must_equal 1
+    end
+
+    it 'requires only three on a 3:1' do
+      @board.settlements << Settlement.new(h(2,1), h(2,2), h(3,1), @player)
+      h(2,1).port_type = '3:1'
+      h(2,1).port_direction = 'bottom'
+      @player.sheep = 3
+      @player.trade_in('sheep', 'wood')
+      @player.sheep.must_equal 0
+      @player.wood.must_equal 1
+    end
+
+    it 'requires only two on a 2:1 of the right type' do
+      @board.settlements << Settlement.new(h(2,1), h(2,2), h(3,1), @player)
+      h(2,1).port_type = 'sheep'
+      h(2,1).port_direction = 'bottom'
+      @player.sheep = 2
+      @player.trade_in('sheep', 'wood')
+      @player.sheep.must_equal 0
       @player.wood.must_equal 1
     end
   end

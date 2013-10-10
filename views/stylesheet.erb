@@ -1,9 +1,11 @@
 <style type="text/css">
-  <% height = 80.0 %>
+  <% height = 100.0 %>
   <% width = height/Math.sqrt(3) %>
   <% margin = 5 + height/4.0 %>
   <% road_height = 10 %>
   <% city_height = 25 %>
+  <% port_height = 20 %>
+  <% city_city_height = city_height + 10 %>
   body {
     margin: 0;
   }
@@ -44,7 +46,6 @@
     height: <%= city_height %>px;
     border-radius: <%= city_height %>px;
   }
-  <% city_city_height = city_height + 10 %>
   .city {
     width: <%= city_city_height %>px;
     height: <%= city_city_height %>px;
@@ -116,7 +117,7 @@
   .tile.third {
     top: <%= -2*height %>px;
   }
-  .number {
+  .number, .port-label {
     width: <%= height/2.0 %>px;
     height: <%= height/2.0 %>px;
     line-height: <%= height %>px;
@@ -129,6 +130,32 @@
     left: <%= height/3.0 %>px;
     background-color: transparent;
   }
+  .port {
+    position: relative;
+    top: <%= -2.5*height - port_height/2.0 %>px;
+    left: <%= width/2.0 %>px;
+    width: <%= width %>px;
+    height: <%= port_height %>px;
+  }
+  .port .label {
+    color: white;
+    background-color: #ccc;
+    text-align: center;
+    position: relative;
+    top: <%= - height/2.0 + port_height %>px;
+  }
+  <% %w(top topright botright bottom botleft topleft).each_with_index do |direction, i| %>
+    .port.<%= direction %> {
+      -webkit-transform: rotateZ(<%= i*60 %>deg);
+      -moz-transform: rotateZ(<%= i*60 %>deg);
+    }
+    <% if direction.start_with?('bot') %>
+      .port.<%= direction %> .label {
+        -webkit-transform: scaleX(-1) scaleY(-1);
+        -moz-transform: scaleX(-1) scaleY(-1);
+      }
+    <% end %>
+  <% end %>
   .robbed {
     color: black;
   }

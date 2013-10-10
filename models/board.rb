@@ -1,6 +1,7 @@
 class Board < Catan
   NUMBER_TOKENS = [5, 2, 6, 3, 8, 10, 9, 12, 11, 4, 8, 10, 9, 4, 5, 6, 3, 11]
   HEX_TYPES = %w(ore brick)*3 + %w(sheep wheat wood)*4 + %w(desert)
+  PORT_TYPES = %w(brick wood sheep wheat ore) + ['3:1']*4
   attr_accessor :settlements, :roads, :hexes, :robbed_hex, :longest_road_player, :longest_road_length, :side_length
 
   def self.on_island?(i,j,l)
@@ -9,16 +10,41 @@ class Board < Catan
     true
   end
 
+  def self.port_locales(side_length)
+    return {} unless side_length == 3
+    {
+      [2,1] => 'bottom',
+      [4,0] => 'bottom',
+      [0,2] => 'botright',
+      [0,5] => 'topright',
+      [1,6] => 'topright',
+      [3,6] => 'top',
+      [5,4] => 'topleft',
+      [6,2] => 'topleft',
+      [6,0] => 'botleft'
+    }
+  end
+
   def self.create(side_length=3)
     types = HEX_TYPES.dup.shuffle.cycle
     tokens = NUMBER_TOKENS.dup.cycle
+    ports = PORT_TYPES.dup.shuffle.cycle
 
     hexes = \
     0.upto(side_length*2).map do |i|
       0.upto(side_length*2).map do |j|
         type  = (on_island?(i, j, side_length) ? types.next : 'water')
         token = (tokens.next unless %w(water desert).include?(type))
-        Hex.new(i, j, token, type)
+
+        port_type = nil
+        port_direction = nil
+
+        if type == 'water' && direction = port_locales(side_length)[[i,j]]
+          port_type = ports.next
+          port_direction = direction
+        end
+
+        Hex.new(i, j, token, type, port_type, port_direction)
       end
     end
 
