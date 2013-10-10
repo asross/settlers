@@ -133,19 +133,21 @@
   <% port_height = 20 %>
   .port {
     position: relative;
-    top: <%= -3*height %>px;
+    top: <%= -2.5*height - port_height/2.0 %>px;
     left: <%= width/2.0 %>px;
     width: <%= width %>px;
     height: <%= port_height %>px;
-    -webkit-transform-origin-y: <%= height/2.0 %>px;
   }
   <% %w(top topright botright bottom botleft topleft).each_with_index do |direction, i| %>
     .port.<%= direction %> {
       -webkit-transform: rotateZ(<%= i*60 %>deg);
+      -moz-transform: rotateZ(<%= i*60 %>deg);
     }
   <% end %>
   .port div {
     background-color: #ccc;
+    position: relative;
+    top: <%= - height/2.0 + port_height %>px;
   }
   .port .label {
     text-align: center;
@@ -153,10 +155,10 @@
   }
   .port.bottom .label {
     -webkit-transform: inherit;
+    -moz-transform: inherit;
   }
   .port .arm {
     position: absolute;
-    top: 0;
     width: <%= port_height / 2 %>px;
     height: <%= port_height + 1 %>px;
   }
