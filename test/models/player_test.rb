@@ -43,6 +43,17 @@ describe Player do
       @player.sheep.must_equal 0
       @player.wood.must_equal 1
     end
+
+    it 'works with cities, too' do
+      Player::RESOURCE_CARDS.each{|r| @player.trade_in_ratio_for(r).must_equal 4 }
+      settlement = Settlement.new(h(2,1), h(2,2), h(3,1), @player)
+      h(2,1).port_type = '3:1'
+      h(2,1).port_direction = 'bottom'
+      @board.settlements << settlement
+      Player::RESOURCE_CARDS.each{|r| @player.trade_in_ratio_for(r).must_equal 3 }
+      settlement.size = 2
+      Player::RESOURCE_CARDS.each{|r| @player.trade_in_ratio_for(r).must_equal 3 }
+    end
   end
 
   describe '#build_settlement' do
@@ -53,7 +64,7 @@ describe Player do
     end
 
     it 'raises an error if player has already build 5 settlements' do
-      @player.n_settlements = 5
+      5.times { @board.settlements << Settlement.new(@hex1, @hex2, @hex3, @player) }
       raises('Already built 5') { @player.build_settlement(@hex1, @hex2, @hex3) }
     end
 
@@ -83,7 +94,7 @@ describe Player do
       @player.wood = 1
       @player.build_settlement(@hex1, @hex2, @hex3)
       @player.points.must_equal 1
-      @player.n_settlements.must_equal 1
+      @player.settlements.count.must_equal 1
       [:sheep, :wheat, :brick, :wood].each do |attr|
         @player.send(attr).must_equal 0
       end
@@ -92,7 +103,7 @@ describe Player do
     it "does not require roads or resources on turn1" do
       @player.build_settlement(@hex1, @hex2, @hex3, true)
       @player.points.must_equal 1
-      @player.n_settlements.must_equal 1
+      @player.settlements.count.must_equal 1
       @player.sheep.must_equal 0
       @player.wheat.must_equal 0
       @player.wood.must_equal 0
@@ -102,7 +113,7 @@ describe Player do
     it "awards resources on turn2" do
       @player.build_settlement(@hex1, @hex2, @hex3, false, true)
       @player.points.must_equal 1
-      @player.n_settlements.must_equal 1
+      @player.settlements.count.must_equal 1
       expected_total = [@hex1, @hex2, @hex3].count{|h| Player::RESOURCE_CARDS.include?(h.type) }
       [@player.ore, @player.sheep, @player.wheat, @player.wood, @player.brick].inject(:+).must_equal expected_total
     end
@@ -116,7 +127,7 @@ describe Player do
     end
 
     it 'raises an error if 15 roads are already built' do
-      @player.n_roads = 15
+      15.times { @board.roads << Road.new(@hex2, @hex3, @player.color) }
       raises('Already built 15') { @player.build_road(@hex1, @hex2) }
     end
 
@@ -199,14 +210,14 @@ describe Player do
       @player.ore = 3
       @player.wheat = 2
       @player.points = 1
-      @player.n_settlements = 1
+      @player.settlements.count.must_equal 1
       s.size.must_equal 1
       @player.build_city(@hex1, @hex2, @hex3)
       s.size.must_equal 2
       @player.points.must_equal 2
       @player.ore.must_equal 0
       @player.wheat.must_equal 0
-      @player.n_settlements.must_equal 0
+      @player.settlements.count.must_equal 0
     end
   end
 end
