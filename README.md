@@ -31,7 +31,6 @@ There are two clients, one HTML-based, and one text-based. My plan at this point
 
 ## TODO
 
-- Ports
 - Development cards
 - Text-based client / server interactions
 
