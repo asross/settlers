@@ -221,9 +221,33 @@ describe Player do
     end
   end
 
-  describe '#buy_dev_card' do
-    it 'errors if you lack resources'
-    it 'errors if no cards are left'
-    it 'succeeds otherwise'
+  describe '#buy_development_card' do
+    it 'errors if you lack resources' do
+      @board.development_cards = [ DevCard.new(:year_of_plenty) ]
+      @player.ore = 0
+      @player.wheat = 1
+      @player.sheep = 1
+      raises('Not enough resources') { @player.buy_development_card }
+    end
+
+    it 'errors if no cards are left' do
+      @board.development_cards = []
+      @player.ore = 1
+      @player.wheat = 1
+      @player.sheep = 1
+      raises('deck is empty') { @player.buy_development_card }
+    end
+
+    it 'succeeds otherwise' do
+      card = DevCard.new(:year_of_plenty)
+      @board.development_cards = [ card ]
+      @player.ore = 1
+      @player.wheat = 1
+      @player.sheep = 1
+      @player.buy_development_card
+      %w(ore wheat sheep).each{|r| @player.send(r).must_equal 0 }
+      @player.development_cards.must_equal [ card ]
+      @board.development_cards.must_equal []
+    end
   end
 end

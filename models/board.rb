@@ -2,7 +2,8 @@ class Board < Catan
   NUMBER_TOKENS = [5, 2, 6, 3, 8, 10, 9, 12, 11, 4, 8, 10, 9, 4, 5, 6, 3, 11]
   HEX_TYPES = %w(ore brick)*3 + %w(sheep wheat wood)*4 + %w(desert)
   PORT_TYPES = %w(brick wood sheep wheat ore) + ['3:1']*4
-  attr_accessor :settlements, :roads, :hexes, :robbed_hex, :longest_road_player, :longest_road_length, :side_length
+  CARD_TYPES = %w(knight)*14 + %w(victory_point)*5 + %w(monopoly road_building year_of_plenty)*2
+  attr_accessor :settlements, :roads, :hexes, :robbed_hex, :longest_road_player, :longest_road_length, :side_length, :development_cards
 
   def self.on_island?(i,j,l)
     return false unless (l+1..l*3-1).include?(i+j)
@@ -51,7 +52,7 @@ class Board < Catan
     new(hexes, side_length)
   end
 
-  def initialize(hexes, side_length)
+  def initialize(hexes, side_length, cards=CARD_TYPES.dup.shuffle)
     @hexes = hexes
     @side_length = side_length
     @robbed_hex = hexes.flatten.detect{|h| h.type == 'desert'}
@@ -60,6 +61,7 @@ class Board < Catan
     @roads = []
     @longest_road_player = nil
     @longest_road_length = 0
+    @development_cards = cards.map{|c| DevCard.new(c.to_sym) }
   end
 
   def rolled(roll)
