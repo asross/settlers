@@ -41,6 +41,7 @@ class Game < Catan
   end
 
   def dev_card_actions(player)
+    return [] if @dev_card_played
     cards = player.development_cards.select(&:playable?).map{|c| c.type.to_s }.uniq
 
     case state
@@ -126,7 +127,29 @@ class Game < Catan
 
   def pass_turn
     @turn += 1
+    @dev_card_played = false
     self.state = :preroll
+  end
+
+
+  def monopoly(resource)
+    @dev_card_played = true
+
+  end
+
+  def knight
+    @dev_card_played = true
+
+  end
+
+  def year_of_plenty(resource1, resource2)
+    @dev_card_played = true
+
+  end
+
+  def road_building
+    @dev_card_played = true
+
   end
 
   def h(x, y)
