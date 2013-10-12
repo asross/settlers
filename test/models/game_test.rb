@@ -215,6 +215,7 @@ describe Game do
 
     it 'pre-roll knight' do
       @game.state = :preroll
+      ensure_robbed(1, 4)
       @player1.development_cards << DevCard.new(:knight)
       @board.settlements << Settlement.new(h(1,4), h(2,3), h(2,4), @player2)
       @board.settlements << Settlement.new(h(1,3), h(2,3), h(2,2), @player3)
@@ -233,6 +234,7 @@ describe Game do
 
     it 'post-roll knight' do
       @game.state = :postroll
+      ensure_robbed(1, 4)
       @player1.development_cards << DevCard.new(:knight)
       @board.settlements << Settlement.new(h(1,4), h(2,3), h(2,4), @player2)
       @board.settlements << Settlement.new(h(1,3), h(2,3), h(2,2), @player3)

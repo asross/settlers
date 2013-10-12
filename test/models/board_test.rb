@@ -7,15 +7,8 @@ describe Board do
   end
 
   describe '#move_robber_to' do
-    before do
-      # Initialize the robber at a particular location
-      # to prevent sporadic failures
-      @board.robbed_hex.robbed = false
-      @board.robbed_hex = h(1,1)
-      @board.robbed_hex.robbed = true
-    end
-
     it 'returns a list of all players the robber could affect' do
+      ensure_robbed(1, 1)
       player = Player.new(@board, 'green')
       raises('invalid robber location') { @board.move_robber_to(20,20,player) }
       @board.move_robber_to(3,3,player).must_equal []
