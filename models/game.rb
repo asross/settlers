@@ -154,6 +154,8 @@ class Game < Catan
   end
 
   def play_year_of_plenty(resource1, resource2)
+    active_player.increment(resource1, 1)
+    active_player.increment(resource2, 1)
   end
 
   def play_road_building
