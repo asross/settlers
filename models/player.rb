@@ -1,11 +1,12 @@
 class Player < Catan
   RESOURCE_CARDS = %w(brick wood sheep wheat ore)
-  attr_accessor *RESOURCE_CARDS, :color, :points, :board
+  attr_accessor *RESOURCE_CARDS, :color, :points, :board, :development_cards
   
   def initialize(board, color)
     @board = board
     @color = color
     @points = 0
+    @development_cards = []
     RESOURCE_CARDS.each{|r| send("#{r}=", 0) }
   end
 

@@ -29,13 +29,23 @@ class Game < Catan
   def available_actions(player)
     return [] unless player == active_player  # eventually, could "accept trade request"
     
-    case state
+    dev_card_actions(player) + case state
     when :preroll     then %w(roll)
     when :postroll    then %w(build_settlement build_city build_road trade_in pass_turn)
     when :robbing1    then %w(move_robber)
     when :robbing2    then %w(rob_player)
     when :start_turn1 then %w(build_settlement)
     when :start_turn2 then %w(build_road)
+    else []
+    end
+  end
+
+  def dev_card_actions(player)
+    cards = player.development_cards.select(&:playable?).map{|c| c.type.to_s }.uniq
+
+    case state
+    when :preroll then %w(knight) & cards
+    when :postroll then cards
     else []
     end
   end
