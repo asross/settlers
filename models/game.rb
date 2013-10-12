@@ -55,7 +55,15 @@ class Game < Catan
     unless available_actions(player).include?(action)
       error "#{player.color} cannot perform #{action} at this time"
     end
+    if dev_card_actions(player).include?(action)
+      card = player.development_cards.select(&:playable?).detect{|c| c.type.to_s == action }
+    else
+      card = nil
+    end
     send(action, *args)
+    if card
+      card.played = true
+    end
   end
 
   def state=(s)
@@ -130,7 +138,6 @@ class Game < Catan
     @dev_card_played = false
     self.state = :preroll
   end
-
 
   def monopoly(resource)
     @dev_card_played = true
