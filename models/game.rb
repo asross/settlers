@@ -143,6 +143,11 @@ class Game < Catan
   end
 
   def play_monopoly(resource)
+    players.each do |player|
+      n = player.send(resource)
+      player.increment(resource, -n)
+      active_player.increment(resource, n)
+    end
   end
 
   def play_knight
