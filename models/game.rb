@@ -55,15 +55,7 @@ class Game < Catan
     unless available_actions(player).include?(action)
       error "#{player.color} cannot perform #{action} at this time"
     end
-    if dev_card_actions(player).include?(action)
-      card = player.development_cards.select(&:playable?).detect{|c| c.type.to_s == action }
-    else
-      card = nil
-    end
     send(action, *args)
-    if card
-      card.played = true
-    end
   end
 
   def state=(s)
@@ -139,24 +131,27 @@ class Game < Catan
     self.state = :preroll
   end
 
-  def monopoly(resource)
-    @dev_card_played = true
-
+  %w(monopoly knight year_of_plenty road_building).each do |card|
+    class_eval <<-RUBY
+      def #{card}(*args)
+        card = active_player.development_cards.select(&:playable?).detect{|c| c.type.to_s == '#{card}' }
+        play_#{card}(*args)
+        card.played = true
+        @dev_card_played = true
+      end
+    RUBY
   end
 
-  def knight
-    @dev_card_played = true
-
+  def play_monopoly(resource)
   end
 
-  def year_of_plenty(resource1, resource2)
-    @dev_card_played = true
-
+  def play_knight
   end
 
-  def road_building
-    @dev_card_played = true
+  def play_year_of_plenty(resource1, resource2)
+  end
 
+  def play_road_building
   end
 
   def h(x, y)
