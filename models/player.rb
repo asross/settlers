@@ -85,13 +85,13 @@ class Player < Catan
     end
   end
 
-  def build_road(hex1, hex2, start_turn=false)
+  def build_road(hex1, hex2, road_is_free=false)
     error 'Already built 15 roads' if roads.count >= 15
     error 'Road not buildable there' unless board.road_buildable_at?(hex1, hex2, color)
-    error 'Not enough resources to build road' unless start_turn || (wood >= 1 && brick >= 1)
+    error 'Not enough resources to build road' unless road_is_free || (wood >= 1 && brick >= 1)
     board.roads << Road.new(hex1, hex2, color)
     board.check_for_longest_road(self)
-    unless start_turn
+    unless road_is_free
       @brick -= 1
       @wood -= 1
     end

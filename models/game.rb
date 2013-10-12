@@ -1,5 +1,6 @@
 class Game < Catan
-  STATES = [:preroll, :postroll, :robbing1, :robbing2, :start_turn1, :start_turn2]
+  STATES = [:preroll, :postroll, :robbing1, :robbing2, :start_turn1, :start_turn2, :road_building1, :road_building2]
+  FREE_ROAD_STATES = [:start_turn2, :road_building1, :road_building2]
   ACTIONS = %w(roll build_settlement build_city build_road trade_in pass_turn move_robber rob_player)
   attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable
   attr_reader :state
@@ -35,7 +36,7 @@ class Game < Catan
     when :robbing1    then %w(move_robber)
     when :robbing2    then %w(rob_player)
     when :start_turn1 then %w(build_settlement)
-    when :start_turn2 then %w(build_road)
+    when *FREE_ROAD_STATES then %w(build_road)
     else []
     end
   end
@@ -103,11 +104,15 @@ class Game < Catan
   end
 
   def build_road(v1, v2)
-    active_player.build_road(h(*v1), h(*v2), state == :start_turn2)
+    active_player.build_road(h(*v1), h(*v2), FREE_ROAD_STATES.include?(state))
 
     if state == :start_turn2
       @turn += 1
       self.state = (round >= 2) ? :preroll : :start_turn1
+    elsif state == :road_building1
+      self.state = :road_building2
+    else
+      self.state = :postroll
     end
   end
 
@@ -159,6 +164,7 @@ class Game < Catan
   end
 
   def play_road_building
+    self.state = :road_building1
   end
 
   def h(x, y)
