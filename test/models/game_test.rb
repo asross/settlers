@@ -280,6 +280,22 @@ describe Game do
       @player1.roads.count.must_equal 2
     end
 
+    it 'road building with 14 roads' do
+      @player1.development_cards << DevCard.new(:road_building)
+      @board.settlements << Settlement.new(h(3,3), h(3,4), h(4,3), @player1)
+      14.times { @board.roads << Road.new(h(3,3), h(3,4), @player1.color) }
+      @game.perform_action(@player1, 'road_building')
+      @game.state.must_equal :road_building2
+    end
+
+    it 'road building with 15 roads' do
+      @player1.development_cards << DevCard.new(:road_building)
+      @board.settlements << Settlement.new(h(3,3), h(3,4), h(4,3), @player1)
+      15.times { @board.roads << Road.new(h(3,3), h(3,4), @player1.color) }
+      @game.perform_action(@player1, 'road_building')
+      @game.state.must_equal :postroll
+    end
+
     it 'does not allow more than one card per turn' do
       @player1.development_cards << DevCard.new(:monopoly)
       @player1.development_cards << DevCard.new(:road_building)

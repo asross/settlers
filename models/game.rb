@@ -164,7 +164,14 @@ class Game < Catan
   end
 
   def play_road_building
-    self.state = :road_building1
+    case active_player.roads.count
+    when Player::MAX_ROADS
+      # Player cannot build more roads, so the card should do nothing.
+    when Player::MAX_ROADS - 1
+      self.state = :road_building2
+    else
+      self.state = :road_building1
+    end
   end
 
   def h(x, y)

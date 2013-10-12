@@ -1,5 +1,7 @@
 class Player < Catan
   RESOURCE_CARDS = %w(brick wood sheep wheat ore)
+  MAX_ROADS = 15
+  MAX_SETTLEMENTS = 5
   attr_accessor *RESOURCE_CARDS, :color, :points, :board, :development_cards
   
   def initialize(board, color)
@@ -64,7 +66,7 @@ class Player < Catan
   end
 
   def build_settlement(hex1, hex2, hex3, turn1=false, turn2=false)
-    error 'Already built 5 settlements' if settlements.count >= 5
+    error 'Already built 5 settlements' if settlements.count >= MAX_SETTLEMENTS
     error 'Too close to existing settlement/city' if board.settlement_near?(hex1, hex2, hex3)
     error 'Hexes are not adjacent' unless [hex1, hex2, hex3].combination(2).all?{|h1, h2| h1.adjacent?(h2) }
     unless turn1 || turn2
@@ -86,7 +88,7 @@ class Player < Catan
   end
 
   def build_road(hex1, hex2, road_is_free=false)
-    error 'Already built 15 roads' if roads.count >= 15
+    error 'Already built 15 roads' if roads.count >= MAX_ROADS
     error 'Road not buildable there' unless board.road_buildable_at?(hex1, hex2, color)
     error 'Not enough resources to build road' unless road_is_free || (wood >= 1 && brick >= 1)
     board.roads << Road.new(hex1, hex2, color)
