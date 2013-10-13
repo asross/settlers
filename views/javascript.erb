@@ -26,10 +26,8 @@
           $('body').addClass('player-select');
         <% when 'trade_in' %>
           $('body').addClass('trade-select');
-        <% when 'roll' %>
-          performAction('roll', []);
-        <% when 'pass_turn' %>
-          performAction('pass_turn', []);
+        <% when *%w(roll pass_turn knight road_building buy_development_card) %>
+          performAction('<%= action %>', []);
         <% end %>
       });
     <% end %>

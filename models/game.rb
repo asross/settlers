@@ -1,7 +1,8 @@
 class Game < Catan
   STATES = [:preroll, :postroll, :robbing1, :robbing2, :start_turn1, :start_turn2, :road_building1, :road_building2]
   FREE_ROAD_STATES = [:start_turn2, :road_building1, :road_building2]
-  ACTIONS = %w(roll build_settlement build_city build_road trade_in pass_turn move_robber rob_player)
+  DEV_CARD_ACTIONS = %w(monopoly knight year_of_plenty road_building)
+  ACTIONS = %w(roll build_settlement build_city build_road buy_development_card trade_in pass_turn move_robber rob_player) + DEV_CARD_ACTIONS
   attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable
   attr_reader :state
   
@@ -32,7 +33,7 @@ class Game < Catan
     
     dev_card_actions(player) + case state
     when :preroll     then %w(roll)
-    when :postroll    then %w(build_settlement build_city build_road trade_in pass_turn)
+    when :postroll    then %w(build_settlement build_city build_road buy_development_card trade_in pass_turn)
     when :robbing1    then %w(move_robber)
     when :robbing2    then %w(rob_player)
     when :start_turn1 then %w(build_settlement)
@@ -131,6 +132,10 @@ class Game < Catan
     self.state = :start_turn2 if state == :start_turn1
   end
 
+  def buy_development_card
+    active_player.buy_development_card
+  end
+
   def trade_in(r1, r2)
     active_player.trade_in(r1, r2)
   end
@@ -141,7 +146,7 @@ class Game < Catan
     self.state = :preroll
   end
 
-  %w(monopoly knight year_of_plenty road_building).each do |card|
+  DEV_CARD_ACTIONS.each do |card|
     class_eval <<-RUBY
       def #{card}(*args)
         card = active_player.development_cards.select(&:playable?).detect{|c| c.type.to_s == '#{card}' }
