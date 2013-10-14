@@ -28,18 +28,21 @@
         <% end %>
       <% end %>
 
+      <div id='year-of-plenty-widget'>
+        <%= erb :resource_select, locals: { name: 'resource1' } %>
+        <%= erb :resource_select, locals: { name: 'resource2' } %>
+        <button id='year-of-plenty-submit'>submit</button>
+      </div>
+
+      <div id='monopoly-widget'>
+        <%= erb :resource_select, locals: { name: 'resource' } %>
+        <button id='monopoly-submit'>submit</button>
+      </div>
+
       <div id='trade-widget'>
-        <select name='resource1'>
-          <% Player::RESOURCE_CARDS.each do |resource| %>
-            <option><%= resource %></option>
-          <% end %>
-        </select>
+        <%= erb :resource_select, locals: { name: 'resource1' } %>
         &mdash;&gt;
-        <select name='resource2'>
-          <% Player::RESOURCE_CARDS.each do |resource| %>
-            <option><%= resource %></option>
-          <% end %>
-        </select>
+        <%= erb :resource_select, locals: { name: 'resource2' } %>
         <button id='trade-submit'>submit</button>
       </div>
     </div>

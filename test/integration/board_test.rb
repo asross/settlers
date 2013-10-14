@@ -159,10 +159,32 @@ describe 'board.erb' do
     page.must_have_css('.player[data-color="red"] #build_road')
   end
 
-  it 'allows playing year of plenty'
+  it 'allows playing year of plenty' do
+    $game.state = :postroll
+    @player1.development_cards = [ DevCard.new(:year_of_plenty) ]
+    visit '/?color=red'
+    find('#year_of_plenty').click
+    select 'ore', from: 'resource1'
+    select 'wood', from: 'resource2'
+    find('#year-of-plenty-submit').click
+    within('.player[data-color="red"]') do
+      page.must_have_content '1 ore'
+      page.must_have_content '1 wood'
+    end
+  end
 
-  it 'allows playing monopoly'
-
+  it 'allows playing monopoly' do
+    $game.state = :postroll
+    @player1.development_cards = [ DevCard.new(:monopoly) ]
+    @player2.brick = 5
+    visit '/?color=red'
+    find('#monopoly').click
+    select 'brick', from: 'resource'
+    find('#monopoly-submit').click
+    within('.player[data-color="red"]') do
+      page.must_have_content '5 brick'
+    end
+  end
 
   def click_on_coords(*coords)
     if coords.size == 1
