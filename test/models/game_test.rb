@@ -308,10 +308,25 @@ describe Game do
 
     it 'does not allow replaying of played cards' do
       monopoly = DevCard.new(:monopoly)
-      monopoly.played?.must_equal false
+      monopoly.played.must_equal false
       @player1.development_cards << monopoly
       @game.perform_action(@player1, 'monopoly', 'wheat')
-      monopoly.played?.must_equal true
+      monopoly.played.must_equal true
+    end
+
+    it 'does not allow playing of just-bought cards' do
+      monopoly = DevCard.new(:monopoly)
+      @board.development_cards = [ monopoly ]
+      @player1.ore = 1
+      @player1.wheat = 1
+      @player1.sheep = 1
+      @game.perform_action(@player1, 'buy_development_card')
+      @player1.development_cards.must_equal [ monopoly ]
+      monopoly.turn_purchased.must_equal 6
+      @game.available_actions(@player1).wont_include 'monopoly'
+      @game.turn = 9
+      @game.active_player.must_equal @player1
+      @game.available_actions(@player1).must_include 'monopoly'
     end
 
     it 'victory points'

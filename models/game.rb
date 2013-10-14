@@ -44,7 +44,7 @@ class Game < Catan
 
   def dev_card_actions(player)
     return [] if @dev_card_played
-    cards = player.development_cards.select(&:playable?).map{|c| c.type.to_s }.uniq
+    cards = playable_dev_cards.map{|c| c.type.to_s }.uniq
 
     case state
     when :preroll then %w(knight) & cards
@@ -133,7 +133,8 @@ class Game < Catan
   end
 
   def buy_development_card
-    active_player.buy_development_card
+    card = active_player.buy_development_card
+    card.turn_purchased = turn
   end
 
   def trade_in(r1, r2)
@@ -149,12 +150,16 @@ class Game < Catan
   DEV_CARD_ACTIONS.each do |card|
     class_eval <<-RUBY
       def #{card}(*args)
-        card = active_player.development_cards.select(&:playable?).detect{|c| c.type.to_s == '#{card}' }
+        card = playable_dev_cards.detect{|c| c.type.to_s == '#{card}' }
         play_#{card}(*args)
         card.played = true
         @dev_card_played = true
       end
     RUBY
+  end
+
+  def playable_dev_cards
+    active_player.development_cards.select{|c| c.playable_on_turn?(turn) }
   end
 
   def play_monopoly(resource)

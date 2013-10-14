@@ -111,9 +111,11 @@ class Player < Catan
   def buy_development_card
     error 'Development card deck is empty' unless board.development_cards.any?
     error 'Not enough resources to buy dev card' unless ore >= 1 && wheat >= 1 && sheep >= 1
-    @development_cards << board.development_cards.pop
+    card = board.development_cards.pop
+    @development_cards << card
     @wheat -= 1
     @sheep -= 1
     @ore -= 1
+    card
   end
 end
