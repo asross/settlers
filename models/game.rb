@@ -95,12 +95,8 @@ class Game < Catan
     error "invalid selection #{color} (must pick one of #{@robbable.join(', ')})" unless robbee
     active_player.steal_from(robbee)
     @robbable = nil
-    if @pre_knight_state
-      self.state = @pre_knight_state
-      @pre_knight_state = nil
-    else
-      self.state = :postroll
-    end
+    self.state = @pre_knight_state || :postroll
+    @pre_knight_state = nil
   end
 
   def move_robber(v)
@@ -110,7 +106,8 @@ class Game < Catan
       self.state = :postroll
     when 1
       active_player.steal_from(robbable.first)
-      self.state = :postroll
+      self.state = @pre_knight_state || :postroll
+      @pre_knight_state = nil
     else
       @robbable = robbable
       self.state = :robbing2
