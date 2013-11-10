@@ -167,10 +167,6 @@ describe Board do
     end
   end
 
-  describe '#max_road_length' do
-
-  end
-
   describe '#check_for_longest_road' do
     it 'straightish line' do
       @board.roads << (r1 = Road.new(h(2,5),h(3,5),'blue')) #  /
