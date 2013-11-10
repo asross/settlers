@@ -70,7 +70,7 @@ class Game < Catan
   private
 
   def random_dieroll
-    2 +rand(6) + rand(6)
+    2 + rand(6) + rand(6)
   end
 
   def roll
