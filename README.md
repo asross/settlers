@@ -34,8 +34,11 @@ The server also uses websockets to send updates of game state. However, for the 
 
 ## TODO
 
-- Development cards
 - Endgame
+    * Handling victory points
+    * Recognizing the winner
+- Trading
+- Discarding on 7s
 - Text-based client
 
 # License
