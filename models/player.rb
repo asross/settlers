@@ -1,11 +1,13 @@
 class Player < Catan
   RESOURCE_CARDS = %w(brick wood sheep wheat ore)
-  attr_accessor *RESOURCE_CARDS, :color, :points, :board
+  MAX_ROADS = 15
+  MAX_SETTLEMENTS = 5
+  attr_accessor *RESOURCE_CARDS, :color, :board, :development_cards
   
   def initialize(board, color)
     @board = board
     @color = color
-    @points = 0
+    @development_cards = []
     RESOURCE_CARDS.each{|r| send("#{r}=", 0) }
   end
 
@@ -30,6 +32,18 @@ class Player < Catan
     end
   end
 
+  def knights_played
+    development_cards.count{|card| card.played && card.type == :knight }
+  end
+
+  def victory_point_cards
+    development_cards.count{|card| card.type == :victory_point }
+  end
+
+  def road_length
+    board.longest_road_length(color)
+  end
+
   def settlements
     board.settlements.select{|s| s.size == 1 && s.color == color }
   end
@@ -40,6 +54,10 @@ class Player < Catan
 
   def roads
     board.roads.select{|r| r.color == color }
+  end
+
+  def points
+    settlements.count + 2*cities.count
   end
 
   def trade_in_ratio_for(resource)
@@ -63,7 +81,7 @@ class Player < Catan
   end
 
   def build_settlement(hex1, hex2, hex3, turn1=false, turn2=false)
-    error 'Already built 5 settlements' if settlements.count >= 5
+    error 'Already built 5 settlements' if settlements.count >= MAX_SETTLEMENTS
     error 'Too close to existing settlement/city' if board.settlement_near?(hex1, hex2, hex3)
     error 'Hexes are not adjacent' unless [hex1, hex2, hex3].combination(2).all?{|h1, h2| h1.adjacent?(h2) }
     unless turn1 || turn2
@@ -71,7 +89,6 @@ class Player < Catan
       error 'Not enough resources to build settlement' unless [sheep, wheat, brick, wood].all?{|r| r >= 1}
     end
     board.settlements << Settlement.new(hex1, hex2, hex3, self)
-    @points += 1
     if turn2
       [hex1, hex2, hex3].each do |hex|
         increment(hex.type, 1) if RESOURCE_CARDS.include?(hex.type)
@@ -84,13 +101,12 @@ class Player < Catan
     end
   end
 
-  def build_road(hex1, hex2, start_turn=false)
-    error 'Already built 15 roads' if roads.count >= 15
+  def build_road(hex1, hex2, road_is_free=false)
+    error 'Already built 15 roads' if roads.count >= MAX_ROADS
     error 'Road not buildable there' unless board.road_buildable_at?(hex1, hex2, color)
-    error 'Not enough resources to build road' unless start_turn || (wood >= 1 && brick >= 1)
+    error 'Not enough resources to build road' unless road_is_free || (wood >= 1 && brick >= 1)
     board.roads << Road.new(hex1, hex2, color)
-    board.check_for_longest_road(self)
-    unless start_turn
+    unless road_is_free
       @brick -= 1
       @wood -= 1
     end
@@ -100,8 +116,18 @@ class Player < Catan
     error 'No settlement at location' unless board.settlement_at?(hex1, hex2, hex3, color, true)
     error 'Not enough resources to build city' unless ore >= 3 && wheat >= 2
     board.settlement_at(hex1, hex2, hex3).size = 2
-    @points += 1
     @wheat -= 2
     @ore -= 3
+  end
+
+  def buy_development_card
+    error 'Development card deck is empty' unless board.development_cards.any?
+    error 'Not enough resources to buy dev card' unless ore >= 1 && wheat >= 1 && sheep >= 1
+    card = board.development_cards.pop
+    @development_cards << card
+    @wheat -= 1
+    @sheep -= 1
+    @ore -= 1
+    card
   end
 end

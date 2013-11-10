@@ -4,7 +4,7 @@
 <div class='<%= div_class %>' data-color='<%= player.color %>'>
   <span style='float: right;'><a href='/?color=<%= player.color %>'>be</a></span>
   <span class='name'><%= player.color %></span>
-  <%= player.points %> VP
+  <%= @game.display_points(player) %> VP
   <span>
     <%= player.resource_cards.count %> resources
   </span>
@@ -18,6 +18,29 @@
         </li>
       <% end %>
     </ul>
+
+    <% if player.development_cards.any? %>
+      <table class='development-cards'>
+        <thead>
+          <tr>
+            <th> Dev Card </th>
+            <th> Playable </th>
+            <th> Total </th>
+        </thead>
+        <% DevCard::TYPES.each do |dev_type| %>
+          <% cards = player.development_cards.select{|c| c.type == dev_type } %>
+          <% next unless cards.any? %>
+          <% playable = cards.count{|c| c.playable_on_turn?(@game.turn) } %>
+          <tr>
+            <td> <%= dev_type.to_s.gsub('_', ' ').capitalize %> </td>
+            <td> <%= playable %> </td>
+            <td> <%= cards.count %> </td>
+          </tr>
+        <% end %>
+      </table>
+      <br>
+    <% end %>
+
     <div class='buttons'>
       <% available = @game.available_actions(player) %>
       <% Game::ACTIONS.each do |action| %>
@@ -28,18 +51,21 @@
         <% end %>
       <% end %>
 
+      <div id='year-of-plenty-widget'>
+        <%= erb :resource_select, locals: { name: 'resource1' } %>
+        <%= erb :resource_select, locals: { name: 'resource2' } %>
+        <button id='year-of-plenty-submit'>submit</button>
+      </div>
+
+      <div id='monopoly-widget'>
+        <%= erb :resource_select, locals: { name: 'resource' } %>
+        <button id='monopoly-submit'>submit</button>
+      </div>
+
       <div id='trade-widget'>
-        <select name='resource1'>
-          <% Player::RESOURCE_CARDS.each do |resource| %>
-            <option><%= resource %></option>
-          <% end %>
-        </select>
+        <%= erb :resource_select, locals: { name: 'resource1' } %>
         &mdash;&gt;
-        <select name='resource2'>
-          <% Player::RESOURCE_CARDS.each do |resource| %>
-            <option><%= resource %></option>
-          <% end %>
-        </select>
+        <%= erb :resource_select, locals: { name: 'resource2' } %>
         <button id='trade-submit'>submit</button>
       </div>
     </div>

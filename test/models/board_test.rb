@@ -7,15 +7,8 @@ describe Board do
   end
 
   describe '#move_robber_to' do
-    before do
-      # Initialize the robber at a particular location
-      # to prevent sporadic failures
-      @board.robbed_hex.robbed = false
-      @board.robbed_hex = h(1,1)
-      @board.robbed_hex.robbed = true
-    end
-
     it 'returns a list of all players the robber could affect' do
+      ensure_robbed(1, 1)
       player = Player.new(@board, 'green')
       raises('invalid robber location') { @board.move_robber_to(20,20,player) }
       @board.move_robber_to(3,3,player).must_equal []
@@ -172,10 +165,6 @@ describe Board do
       @board.settlement_near?(h(2,5),h(2,6),h(3,5)).must_equal false
       @board.settlement_near?(h(3,3),h(3,4),h(4,3)).must_equal false
     end
-  end
-
-  describe '#max_road_length' do
-
   end
 
   describe '#check_for_longest_road' do

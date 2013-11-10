@@ -61,6 +61,17 @@ describe 'board.erb' do
     @player1.resource_cards.must_equal []
   end
 
+  it 'allows buying of dev cards' do
+    $game.state = :postroll
+    @player1.wheat = 1
+    @player1.sheep = 1
+    @player1.ore = 1
+    visit '/?color=red'
+    find('#buy_development_card').click
+    @player1.development_cards.count.must_equal 1
+    %w(ore wheat sheep).each{|r| @player1.send(r).must_equal 0 }
+  end
+
   it 'displays errors' do
     $game.state = :postroll
     @board.roads << Road.new(h(1,3), h(2,3), 'red')
@@ -128,6 +139,51 @@ describe 'board.erb' do
     find('#pass_turn').click
     page.wont_have_css('.player.active[data-color="red"]')
     page.must_have_css(".player.active[data-color='#{@player2.color}']")
+  end
+
+  it 'allows playing knights' do
+    $game.state = :postroll
+    @player1.development_cards = [ DevCard.new(:knight) ]
+    visit '/?color=red'
+    find('#knight').click
+    page.wont_have_css('.player[data-color="red"] #knight')
+    page.must_have_css('.player[data-color="red"] #move_robber')
+  end
+
+  it 'allows playing road building' do
+    $game.state = :postroll
+    @player1.development_cards = [ DevCard.new(:road_building) ]
+    visit '/?color=red'
+    find('#road_building').click
+    page.wont_have_css('.player[data-color="red"] #road_building')
+    page.must_have_css('.player[data-color="red"] #build_road')
+  end
+
+  it 'allows playing year of plenty' do
+    $game.state = :postroll
+    @player1.development_cards = [ DevCard.new(:year_of_plenty) ]
+    visit '/?color=red'
+    find('#year_of_plenty').click
+    select 'ore', from: 'resource1'
+    select 'wood', from: 'resource2'
+    find('#year-of-plenty-submit').click
+    within('.player[data-color="red"]') do
+      page.must_have_content '1 ore'
+      page.must_have_content '1 wood'
+    end
+  end
+
+  it 'allows playing monopoly' do
+    $game.state = :postroll
+    @player1.development_cards = [ DevCard.new(:monopoly) ]
+    @player2.brick = 5
+    visit '/?color=red'
+    find('#monopoly').click
+    select 'brick', from: 'resource'
+    find('#monopoly-submit').click
+    within('.player[data-color="red"]') do
+      page.must_have_content '5 brick'
+    end
   end
 
   def click_on_coords(*coords)

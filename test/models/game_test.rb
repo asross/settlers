@@ -133,6 +133,56 @@ describe Game do
       end
     end
 
+    describe '#recalculate_longest_road' do
+      before do
+        @board.roads << Road.new(h(2,5),h(3,5), @player2.color)
+        @board.roads << Road.new(h(2,5),h(3,4), @player2.color)
+        @board.roads << Road.new(h(2,4),h(3,4), @player2.color)
+        @board.roads << Road.new(h(2,4),h(3,3), @player2.color)
+        @board.roads << Road.new(h(2,3),h(3,3), @player2.color)
+
+        @board.roads << Road.new(h(3,1),h(3,2), @player1.color)
+        @board.roads << Road.new(h(4,1),h(3,2), @player1.color)
+        @board.roads << Road.new(h(4,1),h(4,2), @player1.color)
+        @board.roads << Road.new(h(5,1),h(4,2), @player1.color)
+
+        @game.send :recalculate_longest_road
+        @game.longest_road_player.must_equal @player2
+      end
+
+      it 'recognizes the player with the longest road of sufficient length' do
+        @board.roads << Road.new(h(5,1),h(5,2), @player1.color)
+        @game.send :recalculate_longest_road
+        @game.longest_road_player.must_equal @player2
+
+        @board.roads << Road.new(h(6,1),h(5,2), @player1.color)
+        @game.send :recalculate_longest_road
+        @game.longest_road_player.must_equal @player1
+      end
+
+      it 'is called after building a road' do
+        @game.state = :postroll
+        @game.active_player.must_equal @player1
+        @player1.wood = 2
+        @player1.brick = 2
+        @game.perform_action(@player1, 'build_road', [[5,1],[5,2]])
+        @game.perform_action(@player1, 'build_road', [[6,1],[5,2]])
+        @game.longest_road_player.must_equal @player1
+      end
+
+      it 'is called after building a settlement' do
+        @game.state = :postroll
+        @game.active_player.must_equal @player1
+        @board.roads << Road.new(h(3,3),h(3,4), @player1.color)
+        @player1.wood = 1
+        @player1.brick = 1
+        @player1.wheat = 1
+        @player1.sheep = 1
+        @game.perform_action(@player1, 'build_settlement', [[2,4],[3,3],[3,4]])
+        @game.longest_road_player.must_equal nil
+      end
+    end
+
     describe '#move_robber' do
       before do
         @game.state = :robbing1
@@ -204,11 +254,178 @@ describe Game do
       @game.active_player.must_equal @player2
       @game.turn.must_equal old_turn + 1
     end
-
-    it '#build_settlement'
-    it '#build_city'
-    it '#build_road'
-    it '#trade_in'
   end
 
+  describe 'development cards' do
+    before do
+      @game.turn = 6
+      @game.state = :postroll
+      @game.active_player.must_equal @player1
+    end
+
+    it 'pre-roll knight' do
+      @game.state = :preroll
+      ensure_robbed(1, 4)
+      @player1.development_cards << DevCard.new(:knight)
+      @board.settlements << Settlement.new(h(1,4), h(2,3), h(2,4), @player2)
+      @board.settlements << Settlement.new(h(1,3), h(2,3), h(2,2), @player3)
+      @player1.ore = 0
+      @player2.ore = 1
+      assert_similar @game.available_actions(@player1), %w(knight roll)
+      @game.perform_action(@player1, 'knight')
+      @game.state.must_equal :robbing1
+      @game.perform_action(@player1, 'move_robber', [[2,3]])
+      @game.state.must_equal :robbing2
+      @game.perform_action(@player1, 'rob_player', @player2.color)
+      @game.state.must_equal :preroll
+      @player1.ore.must_equal 1
+      @player2.ore.must_equal 0
+    end
+
+    it 'pre-roll knight without choices' do
+      @game.state = :preroll
+      ensure_robbed(1, 4)
+      @player1.development_cards << DevCard.new(:knight)
+      @board.settlements << Settlement.new(h(1,4), h(2,3), h(2,4), @player2)
+      @player1.ore = 0
+      @player2.ore = 1
+      assert_similar @game.available_actions(@player1), %w(knight roll)
+      @game.perform_action(@player1, 'knight')
+      @game.state.must_equal :robbing1
+      @game.perform_action(@player1, 'move_robber', [[2,3]])
+      @game.state.must_equal :preroll
+      @player1.ore.must_equal 1
+      @player2.ore.must_equal 0
+    end
+
+    it 'post-roll knight' do
+      @game.state = :postroll
+      ensure_robbed(1, 4)
+      @player1.development_cards << DevCard.new(:knight)
+      @board.settlements << Settlement.new(h(1,4), h(2,3), h(2,4), @player2)
+      @board.settlements << Settlement.new(h(1,3), h(2,3), h(2,2), @player3)
+      @game.perform_action(@player1, 'knight')
+      @game.state.must_equal :robbing1
+      @game.perform_action(@player1, 'move_robber', [[2,3]])
+      @game.state.must_equal :robbing2
+      @game.perform_action(@player1, 'rob_player', @player2.color)
+      @game.state.must_equal :postroll
+    end
+
+    it 'checking for largest army' do
+      def played_knight
+        DevCard.new(:knight).tap{|n| n.played = true }
+      end
+      def new_knight
+        DevCard.new(:knight)
+      end
+      @player1.development_cards = [played_knight, played_knight, new_knight]
+      @player2.development_cards = [played_knight]
+      @player3.development_cards = [played_knight, played_knight]
+
+      @game.largest_army_player.must_equal nil
+
+      @game.state = :postroll
+      @game.perform_action(@player1, 'knight')
+      @game.largest_army_player.must_equal @player1
+
+      @player3.development_cards << new_knight
+      @player3.development_cards << new_knight
+
+      2.times { @game.send(:pass_turn) }
+      @game.state = :postroll
+      @game.perform_action(@player3, 'knight')
+      @game.largest_army_player.must_equal @player1
+
+      3.times { @game.send(:pass_turn) }
+      @game.state = :postroll
+      @game.perform_action(@player3, 'knight')
+      @game.largest_army_player.must_equal @player3
+    end
+
+    it 'monopoly' do
+      @player1.development_cards << DevCard.new(:monopoly)
+      @game.available_actions(@player1).must_include 'monopoly'
+      @player1.wheat = 0
+      @player2.wheat = 3
+      @player3.wheat = 1
+      @game.perform_action(@player1, 'monopoly', 'wheat')
+      @game.state.must_equal :postroll
+      @player1.wheat.must_equal 4
+      @player2.wheat.must_equal 0
+      @player3.wheat.must_equal 0
+    end
+
+    it 'year of plenty' do
+      @player1.development_cards << DevCard.new(:year_of_plenty)
+      @game.available_actions(@player1).must_include 'year_of_plenty'
+      @player1.wheat = 0
+      @game.perform_action(@player1, 'year_of_plenty', %w(wheat wheat))
+      @game.state.must_equal :postroll
+      @player1.wheat.must_equal 2
+    end
+
+    it 'road building' do
+      @player1.development_cards << DevCard.new(:road_building)
+      @board.settlements << Settlement.new(h(3,3), h(3,4), h(4,3), @player1)
+      @game.available_actions(@player1).must_include 'road_building'
+      @game.perform_action(@player1, 'road_building')
+      @game.state.must_equal :road_building1
+      @game.available_actions(@player1).must_equal %w(build_road)
+      @game.perform_action(@player1, 'build_road', [[3,3],[3,4]])
+      @game.state.must_equal :road_building2
+      @game.perform_action(@player1, 'build_road', [[3,4],[2,4]])
+      @game.state.must_equal :postroll
+      @player1.roads.count.must_equal 2
+    end
+
+    it 'road building with 14 roads' do
+      @player1.development_cards << DevCard.new(:road_building)
+      @board.settlements << Settlement.new(h(3,3), h(3,4), h(4,3), @player1)
+      14.times { @board.roads << Road.new(h(3,3), h(3,4), @player1.color) }
+      @game.perform_action(@player1, 'road_building')
+      @game.state.must_equal :road_building2
+    end
+
+    it 'road building with 15 roads' do
+      @player1.development_cards << DevCard.new(:road_building)
+      @board.settlements << Settlement.new(h(3,3), h(3,4), h(4,3), @player1)
+      15.times { @board.roads << Road.new(h(3,3), h(3,4), @player1.color) }
+      @game.perform_action(@player1, 'road_building')
+      @game.state.must_equal :postroll
+    end
+
+    it 'does not allow more than one card per turn' do
+      @player1.development_cards << DevCard.new(:monopoly)
+      @player1.development_cards << DevCard.new(:road_building)
+      @game.available_actions(@player1).must_include 'road_building'
+      @game.perform_action(@player1, 'monopoly', 'wheat')
+      @game.available_actions(@player1).wont_include 'road_building'
+    end
+
+    it 'does not allow replaying of played cards' do
+      monopoly = DevCard.new(:monopoly)
+      monopoly.played.must_equal false
+      @player1.development_cards << monopoly
+      @game.perform_action(@player1, 'monopoly', 'wheat')
+      monopoly.played.must_equal true
+    end
+
+    it 'does not allow playing of just-bought cards' do
+      monopoly = DevCard.new(:monopoly)
+      @board.development_cards = [ monopoly ]
+      @player1.ore = 1
+      @player1.wheat = 1
+      @player1.sheep = 1
+      @game.perform_action(@player1, 'buy_development_card')
+      @player1.development_cards.must_equal [ monopoly ]
+      monopoly.turn_purchased.must_equal 6
+      @game.available_actions(@player1).wont_include 'monopoly'
+      @game.turn = 9
+      @game.active_player.must_equal @player1
+      @game.available_actions(@player1).must_include 'monopoly'
+    end
+
+    it 'victory points'
+  end
 end

@@ -13,7 +13,6 @@ describe Player do
     end
 
     it 'raises an error on invalid input' do
-      @player.points = 10
       raises('Bad resource card') { @player.trade_in('points', 'wheat') }
     end
 
@@ -209,7 +208,7 @@ describe Player do
       @board.settlements << s
       @player.ore = 3
       @player.wheat = 2
-      @player.points = 1
+      @player.points.must_equal 1
       @player.settlements.count.must_equal 1
       s.size.must_equal 1
       @player.build_city(@hex1, @hex2, @hex3)
@@ -218,6 +217,36 @@ describe Player do
       @player.ore.must_equal 0
       @player.wheat.must_equal 0
       @player.settlements.count.must_equal 0
+    end
+  end
+
+  describe '#buy_development_card' do
+    it 'errors if you lack resources' do
+      @board.development_cards = [ DevCard.new(:year_of_plenty) ]
+      @player.ore = 0
+      @player.wheat = 1
+      @player.sheep = 1
+      raises('Not enough resources') { @player.buy_development_card }
+    end
+
+    it 'errors if no cards are left' do
+      @board.development_cards = []
+      @player.ore = 1
+      @player.wheat = 1
+      @player.sheep = 1
+      raises('deck is empty') { @player.buy_development_card }
+    end
+
+    it 'succeeds otherwise' do
+      card = DevCard.new(:year_of_plenty)
+      @board.development_cards = [ card ]
+      @player.ore = 1
+      @player.wheat = 1
+      @player.sheep = 1
+      @player.buy_development_card
+      %w(ore wheat sheep).each{|r| @player.send(r).must_equal 0 }
+      @player.development_cards.must_equal [ card ]
+      @board.development_cards.must_equal []
     end
   end
 end

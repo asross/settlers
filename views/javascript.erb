@@ -9,11 +9,9 @@
     // %w(roll build_settlement build_city build_road trade_in pass_turn move_robber rob_player)
     <% Game::ACTIONS.each do |action| %>
       $(document).on('click', '#<%= action %>', function() {
-        $('body').removeClass('hex-select');
-        $('body').removeClass('road-select');
-        $('body').removeClass('city-select');
-        $('body').removeClass('player-select');
-        $('body').removeClass('trade-select');
+        <% %w(hex road city player trade monopoly year-of-plenty).each do |type| %>
+          $('body').removeClass('<%= type %>-select');
+        <% end %>
         window.currentAction = '<%= action %>';
         <% case action
            when 'build_settlement', 'build_city' %>
@@ -26,10 +24,12 @@
           $('body').addClass('player-select');
         <% when 'trade_in' %>
           $('body').addClass('trade-select');
-        <% when 'roll' %>
-          performAction('roll', []);
-        <% when 'pass_turn' %>
-          performAction('pass_turn', []);
+        <% when 'monopoly' %>
+          $('body').addClass('monopoly-select');
+        <% when 'year_of_plenty' %>
+          $('body').addClass('year-of-plenty-select');
+        <% when *%w(roll pass_turn knight road_building buy_development_card) %>
+          performAction('<%= action %>', []);
         <% end %>
       });
     <% end %>
@@ -71,6 +71,17 @@
       resource1 = $('select[name="resource1"]:visible').val();
       resource2 = $('select[name="resource2"]:visible').val();
       performAction('trade_in', [resource1, resource2]);
+    });
+
+    $(document).on('click', '#monopoly-submit', function() {
+      resource = $('select[name="resource"]:visible').val();
+      performAction('monopoly', resource);
+    });
+
+    $(document).on('click', '#year-of-plenty-submit', function() {
+      resource1 = $('select[name="resource1"]:visible').val();
+      resource2 = $('select[name="resource2"]:visible').val();
+      performAction('year_of_plenty', [resource1, resource2]);
     });
 
     $(document).on('click', '.tile, .number', function() {

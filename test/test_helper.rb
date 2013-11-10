@@ -30,3 +30,10 @@ def h(x, y)
   return unless @board
   @board.hexes[x][y]
 end
+
+def ensure_robbed(x, y)
+  return unless @board
+  @board.robbed_hex.robbed = false
+  @board.robbed_hex = h(x, y)
+  h(x, y).robbed = true
+end
