@@ -33,6 +33,14 @@ class Player < Catan
     end
   end
 
+  def knights_played
+    development_cards.count{|card| card.played && card.type == :knight }
+  end
+
+  def road_length
+    board.longest_road_length(color)
+  end
+
   def settlements
     board.settlements.select{|s| s.size == 1 && s.color == color }
   end

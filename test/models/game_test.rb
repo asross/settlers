@@ -133,6 +133,56 @@ describe Game do
       end
     end
 
+    describe '#recalculate_longest_road' do
+      before do
+        @board.roads << Road.new(h(2,5),h(3,5), @player2.color)
+        @board.roads << Road.new(h(2,5),h(3,4), @player2.color)
+        @board.roads << Road.new(h(2,4),h(3,4), @player2.color)
+        @board.roads << Road.new(h(2,4),h(3,3), @player2.color)
+        @board.roads << Road.new(h(2,3),h(3,3), @player2.color)
+
+        @board.roads << Road.new(h(3,1),h(3,2), @player1.color)
+        @board.roads << Road.new(h(4,1),h(3,2), @player1.color)
+        @board.roads << Road.new(h(4,1),h(4,2), @player1.color)
+        @board.roads << Road.new(h(5,1),h(4,2), @player1.color)
+
+        @game.send :recalculate_longest_road
+        @game.longest_road_player.must_equal @player2
+      end
+
+      it 'recognizes the player with the longest road of sufficient length' do
+        @board.roads << Road.new(h(5,1),h(5,2), @player1.color)
+        @game.send :recalculate_longest_road
+        @game.longest_road_player.must_equal @player2
+
+        @board.roads << Road.new(h(6,1),h(5,2), @player1.color)
+        @game.send :recalculate_longest_road
+        @game.longest_road_player.must_equal @player1
+      end
+
+      it 'is called after building a road' do
+        @game.state = :postroll
+        @game.active_player.must_equal @player1
+        @player1.wood = 2
+        @player1.brick = 2
+        @game.perform_action(@player1, 'build_road', [[5,1],[5,2]])
+        @game.perform_action(@player1, 'build_road', [[6,1],[5,2]])
+        @game.longest_road_player.must_equal @player1
+      end
+
+      it 'is called after building a settlement' do
+        @game.state = :postroll
+        @game.active_player.must_equal @player1
+        @board.roads << Road.new(h(3,3),h(3,4), @player1.color)
+        @player1.wood = 1
+        @player1.brick = 1
+        @player1.wheat = 1
+        @player1.sheep = 1
+        @game.perform_action(@player1, 'build_settlement', [[2,4],[3,3],[3,4]])
+        @game.longest_road_player.must_equal nil
+      end
+    end
+
     describe '#move_robber' do
       before do
         @game.state = :robbing1
@@ -246,6 +296,37 @@ describe Game do
       @game.state.must_equal :postroll
     end
 
+    it 'checking for largest army' do
+      def played_knight
+        DevCard.new(:knight).tap{|n| n.played = true }
+      end
+      def new_knight
+        DevCard.new(:knight)
+      end
+      @player1.development_cards = [played_knight, played_knight, new_knight]
+      @player2.development_cards = [played_knight]
+      @player3.development_cards = [played_knight, played_knight]
+
+      @game.largest_army_player.must_equal nil
+
+      @game.state = :postroll
+      @game.perform_action(@player1, 'knight')
+      @game.largest_army_player.must_equal @player1
+
+      @player3.development_cards << new_knight
+      @player3.development_cards << new_knight
+
+      2.times { @game.send(:pass_turn) }
+      @game.state = :postroll
+      @game.perform_action(@player3, 'knight')
+      @game.largest_army_player.must_equal @player1
+
+      3.times { @game.send(:pass_turn) }
+      @game.state = :postroll
+      @game.perform_action(@player3, 'knight')
+      @game.largest_army_player.must_equal @player3
+    end
+
     it 'monopoly' do
       @player1.development_cards << DevCard.new(:monopoly)
       @game.available_actions(@player1).must_include 'monopoly'
@@ -330,6 +411,5 @@ describe Game do
     end
 
     it 'victory points'
-    it 'largest army'
   end
 end

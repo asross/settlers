@@ -142,7 +142,7 @@ class Board < Catan
   end
 
   def longest_road_length(color)
-    roads.select{|r| r.color == color}.map{|r| longest_path_from(r)}.max
+    roads.select{|r| r.color == color}.map{|r| longest_path_from(r)}.max || 0
   end
 
   def longest_path_from(road, visited=[road], last_vertex=[])

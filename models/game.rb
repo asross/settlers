@@ -5,6 +5,7 @@ class Game < Catan
   ACTIONS = %w(roll build_settlement build_city build_road buy_development_card trade_in pass_turn move_robber rob_player) + DEV_CARD_ACTIONS
   attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable
   attr_reader :state
+  attr_reader :longest_road_player, :largest_army_player
   
   def initialize(board=nil, players=nil)
     @board = board || Board.create
@@ -111,6 +112,7 @@ class Game < Catan
 
   def build_road(v1, v2)
     active_player.build_road(h(*v1), h(*v2), FREE_ROAD_STATES.include?(state))
+    recalculate_longest_road
 
     if state == :start_turn2
       @turn += 1
@@ -128,6 +130,7 @@ class Game < Catan
 
   def build_settlement(v1, v2, v3)
     active_player.build_settlement(h(*v1), h(*v2), h(*v3), round == 0, round == 1)
+    recalculate_longest_road # settlement building might break an existing road
 
     self.state = :start_turn2 if state == :start_turn1
   end
@@ -153,6 +156,7 @@ class Game < Catan
         card = playable_dev_cards.detect{|c| c.type.to_s == '#{card}' }
         play_#{card}(*args)
         card.played = true
+        recalculate_largest_army if card.type == :knight
         @dev_card_played = true
       end
     RUBY
@@ -188,6 +192,31 @@ class Game < Catan
       self.state = :road_building2
     else
       self.state = :road_building1
+    end
+  end
+
+  def recalculate_longest_road
+    totals = players.each_with_object({}) do |p,h|
+      h[p] = p.road_length
+    end
+    score_to_beat = totals[@longest_road_player] || 0
+    score_to_beat = [score_to_beat, 4].max
+    player, total = totals.max_by{|p,l| l }
+    if total > score_to_beat
+      @longest_road_player = player
+    elsif total <= 4
+      @longest_road_player = nil
+    end
+  end
+
+  def recalculate_largest_army
+    totals = players.each_with_object({}) do |p,h|
+      h[p] = p.knights_played
+    end
+    score_to_beat = totals[@largest_army_player] || 2
+    player, total = totals.max_by{|p,l| l }
+    if total > score_to_beat
+      @largest_army_player = player
     end
   end
 
