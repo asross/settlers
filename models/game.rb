@@ -61,6 +61,13 @@ class Game < Catan
     send(action, *args)
   end
 
+  def display_points(player)
+    total = player.points
+    total += 2 if player == longest_road_player
+    total += 2 if player == largest_army_player
+    total
+  end
+
   def state=(s)
     raise ArgumentError, "invalid state #{s}" unless STATES.include?(s)
     @state = s
