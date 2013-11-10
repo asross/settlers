@@ -2,12 +2,11 @@ class Player < Catan
   RESOURCE_CARDS = %w(brick wood sheep wheat ore)
   MAX_ROADS = 15
   MAX_SETTLEMENTS = 5
-  attr_accessor *RESOURCE_CARDS, :color, :points, :board, :development_cards
+  attr_accessor *RESOURCE_CARDS, :color, :board, :development_cards
   
   def initialize(board, color)
     @board = board
     @color = color
-    @points = 0
     @development_cards = []
     RESOURCE_CARDS.each{|r| send("#{r}=", 0) }
   end
@@ -53,6 +52,10 @@ class Player < Catan
     board.roads.select{|r| r.color == color }
   end
 
+  def points
+    settlements.count + 2*cities.count
+  end
+
   def trade_in_ratio_for(resource)
     n = 4
     (settlements + cities).each do |settlement|
@@ -82,7 +85,6 @@ class Player < Catan
       error 'Not enough resources to build settlement' unless [sheep, wheat, brick, wood].all?{|r| r >= 1}
     end
     board.settlements << Settlement.new(hex1, hex2, hex3, self)
-    @points += 1
     if turn2
       [hex1, hex2, hex3].each do |hex|
         increment(hex.type, 1) if RESOURCE_CARDS.include?(hex.type)
@@ -110,7 +112,6 @@ class Player < Catan
     error 'No settlement at location' unless board.settlement_at?(hex1, hex2, hex3, color, true)
     error 'Not enough resources to build city' unless ore >= 3 && wheat >= 2
     board.settlement_at(hex1, hex2, hex3).size = 2
-    @points += 1
     @wheat -= 2
     @ore -= 3
   end

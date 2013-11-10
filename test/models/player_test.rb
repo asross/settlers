@@ -13,7 +13,6 @@ describe Player do
     end
 
     it 'raises an error on invalid input' do
-      @player.points = 10
       raises('Bad resource card') { @player.trade_in('points', 'wheat') }
     end
 
@@ -209,7 +208,7 @@ describe Player do
       @board.settlements << s
       @player.ore = 3
       @player.wheat = 2
-      @player.points = 1
+      @player.points.must_equal 1
       @player.settlements.count.must_equal 1
       s.size.must_equal 1
       @player.build_city(@hex1, @hex2, @hex3)
