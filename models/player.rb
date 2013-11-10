@@ -36,6 +36,10 @@ class Player < Catan
     development_cards.count{|card| card.played && card.type == :knight }
   end
 
+  def victory_point_cards
+    development_cards.count{|card| card.type == :victory_point }
+  end
+
   def road_length
     board.longest_road_length(color)
   end
