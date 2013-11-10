@@ -3,7 +3,7 @@ class Board < Catan
   HEX_TYPES = %w(ore brick)*3 + %w(sheep wheat wood)*4 + %w(desert)
   PORT_TYPES = %w(brick wood sheep wheat ore) + ['3:1']*4
   CARD_TYPES = %w(knight)*14 + %w(victory_point)*5 + %w(monopoly road_building year_of_plenty)*2
-  attr_accessor :settlements, :roads, :hexes, :robbed_hex, :longest_road_player, :longest_road_length, :side_length, :development_cards
+  attr_accessor :settlements, :roads, :hexes, :robbed_hex, :side_length, :development_cards
 
   def self.on_island?(i,j,l)
     return false unless (l+1..l*3-1).include?(i+j)
@@ -166,19 +166,5 @@ class Board < Catan
     successors.map do |r,vertex|
       longest_path_from(r, visited+[r], vertex)
     end.max
-  end
-
-
-  def check_for_longest_road(player)
-    length = longest_road_length(player.color)
-
-    if length >= 5 and length > @longest_road_length
-      unless @longest_road_player == player
-        @longest_road_player.points -= 2 if @longest_road_player
-        @longest_road_player = player
-        @longest_road_player.points += 2
-      end
-      @longest_road_length = length
-    end
   end
 end

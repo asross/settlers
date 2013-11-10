@@ -92,7 +92,6 @@ class Player < Catan
     error 'Road not buildable there' unless board.road_buildable_at?(hex1, hex2, color)
     error 'Not enough resources to build road' unless road_is_free || (wood >= 1 && brick >= 1)
     board.roads << Road.new(hex1, hex2, color)
-    board.check_for_longest_road(self)
     unless road_is_free
       @brick -= 1
       @wood -= 1
