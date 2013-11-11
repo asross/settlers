@@ -9,6 +9,13 @@
   body {
     margin: 0;
   }
+  .clearfix:before, .clearfix:after {
+    content: " ";
+    display: table;
+  }
+  .clearfix:after {
+    clear: both;
+  }
   #last-roll {
     margin: 0.5em;
     font-size: 2em;
