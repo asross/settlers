@@ -16,7 +16,7 @@ class Board < Catan
     {
       [2,1] => 'bottom',
       [4,0] => 'bottom',
-      [0,2] => 'botright',
+      [0,3] => 'botright',
       [0,5] => 'topright',
       [1,6] => 'topright',
       [3,6] => 'top',
