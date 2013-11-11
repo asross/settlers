@@ -78,7 +78,7 @@ class Board < Catan
     for s in settlements
       next unless s.hexes.include?(hex)
       next if s.player == player
-      next if robbable.include? player
+      next if robbable.include? s.player
       robbable << s.player
     end
     robbable
