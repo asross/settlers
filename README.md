@@ -17,9 +17,9 @@ A server exposing it is defined in `app.rb`. It has three endpoints:
 * POST `/actions`
 * POST `/messages`
 
-There are two clients, one HTML-based, and one text-based. Both will use this API, but the server will return different representations to each one (e.g. HTML to the web client, and JSON to the textbased client).
+There are two clients, one HTML and one text-based. Both will use this API, but the server will return different representations to each (e.g. HTML to the web client, and JSON to the text-based client).
 
-The server also uses websockets to send updates of game state, but not to receive them; the interface is write-only from the server point of view and read-only from the client's.
+The server also uses websockets to send but not receive updates of game state; the interface is write-only from the server point of view and read-only from the client's.
 
 ## Setup
 
@@ -27,7 +27,7 @@ The server also uses websockets to send updates of game state, but not to receiv
 2. `ruby app.rb`
 3. Visit `localhost:4567`
 
-To run tests, do `ruby test/run.rb`
+To run tests, `ruby test/run.rb`
 
 ## TODO
 
@@ -37,6 +37,7 @@ To run tests, do `ruby test/run.rb`
 - Trading
 - Discarding on 7s
 - Text-based client
+- Potentially making this an actual web app?
 
 # License
 
