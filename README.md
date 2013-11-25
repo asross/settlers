@@ -12,25 +12,22 @@ Play Settlers of Catan on your home computer with your friends by running the se
 
 Game logic is contained in plain old ruby objects defined in `/models`.
 
-An HTTP server exposing it is defined in `app.rb`. It has three endpoints:
+A server exposing it is defined in `app.rb`. It has three endpoints:
+* GET `/`
+* POST `/actions`
+* POST `/messages`
 
-`GET /`
+There are two clients, one HTML-based, and one text-based. Both will use this API, but the server will return different representations to each one (e.g. HTML to the web client, and JSON to the textbased client).
 
-`POST /actions`
-
-`POST /messages`
-
-There are two clients, one HTML-based, and one text-based. My plan at this point is for both to use this API, but the server will send back different representations (e.g. HTML to the web client, and a printable string to the textbased client) based on Accept headers or MIME types.
-
-The server also uses websockets to send updates of game state. However, for the foreseeable, the websocket interface will be write-only from the server point of view and read-only from the client's.
+The server also uses websockets to send updates of game state, but not to receive them; the interface is write-only from the server point of view and read-only from the client's.
 
 ## Setup
 
-1. `gem install bundler`
-2. `bundle install`
-3. `ruby test/run.rb`
-4. `ruby app.rb`
-5. Visit `localhost:4567`
+1. `bundle`
+2. `ruby app.rb`
+3. Visit `localhost:4567`
+
+To run tests, do `ruby test/run.rb`
 
 ## TODO
 
