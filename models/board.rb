@@ -12,19 +12,51 @@ class Board < Catan
     true
   end
 
+  def self.edge_pairs
+    @edge_pairs ||= Hash.new do |h, side_length|
+      # First find all the edges with directions
+      pairs = []
+      0.upto(side_length*2).each do |i|
+        0.upto(side_length*2).each do |j|
+          next if on_island?(i, j, side_length)
+          Hex.new(i, j, nil, nil).directions.each do |dir, (x, y)|
+            next unless on_island?(x, y, side_length)
+            pairs << [[i,j],[x,y],dir]
+          end
+        end
+      end
+
+      # Now sort them by angle from the center (so we can traverse in
+      # a circle)
+      cx, cy = side_length, side_length
+      pairs.sort_by! do |pair|
+        wx, wy = pair[0]  # water hex
+        lx, ly = pair[1]  # land hex
+        # Care most about the land hex angle, but use
+        # the water hex angle to break ties.
+        Math.atan2(lx-cx, ly-cy) + 0.00001 * Math.atan2(wx-cx, wy-cy)
+      end
+
+      # Now cache them
+      h[side_length] = pairs
+    end
+  end
+
   def self.port_locales(side_length)
-    return {} unless side_length == 3
-    {
-      [2,1] => 'bottom',
-      [4,0] => 'bottom',
-      [0,3] => 'botright',
-      [0,5] => 'topright',
-      [1,6] => 'topright',
-      [3,6] => 'top',
-      [5,4] => 'topleft',
-      [6,2] => 'topleft',
-      [6,0] => 'botleft'
-    }
+    # Travel in a circle around the edge of the island.
+    # Alternate between skipping 2, skipping 2 again, and skipping 3.
+    counter = 0
+    index = 0
+    pairs = edge_pairs[side_length]
+    result = {}
+    until index >= pairs.length
+      water, land, dir = pairs[index]
+      result[water] = dir
+      index += 3
+      index += 1 if (counter % 3) == 2
+      counter += 1
+    end
+    result
   end
 
   def self.create(side_length=3)

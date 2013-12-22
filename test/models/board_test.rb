@@ -6,6 +6,41 @@ describe Board do
     @board = Board.create
   end
 
+  describe '.edge_pairs' do
+    it 'returns an ordered list of all adjacent water/land hex pairs' do
+      land_pieces = Board.edge_pairs[3].map{|e| e[1] }
+      assert_similar land_pieces, [[1,3],[2,2],[3,1],[4,1],[5,1],[5,2],[5,3],[4,4],[3,5],[2,5],[1,5],[1,4]]
+    end
+
+    it 'grows by a factor of 12 in size' do
+      1.upto(10).each do |i|
+        Board.edge_pairs[i].count.must_equal ((i-0.5)*12)
+      end
+    end
+  end
+
+  describe '.port_locales' do
+    it 'returns sensible port locations' do
+      expected = {
+        [2,1] => 'bottom',
+        [4,0] => 'bottom',
+        [0,3] => 'botright',
+        [0,5] => 'topright',
+        [1,6] => 'topright',
+        [3,6] => 'top',
+        [5,4] => 'topleft',
+        [6,2] => 'topleft',
+        [6,0] => 'botleft'
+      }
+
+      result = Board.port_locales(3)
+
+      expected.keys.each do |k|
+        expected[k].must_equal result[k]
+      end
+    end
+  end
+
   describe '#move_robber_to' do
     it 'returns a list of all players the robber could affect' do
       ensure_robbed(1, 1)
