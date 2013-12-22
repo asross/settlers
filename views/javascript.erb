@@ -24,6 +24,8 @@
           $('body').addClass('player-select');
         <% when 'trade_in' %>
           $('body').addClass('trade-select');
+        <% when 'discard' %>
+          $('body').addClass('discard-select');
         <% when 'monopoly' %>
           $('body').addClass('monopoly-select');
         <% when 'year_of_plenty' %>
@@ -82,6 +84,17 @@
       resource1 = $('select[name="resource1"]:visible').val();
       resource2 = $('select[name="resource2"]:visible').val();
       performAction('year_of_plenty', [resource1, resource2]);
+    });
+
+    $(document).on('click', '#discard-submit', function() {
+      resources = []
+      <% Player::RESOURCE_CARDS.each do |resource| %>
+        value = $('input[name="<%= resource %>"]:visible').val();
+        if (value)
+          for (i = 0; i < parseInt(value); i++)
+            resources.push('<%= resource %>')
+      <% end %>
+      performAction('discard', resources);
     });
 
     $(document).on('click', '.tile, .number', function() {

@@ -1,8 +1,8 @@
 class Game < Catan
-  STATES = [:preroll, :postroll, :robbing1, :robbing2, :start_turn1, :start_turn2, :road_building1, :road_building2]
+  STATES = [:preroll, :postroll, :robbing1, :robbing2, :start_turn1, :start_turn2, :road_building1, :road_building2, :discard]
   FREE_ROAD_STATES = [:start_turn2, :road_building1, :road_building2]
   DEV_CARD_ACTIONS = %w(monopoly knight year_of_plenty road_building)
-  ACTIONS = %w(roll build_settlement build_city build_road buy_development_card trade_in pass_turn move_robber rob_player) + DEV_CARD_ACTIONS
+  ACTIONS = %w(roll build_settlement build_city build_road buy_development_card trade_in pass_turn move_robber rob_player discard) + DEV_CARD_ACTIONS
   attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable
   attr_reader :state
   attr_reader :longest_road_player, :largest_army_player
@@ -30,6 +30,7 @@ class Game < Catan
   end
 
   def available_actions(player)
+    return %w(discard) if should_discard?(player)
     return [] unless player == active_player  # eventually, could "accept trade request"
     
     dev_card_actions(player) + case state
@@ -58,6 +59,12 @@ class Game < Catan
     unless available_actions(player).include?(action)
       error "#{player.color} cannot perform #{action} at this time"
     end
+
+    # ugh -- some actions need to be player specific.
+    if action == 'discard'
+      args = [player]+args
+    end
+
     send(action, *args)
   end
 
@@ -84,7 +91,11 @@ class Game < Catan
     @last_roll = random_dieroll
     @board.rolled(@last_roll)
     if @last_roll == 7
-      self.state = :robbing1
+      if players.any?{|p| p.resource_cards.count > 7}
+        self.state = :discard
+      else
+        self.state = :robbing1
+      end
     else
       self.state = :postroll
     end
@@ -111,6 +122,25 @@ class Game < Catan
     else
       @robbable = robbable
       self.state = :robbing2
+    end
+  end
+
+  def discards_this_turn
+    @discards_this_turn ||= []
+  end
+
+  def should_discard?(player)
+    state == :discard &&
+      player.resource_cards.count > 7 &&
+      !discards_this_turn.include?(player)
+  end
+
+  def discard(player, *resources)
+    player.discard(*resources)
+    discards_this_turn << player
+    if players.none?(&method(:should_discard?))
+      @discards_this_turn = nil
+      self.state = :robbing1
     end
   end
 

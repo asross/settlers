@@ -35,7 +35,6 @@ To run tests, `ruby test/run.rb`
     * Handling victory points
     * Recognizing the winner
 - Trading
-- Discarding on 7s
 - Text-based client
 - Potentially making this an actual web app?
 
