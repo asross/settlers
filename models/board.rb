@@ -70,15 +70,11 @@ class Board < Catan
         type  = (on_island?(i, j, side_length) ? types.next : 'water')
         token = (tokens.next unless %w(water desert).include?(type))
 
-        port_type = nil
-        port_direction = nil
-
-        if type == 'water' && direction = port_locales(side_length)[[i,j]]
-          port_type = ports.next
-          port_direction = direction
+        if type == 'water' && port_direction = port_locales(side_length)[[i,j]]
+          Hex.new(i, j, token, type, ports.next, port_direction)
+        else
+          Hex.new(i, j, token, type)
         end
-
-        Hex.new(i, j, token, type, port_type, port_direction)
       end
     end
 
