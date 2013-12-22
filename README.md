@@ -27,7 +27,7 @@ The server also uses websockets to send but not receive updates of game state; t
 2. `ruby app.rb`
 3. Visit `localhost:4567`
 
-To run tests, `ruby test/run.rb`
+To run tests, `ruby test.rb`
 
 ## TODO
 
