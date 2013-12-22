@@ -6,6 +6,7 @@ class Board < Catan
   attr_accessor :settlements, :roads, :hexes, :robbed_hex, :side_length, :development_cards
 
   def self.on_island?(i,j,l)
+    return false unless (0..l*2).include?(i) && (0..l*2).include?(j)
     return false unless (l+1..l*3-1).include?(i+j)
     return false unless ([0,l*2] & [i,j]).size == 0
     true
