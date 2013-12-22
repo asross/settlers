@@ -57,6 +57,14 @@
         <%= erb :resource_select, locals: { name: 'resource2' } %>
         <button id='trade-submit'>submit</button>
       </div>
+
+      <div id='discard-widget'>
+        <% Player::RESOURCE_CARDS.each do |resource| %>
+          <input type='number' min='0' step='1' name='<%= resource %>'>
+          <label for='<%= resource %>'><%= resource %></label>
+        <% end %>
+        <button id='discard-submit'>submit</button>
+      </div>
     </div>
   </div>
 </div>

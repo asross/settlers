@@ -108,6 +108,36 @@ describe 'board.erb' do
     @player3.ore.must_equal 0
   end
 
+  it 'allows discarding' do
+    def $game.random_dieroll; 7; end
+    @player2.ore = 10
+    @player3.wheat = 4
+    @player3.sheep = 4
+    find('#roll').click
+    page.has_css?('#move_robber').must_equal false
+
+    visit "/?color=#{@player2.color}"
+    find('#discard').click
+    within('#discard-widget') do
+      fill_in 'ore', with: 5
+      find('#discard-submit').click
+    end
+    @player2.ore.must_equal 5
+
+    visit "/?color=#{@player3.color}"
+    find('#discard').click
+    within('#discard-widget') do
+      fill_in 'wheat', with: 2
+      fill_in 'sheep', with: 2
+      find('#discard-submit').click
+    end
+    @player3.wheat.must_equal 2
+    @player3.sheep.must_equal 2
+
+    visit "/?color=#{@player1.color}"
+    page.must_have_css '#move_robber'
+  end
+
   it 'allows city building' do
     @player1.ore = 3
     @player1.wheat = 2
