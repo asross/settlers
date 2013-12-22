@@ -131,6 +131,65 @@ describe Game do
         @game.last_roll.must_equal 7
         @game.state.must_equal :robbing1
       end
+
+      it 'transitions to discard phase on 7 if players have >7 cards' do
+        # p1 should discard 10
+        @player1.ore = 20
+
+        # p2 should discard 0
+        @player2.wheat = 3
+
+        # p3 should discard 5
+        @player3.sheep = 4
+        @player3.wheat = 4
+        @player3.brick = 3
+
+        # roll a 7
+        def @game.random_dieroll; 7; end
+        @game.perform_action(@player1, 'roll')
+        @game.last_roll.must_equal 7
+
+        # we should transition to discard
+        @game.state.must_equal :discard
+        @game.available_actions(@player1).must_equal %w(discard)
+        @game.available_actions(@player2).must_equal []
+        @game.available_actions(@player3).must_equal %w(discard)
+ 
+        # discard actions have to happen in one go with extant resources
+        raises("must discard exactly 10 cards") {
+          @game.perform_action(@player1, 'discard', %w(ore))
+        }
+        raises("you do not have enough brick or sheep to discard") {
+          @game.perform_action(@player1, 'discard', %w(brick)*3 + %w(sheep)*7)
+        }
+        raises("must discard exactly 5 cards") {
+          @game.perform_action(@player3, 'discard', %w(sheep wheat sheep brick))
+        }
+        raises("you do not have enough sheep to discard") {
+          @game.perform_action(@player3, 'discard', %w(sheep)*5)
+        }
+
+        # player1 discards
+        @game.perform_action(@player1, 'discard', %w(ore)*10)
+        @player1.ore.must_equal 10
+
+        # now we're just waiting on p3
+        @game.available_actions(@player1).must_equal [] # waits for player3
+        @game.available_actions(@player2).must_equal []
+        @game.available_actions(@player3).must_equal %w(discard)
+
+        # player3 discards
+        @game.perform_action(@player3, 'discard', %w(sheep sheep wheat wheat brick))
+        @player3.sheep.must_equal 2
+        @player3.wheat.must_equal 2
+        @player3.brick.must_equal 2
+
+        # now finally p1 can move the robber
+        @game.state.must_equal :robbing1
+        @game.available_actions(@player1).must_equal %w(move_robber)
+        @game.available_actions(@player2).must_equal []
+        @game.available_actions(@player3).must_equal []
+      end
     end
 
     describe '#recalculate_longest_road' do
