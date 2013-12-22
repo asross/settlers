@@ -89,8 +89,6 @@ class Board < Catan
     desert.robbed = true
     @settlements = []
     @roads = []
-    @longest_road_player = nil
-    @longest_road_length = 0
     @development_cards = cards.map{|c| DevCard.new(c.to_sym) }
   end
 
