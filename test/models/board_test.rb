@@ -8,13 +8,13 @@ describe Board do
 
   describe '.edge_pairs' do
     it 'returns an ordered list of all adjacent water/land hex pairs' do
-      land_pieces = Board.edge_pairs[3].map{|e| e[1] }
+      land_pieces = Board.edge_pairs(3).map{|e| e[1] }
       assert_similar land_pieces, [[1,3],[2,2],[3,1],[4,1],[5,1],[5,2],[5,3],[4,4],[3,5],[2,5],[1,5],[1,4]]
     end
 
     it 'grows by a factor of 12 in size' do
       1.upto(10).each do |i|
-        Board.edge_pairs[i].count.must_equal ((i-0.5)*12)
+        Board.edge_pairs(i).count.must_equal ((i-0.5)*12)
       end
     end
   end

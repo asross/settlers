@@ -12,51 +12,52 @@ class Board < Catan
     true
   end
 
-  def self.edge_pairs
-    @edge_pairs ||= Hash.new do |h, side_length|
-      # First find all the edges with directions
-      pairs = []
-      0.upto(side_length*2).each do |i|
-        0.upto(side_length*2).each do |j|
-          next if on_island?(i, j, side_length)
-          Hex.new(i, j, nil, nil).directions.each do |dir, (x, y)|
-            next unless on_island?(x, y, side_length)
-            pairs << [[i,j],[x,y],dir]
-          end
+  def self.edge_pairs(side_length)
+    # Loop through, find all pairs of adjacent hexes
+    # where one is in the water and one is not.
+    #
+    # Include the direction between them.
+    pairs = []
+    0.upto(side_length*2).each do |i|
+      0.upto(side_length*2).each do |j|
+        next if on_island?(i, j, side_length)
+        Hex.new(i, j, nil, nil).directions.each do |dir, (x, y)|
+          next unless on_island?(x, y, side_length)
+          pairs << [[i,j],[x,y],dir]
         end
       end
-
-      # Now sort them by angle from the center (so we can traverse in
-      # a circle)
-      cx, cy = side_length, side_length
-      pairs.sort_by! do |pair|
-        wx, wy = pair[0]  # water hex
-        lx, ly = pair[1]  # land hex
-        # Care most about the land hex angle, but use
-        # the water hex angle to break ties.
-        Math.atan2(lx-cx, ly-cy) + 0.00001 * Math.atan2(wx-cx, wy-cy)
-      end
-
-      # Now cache them
-      h[side_length] = pairs
     end
+    pairs
   end
 
   def self.port_locales(side_length)
-    # Travel in a circle around the edge of the island.
-    # Alternate between skipping 2, skipping 2 again, and skipping 3.
-    counter = 0
-    index = 0
-    pairs = edge_pairs[side_length]
-    result = {}
-    until index >= pairs.length
-      water, land, dir = pairs[index]
-      result[water] = dir
-      index += 3
-      index += 1 if (counter % 3) == 2
-      counter += 1
+    @port_locales ||= Hash.new do |h, side_length|
+      # Get a list of edge pairs w/ direction between them
+      # Sort them so that they are laid out circularly.
+      pairs = edge_pairs(side_length).sort_by do |pair|
+        c = side_length   # effective "center" coordinate
+        wx, wy = pair[0]  # water hex
+        lx, ly = pair[1]  # land hex
+        # Angle from center to land hex, plus a tiebreaker term
+        Math.atan2(lx-c, ly-c) + 0.00001 * Math.atan2(wx-c, wy-c)
+      end
+
+      # Travel in a circle around the edge of the island.
+      # Alternate between skipping 2, skipping 2 again, and skipping 3.
+      counter = 0
+      i = 0
+      result = {}
+      until i >= pairs.length
+        water, land, direction = pairs[i]
+        result[water] = direction
+        i += 3
+        i += 1 if (counter % 3) == 2
+        counter += 1
+      end
+      result
     end
-    result
+
+    @port_locales[side_length]
   end
 
   def self.create(side_length=3)
