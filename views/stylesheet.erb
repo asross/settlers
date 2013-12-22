@@ -227,14 +227,25 @@
   #players .player .buttons {
     padding: 0 2em;
   }
-  #players .player table.development-cards {
-   padding-left: 40px;
+  #players .player .dev-card {
+    padding: 0 5px;
+    background-color: lightgoldenrodyellow;
+    font-size: 13px;
+    border-radius: 2px;
+    float: left;
+    <% dev_margin = 2 %>
+    margin-top: <%= dev_margin %>px;
+    margin-bottom: <%= dev_margin %>px;
+    margin-left: 0;
+    margin-right: <%= 2*dev_margin %>px;
   }
-  #players .player table.development-cards th {
-    text-align: left;
+
+  #players .player .dev-card.used {
+    opacity: 0.5;
+    font-style: italic;
   }
-  #players .player table.development-cards td {
-    text-align: center;
+  #players .player .dev-card.new:before {
+    content: '*';
   }
   button:hover:enabled {
     cursor: pointer;

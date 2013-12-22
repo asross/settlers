@@ -20,25 +20,14 @@
     </ul>
 
     <% if player.development_cards.any? %>
-      <table class='development-cards'>
-        <thead>
-          <tr>
-            <th> Dev Card </th>
-            <th> Playable </th>
-            <th> Total </th>
-        </thead>
-        <% DevCard::TYPES.each do |dev_type| %>
-          <% cards = player.development_cards.select{|c| c.type == dev_type } %>
-          <% next unless cards.any? %>
-          <% playable = cards.count{|c| c.playable_on_turn?(@game.turn) } %>
-          <tr>
-            <td> <%= dev_type.to_s.gsub('_', ' ').capitalize %> </td>
-            <td> <%= playable %> </td>
-            <td> <%= cards.count %> </td>
-          </tr>
+      <ul class='clearfix'>
+        <% player.development_cards.sort_by(&:type).each do |card| %>
+          <% klass = "dev-card #{card.type}" %>
+          <% klass += ' used' if card.played %>
+          <% klass += ' new' if card.turn_purchased == @game.turn && card.type != :victory_point %>
+          <li class='<%= klass %>'><%= card.type.to_s.gsub('_', ' ') %></li>
         <% end %>
-      </table>
-      <br>
+      </ul>
     <% end %>
 
     <div class='buttons'>
