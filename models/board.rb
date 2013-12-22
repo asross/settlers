@@ -3,7 +3,7 @@ class Board < Catan
   HEX_TYPES = %w(ore brick)*3 + %w(sheep wheat wood)*4 + %w(desert)
   PORT_TYPES = %w(brick wood sheep wheat ore) + ['3:1']*4
   CARD_TYPES = %w(knight)*14 + %w(victory_point)*5 + %w(monopoly road_building year_of_plenty)*2
-  attr_accessor :settlements, :roads, :hexes, :robbed_hex, :side_length, :development_cards
+  attr_accessor :settlements, :roads, :hexes, :side_length, :development_cards
 
   def self.on_island?(i,j,l)
     return false unless (0..l*2).include?(i) && (0..l*2).include?(j)
@@ -85,8 +85,8 @@ class Board < Catan
   def initialize(hexes, side_length, cards=CARD_TYPES.dup.shuffle)
     @hexes = hexes
     @side_length = side_length
-    @robbed_hex = hexes.flatten.detect{|h| h.type == 'desert'}
-    @robbed_hex.robbed = true
+    desert = @hexes.flatten.detect{|h| h.type == 'desert'}
+    desert.robbed = true
     @settlements = []
     @roads = []
     @longest_road_player = nil
@@ -98,12 +98,15 @@ class Board < Catan
     settlements.each{|s| s.rolled(roll) }
   end
 
+  def robbed_hex
+    @hexes.flatten.detect(&:robbed)
+  end
+
   def move_robber_to(x, y, player)
     error 'invalid robber location' unless hexes[x] && hex = hexes[x][y]
-    error 'cannot pick same location' if hex == @robbed_hex
-    @robbed_hex.robbed = false
-    @robbed_hex = hex
-    @robbed_hex.robbed = true
+    error 'cannot pick same location' if hex == robbed_hex
+    robbed_hex.robbed = false
+    hex.robbed = true
     robbable = []
     for s in settlements
       next unless s.hexes.include?(hex)
