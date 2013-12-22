@@ -3,15 +3,23 @@ class Game < Catan
   FREE_ROAD_STATES = [:start_turn2, :road_building1, :road_building2]
   DEV_CARD_ACTIONS = %w(monopoly knight year_of_plenty road_building)
   ACTIONS = %w(roll build_settlement build_city build_road buy_development_card trade_in pass_turn move_robber rob_player discard) + DEV_CARD_ACTIONS
+  COLORS = %w(aqua deeppink gold lightcoral thistle)
+
   attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable
   attr_reader :state
   attr_reader :longest_road_player, :largest_army_player
   
-  def initialize(board=nil, players=nil)
-    @board = board || Board.create
-    @players = players || %w(aqua deeppink gold lightcoral thistle).shuffle[0..2].map do |color|
-      Player.new(@board, color)
+  def initialize(opts={})
+    opts[:side_length] ||= 3
+    opts[:board] ||= Board.new(opts)
+    @board = opts[:board]
+
+    opts[:n_players] ||= 3
+    opts[:players] ||= COLORS.shuffle[0..opts[:n_players]-1].map do |c|
+      Player.new(@board, c)
     end
+    @players = opts[:players]
+
     @turn = 0
     @messages = []
     @state = :start_turn1

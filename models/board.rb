@@ -60,33 +60,30 @@ class Board < Catan
     @port_locales[side_length]
   end
 
-  def self.create(side_length=3)
+  def initialize(opts={})
+    @side_length = opts[:side_length] || 3
+
     types = HEX_TYPES.dup.shuffle.cycle
     tokens = NUMBER_TOKENS.dup.cycle
     ports = PORT_TYPES.dup.shuffle.cycle
+    cards = CARD_TYPES.dup.shuffle
 
-    hexes = \
-    0.upto(side_length*2).map do |i|
-      0.upto(side_length*2).map do |j|
-        type  = (on_island?(i, j, side_length) ? types.next : 'water')
-        token = (tokens.next unless %w(water desert).include?(type))
-
-        if type == 'water' && port_direction = port_locales(side_length)[[i,j]]
-          Hex.new(i, j, token, type, ports.next, port_direction)
-        else
-          Hex.new(i, j, token, type)
+    @hexes = \
+      0.upto(@side_length*2).map do |i|
+        0.upto(@side_length*2).map do |j|
+          type = (Board.on_island?(i, j, @side_length) ? types.next : 'water')
+          token = (tokens.next unless %w(water desert).include?(type))
+          if port_direction = Board.port_locales(@side_length)[[i,j]]
+            Hex.new(i, j, token, type, ports.next, port_direction)
+          else
+            Hex.new(i, j, token, type)
+          end
         end
       end
-    end
 
-    new(hexes, side_length)
-  end
-
-  def initialize(hexes, side_length, cards=CARD_TYPES.dup.shuffle)
-    @hexes = hexes
-    @side_length = side_length
     desert = @hexes.flatten.detect{|h| h.type == 'desert'}
     desert.robbed = true
+
     @settlements = []
     @roads = []
     @development_cards = cards.map{|c| DevCard.new(c.to_sym) }

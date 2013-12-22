@@ -3,7 +3,7 @@ require_relative '../test_helper'
 describe Board do
 
   before do
-    @board = Board.create
+    @board = Board.new
   end
 
   describe '.edge_pairs' do

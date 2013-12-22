@@ -3,11 +3,11 @@ require_relative '../test_helper'
 describe Game do
 
   before do
-    @board = Board.create
+    @board = Board.new
     @player1 = Player.new(@board, 'viridian')
     @player2 = Player.new(@board, 'cerulean')
     @player3 = Player.new(@board, 'alabaster')
-    @game = Game.new(@board, [@player1, @player2, @player3])
+    @game = Game.new(board: @board, players: [@player1, @player2, @player3])
   end
 
   it 'has proper initial state' do

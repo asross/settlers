@@ -2,13 +2,13 @@ require_relative '../test_helper'
 
 describe 'board.erb' do
   before do
-    @board = Board.create
+    @board = Board.new
     @player1 = Player.new(@board, 'red')
     @player2 = Player.new(@board, 'white')
     @player3 = Player.new(@board, 'blue')
     @board.settlements << Settlement.new(h(2,2), h(2,3), h(3,2), @player1)
     @board.roads << Road.new(h(2,2), h(2,3), 'red')
-    $game = Game.new(@board, [@player1, @player2, @player3])
+    $game = Game.new(board: @board, players: [@player1, @player2, @player3])
     $game.turn = 6
     $game.state = :preroll
     Capybara.current_driver = Capybara.javascript_driver

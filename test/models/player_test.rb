@@ -3,7 +3,7 @@ require_relative '../test_helper'
 describe Player do
 
   before do
-    @board = Board.create
+    @board = Board.new
     @player = Player.new(@board, 'puce')
   end
 

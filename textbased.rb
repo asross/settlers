@@ -2,7 +2,8 @@ require_relative 'models/catan'
 Dir.glob('./models/*.rb').each { |f| require f }
 
 
-$board = Board.create(3)
+side_length = ENV.fetch('SIDE_LENGTH', 3).to_i
+$board = Board.new(side_length: side_length)
 
 
 #2 situations for settlements:
