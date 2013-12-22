@@ -241,6 +241,9 @@ class Game < Catan
     totals = players.each_with_object({}) do |p,h|
       h[p] = p.road_length
     end
+    # Have to re-check the longest road player's score, because
+    # (unlike with knights) it is possible that it has been reduced
+    # (e.g. by another player breaking the chain with a settlement)
     score_to_beat = totals[@longest_road_player] || 0
     score_to_beat = [score_to_beat, 4].max
     player, total = totals.max_by{|p,l| l }
