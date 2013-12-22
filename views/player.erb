@@ -34,9 +34,9 @@
       <% available = @game.available_actions(player) %>
       <% Game::ACTIONS.each do |action| %>
         <% if available.include?(action) %>
-          <button id='<%= action %>'> <%= action %> </button>
+          <button id='<%= action %>'> <%= action.to_s.gsub('_', ' ') %> </button>
         <% else %>
-          <button disabled='disabled'> <%= action %> </button>
+          <button disabled='disabled'> <%= action.to_s.gsub('_', ' ') %> </button>
         <% end %>
       <% end %>
 
