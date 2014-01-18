@@ -11,5 +11,9 @@ EM.run do
     }
   }
 
-  Thin::Server.start(CatanServer, '0.0.0.0')
+  if ENV['PORT']
+    Thin::Server.start(CatanServer, '0.0.0.0', ENV['PORT'])
+  else
+    Thin::Server.start(CatanServer, '0.0.0.0')
+  end
 end
