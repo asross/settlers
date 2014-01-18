@@ -109,7 +109,7 @@
       }
     });
 
-    ws = new WebSocket('ws://' + location.hostname + ':8080');
+    ws = new WebSocket('ws://' + location.hostname);
 
     ws.onmessage = function(evt) {
       response = JSON.parse(evt.data);
