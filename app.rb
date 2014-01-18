@@ -1,7 +1,7 @@
 require_relative './catan_server.rb'
 
 EM.run do
-  EM::WebSocket.start(host: '0.0.0.0', port: 8080) { |ws|
+  EM::WebSocket.start(host: '0.0.0.0', port: ENV['WS_PORT'] || 8080) { |ws|
     ws.onopen {
       sid = $channel.subscribe { |msg| ws.send msg }
 
