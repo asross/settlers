@@ -48,7 +48,9 @@
         type: 'POST',
         data: { color: '<%= @current_player.color %>', data: JSON.stringify({ action: action, args: args }) }
       }).success(function(data, textStatus, jqXHR) {
-        window.location.reload(true);
+        <% if ENV['RELOAD_AFTER_ACTIONS'] %>
+          window.location.reload(true);
+        <% end %>
       }).error(function(jqXHR, textStatus, errorThrown) {
         console.log(jqXHR.responseText);
         $('#error').text(jqXHR.responseText);
