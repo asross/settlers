@@ -3,7 +3,7 @@ class Game < Catan
   FREE_ROAD_STATES = [:start_turn2, :road_building1, :road_building2]
   DEV_CARD_ACTIONS = %w(monopoly knight year_of_plenty road_building)
   ACTIONS = %w(roll build_settlement build_city build_road buy_development_card trade_in pass_turn move_robber rob_player discard) + DEV_CARD_ACTIONS
-  COLORS = %w(aqua deeppink gold lightcoral thistle)
+  COLORS = %w(aqua deeppink gold lightcoral thistle burlywood azure lawngreen)
 
   attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable
   attr_reader :state
