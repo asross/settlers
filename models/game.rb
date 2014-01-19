@@ -11,14 +11,12 @@ class Game < Catan
   
   def initialize(opts={})
     opts[:side_length] ||= 3
-    opts[:board] ||= Board.new(opts)
-    @board = opts[:board]
-
     opts[:n_players] ||= 3
-    opts[:players] ||= COLORS.shuffle[0..opts[:n_players]-1].map do |c|
+
+    @board = opts[:board] || Board.new(opts)
+    @players = opts[:players] || COLORS.shuffle.take(opts[:n_players]).map do |c|
       Player.new(@board, c)
     end
-    @players = opts[:players]
 
     @turn = 0
     @messages = []

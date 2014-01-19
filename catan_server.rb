@@ -6,9 +6,8 @@ require 'pry'
 require_relative 'models/catan'
 Dir.glob('./models/*.rb').each { |f| require f }
 
-side_length = ENV.fetch('SIDE_LENGTH', 3).to_i
-n_players = ENV.fetch('PLAYERS', 3).to_i
-$game = Game.new(side_length: side_length, n_players: n_players)
+$game = Game.new(side_length: ENV.fetch('SIZE', 3).to_i,
+                 n_players: ENV.fetch('PLAYERS', 3).to_i)
 $channel = EM::Channel.new
 
 class CatanServer < Sinatra::Base
