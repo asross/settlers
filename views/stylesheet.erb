@@ -6,6 +6,8 @@
   <% city_height = 25 %>
   <% port_height = 20 %>
   <% city_city_height = city_height + 10 %>
+  <% players_width = 300 %>
+  <% total_hex_width = 2*margin + (@game.board.size + @game.board.side_length)*width %>
   body {
     margin: 0;
   }
@@ -177,7 +179,7 @@
   #chat {
     position: absolute;
     top: <%= @game.board.size*height %>px;
-    width: <%= 2*margin + (@game.board.size + @game.board.side_length)*width %>px;
+    width: <%= total_hex_width %>px;
     height: 200px;
     border-top: 1px solid #ccc;
   }
@@ -204,16 +206,16 @@
   }
   #chat form input {
     padding: 1em;
-    width: <%= 2*margin + (@game.board.size + @game.board.side_length)*width + 300 %>px;
+    width: <%= total_hex_width + players_width %>px;
   }
   #players {
     position: absolute;
-    left: <%= 2*margin + (@game.board.size + @game.board.side_length)*width %>px;
+    left: <%= total_hex_width %>px;
     top: 0;
     height: <%= 183 + @game.board.size*height %>px;
     border-left: 1px solid #ccc;
     border-right: 1px solid #ccc;
-    width: 300px;
+    width: <%= players_width %>px;
     background-color: #e8e8e8;
   }
   #players .player {
