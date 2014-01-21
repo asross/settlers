@@ -15,6 +15,12 @@ class CatanServer < Sinatra::Base
     @game = $game
   end
 
+  get '/new_game' do
+    $game = Game.new(side_length: ENV.fetch('SIZE', 3).to_i,
+                     n_players: ENV.fetch('PLAYERS', 3).to_i)
+    redirect '/'
+  end
+
   get '/' do
     redirect "/?color=#{@game.players.sample.color}" unless current_player
     erb :game

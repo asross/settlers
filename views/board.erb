@@ -5,6 +5,7 @@
 </div>
 
 <div id='last-roll'> <%= @game.last_roll %> </div>
+<a href='/new_game' id='new-game' onclick='return confirm("Are you sure?")'>New Game</a>
 
 <% @game.board.hexes.flatten.each do |hex| %>
   <% next if hex.x + hex.y < @game.board.side_length %>
