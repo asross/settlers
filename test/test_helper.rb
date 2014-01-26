@@ -1,5 +1,5 @@
 require_relative '../catan_server.rb'
-ENV['RELOAD_AFTER_ACTIONS'] = 1
+ENV['RELOAD_AFTER_ACTIONS'] = '1'
 require 'minitest'
 require 'minitest/pride'
 require 'minitest/autorun'
