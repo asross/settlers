@@ -8,8 +8,15 @@
   <% city_city_height = city_height + 10 %>
   <% players_width = 300 %>
   <% total_hex_width = 2*margin + (@game.board.size + @game.board.side_length)*width %>
+  <% watercolor = 'cornflowerblue' %>
   body {
     margin: 0;
+    background-color: #ccc;
+  }
+  #hexes {
+    background-color: <%= watercolor %>;
+    width: <%= total_hex_width %>px;
+    height: <%= @game.board.size * height %>px;
   }
   .clearfix:before, .clearfix:after {
     content: " ";
@@ -30,7 +37,7 @@
     width: <%= width %>px;
     height: <%= width %>px;
     line-height: <%= width %>px;
-    background-color: #ccc;
+    background-color: #eee;
     text-align: center;
   }
   .tile {
@@ -104,7 +111,7 @@
     background-color: #ccc;
   }
   .water {
-    background-color: cornflowerblue;
+    background-color: <%= watercolor %>;
   }
   .wheat {
     background-color: goldenrod;
@@ -177,57 +184,58 @@
   <% end %>
   .robbed {
     color: black;
+    font-weight: bold;
   }
   .hex {
     height: 0px;
   }
-  #chat {
-    position: absolute;
-    top: <%= @game.board.size*height %>px;
-    width: <%= total_hex_width %>px;
-    height: 200px;
-    border-top: 1px solid #ccc;
-  }
-  #chat #error-area {
+  #error-area {
     height: 3em;
-    background-color: #f8f8f8;
+    width: <%= total_hex_width %>px;
+    background-color: #eee;
   }
-  #chat #error-area #error {
+  #error-area #error {
     line-height: 3em;
     padding-left: 1em;
     color: darkred;
   }
-  #chat #message-area {
-    border-top: 1px solid #ccc;
-    height: 100px;
+  #message-area {
     background-color: #eee;
-    padding: 1em;
+    border: 16px solid #eee;
     overflow: scroll;
+    word-wrap: break-word;
   }
-  #chat #message-area ul {
+  #message-area ul {
     margin: 0;
     padding: 0;
     list-style: none;
   }
+  #chat {
+    position: absolute;
+    top: <%= @game.board.size * height %>px;
+    left: <%= total_hex_width %>px;
+  }
+  #chat form {
+    margin: 0;
+  }
   #chat form input {
     padding: 1em;
-    width: <%= total_hex_width + players_width + 2 %>px;
     margin: 0;
-    border: 1px solid #ccc;
+    width: <%= players_width %>px;
+    height: 3em;
+    font-size: 1em;
+    border: none;
   }
   #players {
     position: absolute;
+    background-color: #eee;
     left: <%= total_hex_width %>px;
     top: 0;
-    height: <%= 183 + @game.board.size*height %>px;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
     width: <%= players_width %>px;
-    background-color: #e8e8e8;
+    height: <%= @game.board.size * height %>px;
   }
   #players .player {
     width: 100%;
-    border-top: 1px solid #ccc;
     padding: 1em 0;
   }
   #players .player span {

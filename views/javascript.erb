@@ -3,8 +3,15 @@
 
   $(document).ready(function() {
     // Display latest messages first
-    chat = document.getElementById('message-area');
-    chat.scrollTop = chat.scrollHeight;
+
+    function fixChatHeight() {
+      chat = document.getElementById('message-area');
+      chatTop = $(chat).offset().top;
+      playersHeight = $('#players').height();
+      $(chat).css('height', playersHeight - chatTop - 32);
+      chat.scrollTop = chat.scrollHeight;
+    }
+    fixChatHeight();
 
     // %w(roll build_settlement build_city build_road trade_in pass_turn move_robber rob_player)
     <% Game::ACTIONS.each do |action| %>
@@ -33,6 +40,7 @@
         <% when *%w(roll pass_turn knight road_building buy_development_card) %>
           performAction('<%= action %>', []);
         <% end %>
+        fixChatHeight();
       });
     <% end %>
 
@@ -119,6 +127,7 @@
       data = response[1];
       if (event == 'action') {
         $('#board').html(data.html);
+        fixChatHeight();
       } else if (event == 'message') {
         $('#message-area').html(data.html);
       }

@@ -7,13 +7,8 @@
   </head>
   <body>
     <div id='board'> <%= erb :board %> </div>
+    <div id='error-area'><span id='error'></span></div>
     <div id='chat'>
-      <div id='error-area'>
-        <span id='error'></span>
-      </div>
-      <div id='message-area'>
-        <%= erb :messages %>
-      </div>
       <form action='/messages' method='post'>
         <input type='text' name='message' placeholder='message...'>
         <input type='hidden' name='color' value='<%= @current_player.color %>'>

@@ -2,13 +2,16 @@
   <% @game.players.each do |player| %>
     <%= erb :player, layout: false, locals: { player: player } %>
   <% end %>
+  <div id='message-area'><%= erb :messages %></div>
 </div>
 
 <div id='last-roll'> <%= @game.last_roll %> </div>
 <a href='/new_game' id='new-game' onclick='return confirm("Are you sure?")'>New Game</a>
 
+<div id='hexes'>
 <% @game.board.hexes.flatten.each do |hex| %>
   <% next if hex.x + hex.y < @game.board.side_length %>
   <% next if hex.x + hex.y > 3*@game.board.side_length %>
   <%= erb :hex, layout: false, locals: { hex: hex } %>
 <% end %>
+</div>
