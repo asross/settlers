@@ -6,6 +6,8 @@ of Catan!
 
 Play Settlers of Catan on your home computer with your friends by running the server on one machine and having others connect to it either through a web or text interface.
 
+[See a demo here.](http://ec2-54-200-74-203.us-west-2.compute.amazonaws.com:4567/)
+
 ## Setup
 
 1. `bundle`
@@ -22,20 +24,6 @@ To run tests, `ruby test.rb`
 - Trading
 - Text-based client
 - Running more than one game at a time
-- Hosting it somewhere
-
-## Development
-
-Game logic is contained in plain old ruby objects defined in `/models`.
-
-A server exposing it is defined in `app.rb`. It has three endpoints:
-* GET `/`
-* POST `/actions`
-* POST `/messages`
-
-There are or will be two clients, one HTML and one text-based. Both use this API, but the server will return different representations to each (e.g. HTML to the web client, and JSON to the text-based client).
-
-The server also uses websockets to send but not receive updates of game state; the interface is write-only from the server point of view and read-only from the client's.
 
 ## License
 
