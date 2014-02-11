@@ -4,10 +4,30 @@
 <div class='<%= div_class %>' data-color='<%= player.color %>'>
   <span style='float: right;'><a href='/?color=<%= player.color %>'>be</a></span>
   <span class='name'><%= player.color %></span>
-  <%= @game.display_points(player) %> VP
-  <span>
-    <%= player.resource_cards.count %> resources
-  </span>
+  <%
+    def pluralize(l, n)
+      str = "#{n} #{l}"
+      str += 's' if n != 1
+      str
+    end
+    ncards = player.development_cards.count{|c| !c.played }
+    nknights = player.development_cards.count{|c| c.played && c.type == :knight }
+    nresources = player.resource_cards.count
+    data = []
+    data << pluralize('resource', nresources)
+    data << pluralize('card', ncards) if ncards > 0
+    data << pluralize('knight', nknights) if nknights > 0
+    data << pluralize('VP', @game.display_points(player))
+    data << 'longest road' if player == @game.longest_road_player
+    data << 'largest army' if player == @game.largest_army_player
+  %>
+  <select>
+    <% data.each do |datum| %>
+      <option>
+        <%= datum %>
+      </option>
+    <% end %>
+  </select>
 
   <div class='info'>
     <ul>
