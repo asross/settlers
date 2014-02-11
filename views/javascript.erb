@@ -16,7 +16,7 @@
     // %w(roll build_settlement build_city build_road trade_in pass_turn move_robber rob_player)
     <% Game::ACTIONS.each do |action| %>
       $(document).on('click', '#<%= action %>', function() {
-        <% %w(hex road city player trade monopoly year-of-plenty).each do |type| %>
+        <% %w(hex road city player trade monopoly year-of-plenty discard).each do |type| %>
           $('body').removeClass('<%= type %>-select');
         <% end %>
         window.currentAction = '<%= action %>';
