@@ -6,10 +6,9 @@ class Board < Catan
   attr_accessor :settlements, :roads, :hexes, :side_length, :development_cards
 
   def self.on_island?(i,j,l)
-    return false unless (0..l*2).include?(i) && (0..l*2).include?(j)
-    return false unless (l+1..l*3-1).include?(i+j)
-    return false unless ([0,l*2] & [i,j]).size == 0
-    true
+    i.between?(1, l*2-1) &&
+      j.between?(1, l*2-1) &&
+        (i+j).between?(l+1, l*3-1)
   end
 
   def self.edge_pairs(side_length)
@@ -44,15 +43,13 @@ class Board < Catan
 
       # Travel in a circle around the edge of the island.
       # Alternate between skipping 2, skipping 2 again, and skipping 3.
-      counter = 0
+      intervals = [3,3,4].cycle
       i = 0
       result = {}
       until i >= pairs.length
         water, land, direction = pairs[i]
         result[water] = direction
-        i += 3
-        i += 1 if (counter % 3) == 2
-        counter += 1
+        i += intervals.next
       end
       result
     end
