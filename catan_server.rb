@@ -15,9 +15,10 @@ class CatanServer < Sinatra::Base
     @game = $game
   end
 
-  get '/new_game' do
-    $game = Game.new(side_length: ENV.fetch('SIZE', 3).to_i,
-                     n_players: ENV.fetch('PLAYERS', 3).to_i)
+  post '/new_game' do
+    board_size = params[:game].fetch(:board_size, 3).to_i
+    n_players = params[:game].fetch(:n_players, 3).to_i
+    $game = Game.new(side_length: board_size, n_players: n_players)
     redirect '/'
   end
 

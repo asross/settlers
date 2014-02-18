@@ -6,7 +6,19 @@
 </div>
 
 <div id='last-roll'> <%= @game.last_roll %> </div>
-<a href='/new_game' id='new-game' onclick='return confirm("Are you sure?")'>New Game</a>
+<%
+  modal = "
+    <form action='/new_game' id='new-game-form' method='post'>
+      <input type='number' min='3' max='13' width='100%' name='game[board_size]' placeholder='size' autocomplete='off'>
+      <br>
+      <input type='number' min='1' name='game[n_players]' placeholder='players' autocomplete='off'>
+      <br>
+      <input type='submit'>
+      <button class='minimodal-cancel'>Cancel</button>
+    </form>
+  "
+%>
+<a href='#' id='new-game' data-action='minimodal' data-html="<%= modal %>">New Game</a>
 
 <div id='hexes'>
 <% @game.board.hexes.flatten.each do |hex| %>
