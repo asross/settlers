@@ -43,14 +43,8 @@ class Board < Catan
     @hexes = \
       0.upto(side_length*2).map do |i|
         0.upto(side_length*2).map do |j|
-          if on_island?(i, j)
-            type = types.next
-            token = (tokens.next unless type == 'desert')
-          else
-            type = 'water'
-            token = nil
-          end
-
+          type = on_island?(i, j) ? types.next : 'water'
+          token = (tokens.next unless %(desert water).include?(type))
           Hex.new(i, j, token, type)
         end
       end
