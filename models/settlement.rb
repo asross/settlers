@@ -16,7 +16,7 @@ class Settlement
       next if hex.robbed
       next if %w(water desert).include?(hex.type)
       next unless hex.number == roll
-      player.increment(hex.type, 1)
+      player.increment(hex.type, size)
     end
   end
 

@@ -125,6 +125,16 @@ describe Game do
         @player1.send(@hex.type).must_equal 1
       end
 
+      it 'awards 2 for cities' do
+        $hex_number = @hex.number
+        def @game.random_dieroll; $hex_number; end
+        @player1.settlements.first.size = 2
+        @game.perform_action(@player1, 'roll')
+        @game.last_roll.must_equal @hex.number
+        @game.state.must_equal :postroll
+        @player1.send(@hex.type).must_equal 2
+      end
+
       it 'transitions to robbing1 on 7s' do
         def @game.random_dieroll; 7; end
         @game.perform_action(@player1, 'roll')
