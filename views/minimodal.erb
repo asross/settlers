@@ -1,0 +1,26 @@
+<script type='text/javascript'>
+  $(document).on('click', '[data-action="minimodal"]', function() {
+    if (!window.minimodals)
+      window.minimodals = {};
+    if (!window.minimodals[this]) {
+      modal = $("<div class='minimodal'>" + $(this).data('html') + "</div>")
+      modal.css('position', 'absolute');
+      modal.css('top', $(this).position().top + $(this).height());
+      modal.css('left', $(this).position().left);
+      that = this;
+      modal.find('.minimodal-cancel').click(function(e) {
+        e.preventDefault();
+        modal.remove();
+        window.minimodals[that] = null;
+        return false;
+      });
+      window.minimodals[this] = modal;
+      $('body').append(modal);
+    } else {
+      modal = window.minimodals[this];
+      modal.remove();
+      window.minimodals[this] = null;
+      return false;
+    }
+  });
+</script>
