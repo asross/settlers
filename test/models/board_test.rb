@@ -3,24 +3,24 @@ require_relative '../test_helper'
 describe Board do
 
   before do
-    @board = Board.new
+    @board = Board.new(side_length: 3)
   end
 
-  describe '.edge_pairs' do
+  describe '#sorted_edge_pairs' do
     it 'returns an ordered list of all adjacent water/land hex pairs' do
-      land_pieces = Board.edge_pairs(3).map{|e| e[1] }
+      land_pieces = @board.sorted_edge_pairs.map{|e| e[1].coordinates }
       assert_similar land_pieces, [[1,3],[2,2],[3,1],[4,1],[5,1],[5,2],[5,3],[4,4],[3,5],[2,5],[1,5],[1,4]]
     end
 
     it 'grows by a factor of 12 in size' do
       1.upto(10).each do |i|
-        Board.edge_pairs(i).count.must_equal ((i-0.5)*12)
+        Board.new(side_length: i).sorted_edge_pairs.count.must_equal ((i-0.5)*12)
       end
     end
   end
 
-  describe '.port_locales' do
-    it 'returns sensible port locations' do
+  describe 'port locales' do
+    it 'sets them properly' do
       expected = {
         [2,1] => 'bottom',
         [4,0] => 'bottom',
@@ -33,10 +33,10 @@ describe Board do
         [6,0] => 'botleft'
       }
 
-      result = Board.port_locales(3)
-
-      expected.keys.each do |k|
-        expected[k].must_equal result[k]
+      expected.each do |(x, y), direction|
+        port_hex = h(x, y)
+        port_hex.port?.must_equal true
+        port_hex.port_direction.must_equal direction
       end
     end
   end

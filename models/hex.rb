@@ -1,4 +1,14 @@
 class Hex < Catan
+  TYPES = %w(ore brick sheep wheat wood desert water)
+
+  TYPES.each do |type|
+    class_eval <<-RUBY
+      def #{type}?
+        type == "#{type}"
+      end
+    RUBY
+  end
+
   attr_accessor :x, :y, :number, :type, :robbed, :port_type, :port_direction
 
   def inspect
@@ -32,7 +42,7 @@ class Hex < Catan
   end
 
   def port?
-    port_type && port_direction && type == 'water'
+    water? && !port_type.nil? && !port_direction.nil?
   end
 
   def port_borders?(settlement)

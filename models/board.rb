@@ -5,56 +5,32 @@ class Board < Catan
   CARD_TYPES = %w(knight)*14 + %w(victory_point)*5 + %w(monopoly road_building year_of_plenty)*2
   attr_accessor :settlements, :roads, :hexes, :side_length, :development_cards
 
-  def self.on_island?(i,j,l)
+  def on_island?(i,j)
+    l = side_length
     i.between?(1, l*2-1) &&
       j.between?(1, l*2-1) &&
         (i+j).between?(l+1, l*3-1)
   end
 
-  def self.edge_pairs(side_length)
-    # Loop through, find all pairs of adjacent hexes
-    # where one is in the water and one is not.
-    #
-    # Include the direction between them.
-    pairs = []
-    0.upto(side_length*2).each do |i|
-      0.upto(side_length*2).each do |j|
-        next if on_island?(i, j, side_length)
-        Hex.new(i, j, nil, nil).directions.each do |dir, (x, y)|
-          next unless on_island?(x, y, side_length)
-          pairs << [[i,j],[x,y],dir]
+  def sorted_edge_pairs
+    @sorted_edge_pairs ||= begin
+      edge_pairs = \
+        hexes.flatten.select(&:water?).flat_map do |water_hex|
+          water_hex.directions.each_with_object([]) do |(dir, (x,y)), pairs|
+            if on_island?(x, y)
+              pairs << [water_hex, hexes[x][y], dir]
+            end
+          end
         end
-      end
-    end
-    pairs
-  end
 
-  def self.port_locales(side_length)
-    @port_locales ||= Hash.new do |h, side_length|
-      # Get a list of edge pairs w/ direction between them
-      # Sort them so that they are laid out circularly.
-      pairs = edge_pairs(side_length).sort_by do |pair|
+      edge_pairs.sort_by do |pair|
         c = side_length   # effective "center" coordinate
-        wx, wy = pair[0]  # water hex
-        lx, ly = pair[1]  # land hex
+        wx, wy = pair[0].coordinates  # water hex
+        lx, ly = pair[1].coordinates  # land hex
         # Angle from center to land hex, plus a tiebreaker term
         Math.atan2(lx-c, ly-c) + 0.00001 * Math.atan2(wx-c, wy-c)
       end
-
-      # Travel in a circle around the edge of the island.
-      # Alternate between skipping 2, skipping 2 again, and skipping 3.
-      intervals = [3,3,4].cycle
-      i = 0
-      result = {}
-      until i >= pairs.length
-        water, land, direction = pairs[i]
-        result[water] = direction
-        i += intervals.next
-      end
-      result
     end
-
-    @port_locales[side_length]
   end
 
   def initialize(opts={})
@@ -62,24 +38,36 @@ class Board < Catan
 
     types = HEX_TYPES.dup.shuffle.cycle
     tokens = NUMBER_TOKENS.dup.cycle
-    ports = PORT_TYPES.dup.shuffle.cycle
     cards = CARD_TYPES.dup.shuffle
 
     @hexes = \
-      0.upto(@side_length*2).map do |i|
-        0.upto(@side_length*2).map do |j|
-          type = (Board.on_island?(i, j, @side_length) ? types.next : 'water')
-          token = (tokens.next unless %w(water desert).include?(type))
-          if port_direction = Board.port_locales(@side_length)[[i,j]]
-            Hex.new(i, j, token, type, ports.next, port_direction)
+      0.upto(side_length*2).map do |i|
+        0.upto(side_length*2).map do |j|
+          if on_island?(i, j)
+            type = types.next
+            token = (tokens.next unless type == 'desert')
           else
-            Hex.new(i, j, token, type)
+            type = 'water'
+            token = nil
           end
+
+          Hex.new(i, j, token, type)
         end
       end
 
-    desert = @hexes.flatten.detect{|h| h.type == 'desert'}
-    desert.robbed = true
+    port_types = PORT_TYPES.dup.shuffle.cycle
+    port_intervals = [3,3,4].cycle
+    i = 0
+    until i >= sorted_edge_pairs.length
+      water_hex, land_hex, port_direction = sorted_edge_pairs[i]
+      water_hex.port_type = port_types.next
+      water_hex.port_direction = port_direction
+      i += port_intervals.next
+    end
+
+    if desert = @hexes.flatten.detect(&:desert?)
+      desert.robbed = true
+    end
 
     @settlements = []
     @roads = []
