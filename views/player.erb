@@ -11,7 +11,7 @@
       str
     end
     ncards = player.development_cards.count{|c| !c.played }
-    nknights = player.development_cards.count{|c| c.played && c.type == :knight }
+    nknights = player.knights_played
     nresources = player.resource_cards.count
     data = []
     data << pluralize('resource', nresources)

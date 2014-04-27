@@ -33,11 +33,11 @@ class Player < Catan
   end
 
   def knights_played
-    development_cards.count{|card| card.played && card.type == :knight }
+    development_cards.count{|card| card.played && card.knight? }
   end
 
   def victory_point_cards
-    development_cards.count{|card| card.type == :victory_point }
+    development_cards.count(&:victory_point?)
   end
 
   def road_length

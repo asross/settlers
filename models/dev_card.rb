@@ -1,5 +1,14 @@
 class DevCard < Catan
   TYPES = %w(monopoly road_building year_of_plenty knight victory_point).map(&:to_sym)
+
+  TYPES.each do |type|
+    class_eval <<-RUBY
+      def #{type}?
+        type.to_s == "#{type}"
+      end
+    RUBY
+  end
+
   attr_accessor :type, :played, :turn_purchased
 
   def initialize(type)
@@ -8,9 +17,9 @@ class DevCard < Catan
   end
 
   def playable_on_turn?(turn)
-    return false if type == :victory_point
+    return false if victory_point?
     return false if turn == turn_purchased
-    return false if @played
+    return false if played
     true
   end
 
