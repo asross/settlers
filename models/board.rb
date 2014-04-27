@@ -83,7 +83,7 @@ class Board < Catan
 
     @settlements = []
     @roads = []
-    @development_cards = cards.map{|c| DevCard.new(c.to_sym) }
+    @development_cards = cards.map{|c| DevCard.new(c) }
   end
 
   def rolled(roll)

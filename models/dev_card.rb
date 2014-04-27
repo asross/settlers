@@ -3,7 +3,7 @@ class DevCard < Catan
   attr_accessor :type, :played, :turn_purchased
 
   def initialize(type)
-    @type = type
+    @type = type.to_sym
     @played = false
   end
 
