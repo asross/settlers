@@ -193,10 +193,10 @@ class Game < Catan
   DEV_CARD_ACTIONS.each do |card|
     class_eval <<-RUBY
       def #{card}(*args)
-        card = playable_dev_cards.detect{|c| c.type.to_s == '#{card}' }
+        card = playable_dev_cards.detect(&:#{card}?)
         play_#{card}(*args)
         card.played = true
-        recalculate_largest_army if card.type == :knight
+        recalculate_largest_army if card.knight?
         @dev_card_played = true
       end
     RUBY
@@ -235,32 +235,29 @@ class Game < Catan
     end
   end
 
-  def recalculate_longest_road
-    totals = players.each_with_object({}) do |p,h|
-      h[p] = p.road_length
+  def recalculate(leader_var, method, min)
+    if leader = instance_variable_get(leader_var)
+      score_to_beat = [min, leader.send(method)].max
+    else
+      score_to_beat = min
     end
-    # Have to re-check the longest road player's score, because
-    # (unlike with knights) it is possible that it has been reduced
-    # (e.g. by another player breaking the chain with a settlement)
-    score_to_beat = totals[@longest_road_player] || 0
-    score_to_beat = [score_to_beat, 4].max
-    player, total = totals.max_by{|p,l| l }
-    if total > score_to_beat
-      @longest_road_player = player
-    elsif total <= 4
-      @longest_road_player = nil
+
+    new_leader = players.max_by(&method)
+    best_score = new_leader.send(method)
+
+    if best_score > score_to_beat
+      instance_variable_set(leader_var, new_leader)
+    elsif best_score <= min
+      instance_variable_set(leader_var, nil)
     end
   end
 
+  def recalculate_longest_road
+    recalculate(:@longest_road_player, :road_length, 4)
+  end
+
   def recalculate_largest_army
-    totals = players.each_with_object({}) do |p,h|
-      h[p] = p.knights_played
-    end
-    score_to_beat = totals[@largest_army_player] || 2
-    player, total = totals.max_by{|p,l| l }
-    if total > score_to_beat
-      @largest_army_player = player
-    end
+    recalculate(:@largest_army_player, :knights_played, 2)
   end
 
   def h(x, y)
