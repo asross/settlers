@@ -216,6 +216,42 @@ describe 'board.erb' do
     end
   end
 
+  it 'allows trading' do
+    $game.state = :postroll
+    @player1.ore = 1
+    @player2.brick = 1
+    visit '/?color=red'
+
+    click_button 'request trade'
+
+    within('#request-trade-widget') do
+      within('.my-resources') do
+        fill_in 'ore', with: 1
+      end
+      within('.your-resources') do
+        fill_in 'brick', with: 1
+      end
+      click_button 'submit'
+    end
+
+    visit "/?color=white"
+
+    page.must_have_content "red is offering their 1 ore for your 1 brick"
+    click_button 'accept trade'
+
+    within('.player[data-color="white"]') do
+      page.must_have_content '0 brick'
+      page.must_have_content '1 ore'
+    end
+
+    visit '/?color=red'
+
+    within('.player[data-color="red"]') do
+      page.must_have_content '0 ore'
+      page.must_have_content '1 brick'
+    end
+  end
+
   def click_on_coords(*coords)
     if coords.size == 1
       # Need to click inside the hex

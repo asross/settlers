@@ -16,7 +16,7 @@
     // %w(roll build_settlement build_city build_road trade_in pass_turn move_robber rob_player)
     <% Game::ACTIONS.each do |action| %>
       $(document).on('click', '#<%= action %>', function() {
-        <% %w(hex road city player trade monopoly year-of-plenty discard).each do |type| %>
+        <% %w(hex road city player trade monopoly year-of-plenty discard request-trade).each do |type| %>
           $('body').removeClass('<%= type %>-select');
         <% end %>
         window.currentAction = '<%= action %>';
@@ -37,7 +37,9 @@
           $('body').addClass('monopoly-select');
         <% when 'year_of_plenty' %>
           $('body').addClass('year-of-plenty-select');
-        <% when *%w(roll pass_turn knight road_building buy_development_card) %>
+        <% when 'request_trade' %>
+          $('body').addClass('request-trade-select');
+        <% when *%w(roll pass_turn knight road_building buy_development_card accept_trade) %>
           performAction('<%= action %>', []);
         <% end %>
         fixChatHeight();
@@ -58,6 +60,9 @@
       }).success(function(data, textStatus, jqXHR) {
         <% if ENV['RELOAD_AFTER_ACTIONS'] %>
           window.location.reload(true);
+        <% end %>
+        <% %w(hex road city player trade monopoly year-of-plenty discard request-trade).each do |type| %>
+          $('body').removeClass('<%= type %>-select');
         <% end %>
       }).error(function(jqXHR, textStatus, errorThrown) {
         console.log(jqXHR.responseText);
@@ -96,15 +101,27 @@
       performAction('year_of_plenty', [resource1, resource2]);
     });
 
-    $(document).on('click', '#discard-submit', function() {
+    function getResources($context) {
       resources = []
       <% Player::RESOURCE_CARDS.each do |resource| %>
-        value = $('input[name="<%= resource %>"]:visible').val();
+        value = $context.find('input[name="<%= resource %>"]:visible').val();
         if (value)
           for (i = 0; i < parseInt(value); i++)
             resources.push('<%= resource %>')
       <% end %>
-      performAction('discard', resources);
+      return resources
+    }
+
+    $(document).on('click', '#discard-submit', function() {
+      performAction('discard', getResources($(this).closest('.widget')));
+    });
+
+    $(document).on('click', '#request-trade-submit', function() {
+      $widget = $(this).closest('.widget');
+      myResources = getResources($widget.find('.my-resources'));
+      yourResources = getResources($widget.find('.your-resources'));
+      playerColor = $widget.find('select').val();
+      performAction('request_trade', [playerColor, myResources, yourResources]);
     });
 
     $(document).on('click', '.tile, .number', function() {

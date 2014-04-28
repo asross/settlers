@@ -50,35 +50,72 @@
       </ul>
     <% end %>
 
+    <%
+      def list_resources(resources)
+        counts = Player::RESOURCE_CARDS.map{|r| [r, resources.count{|rr| rr == r }]}.select{|r, count| count > 0 }
+        counts.map{|r, count| "#{count} #{r}"}.join(', ')
+      end
+    %>
+
     <div class='buttons'>
+      <% if request = @game.trade_requests[player.color] %>
+        <% their_resources, your_resources = request %>
+        <p>
+        <%= @game.active_player.color %> is offering their <%= list_resources(their_resources) %> for your <%= list_resources(your_resources) %>
+        </p>
+      <% end %>
       <% @game.available_actions(player).each do |action| %>
         <button id='<%= action %>'> <%= action.to_s.gsub('_', ' ') %> </button>
       <% end %>
 
-      <div id='year-of-plenty-widget'>
+      <div class='widget' id='year-of-plenty-widget'>
         <%= erb :resource_select, locals: { name: 'resource1' } %>
         <%= erb :resource_select, locals: { name: 'resource2' } %>
         <button id='year-of-plenty-submit'>submit</button>
       </div>
 
-      <div id='monopoly-widget'>
+      <div class='widget' id='monopoly-widget'>
         <%= erb :resource_select, locals: { name: 'resource' } %>
         <button id='monopoly-submit'>submit</button>
       </div>
 
-      <div id='trade-widget'>
+      <div class='widget' id='trade-widget'>
         <%= erb :resource_select, locals: { name: 'resource1' } %>
         &mdash;&gt;
         <%= erb :resource_select, locals: { name: 'resource2' } %>
         <button id='trade-submit'>submit</button>
       </div>
 
-      <div id='discard-widget'>
+      <div class='widget' id='discard-widget'>
         <% Player::RESOURCE_CARDS.each do |resource| %>
           <input type='number' min='0' step='1' name='<%= resource %>'>
           <label for='<%= resource %>'><%= resource %></label>
         <% end %>
         <button id='discard-submit'>submit</button>
+      </div>
+
+      <div class='widget' id='request-trade-widget'>
+        My:
+        <div class='my-resources'>
+          <% Player::RESOURCE_CARDS.each do |resource| %>
+            <input type='number' min='0' step='1' name='<%= resource %>'>
+            <label for='<%= resource %>'><%= resource %></label>
+          <% end %>
+        </div>
+        For:
+        <select>
+          <% @game.players.each do |p| %>
+            <% next if p == player %>
+            <option value='<%= p.color %>'><%= p.color %></option>
+          <% end %>
+        </select>'s
+        <div class='your-resources'>
+          <% Player::RESOURCE_CARDS.each do |resource| %>
+            <input type='number' min='0' step='1' name='<%= resource %>'>
+            <label for='<%= resource %>'><%= resource %></label>
+          <% end %>
+        </div>
+        <button id='request-trade-submit'>submit</button>
       </div>
     </div>
   </div>
