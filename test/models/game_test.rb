@@ -164,18 +164,18 @@ describe Game do
         @game.available_actions(@player1).must_equal %w(discard)
         @game.available_actions(@player2).must_equal []
         @game.available_actions(@player3).must_equal %w(discard)
- 
+
         # discard actions have to happen in one go with extant resources
         raises("must discard exactly 10 cards") {
           @game.perform_action(@player1, 'discard', %w(ore))
         }
-        raises("you do not have enough brick or sheep to discard") {
+        raises("you do not have enough brick or sheep") {
           @game.perform_action(@player1, 'discard', %w(brick)*3 + %w(sheep)*7)
         }
         raises("must discard exactly 5 cards") {
           @game.perform_action(@player3, 'discard', %w(sheep wheat sheep brick))
         }
-        raises("you do not have enough sheep to discard") {
+        raises("you do not have enough sheep") {
           @game.perform_action(@player3, 'discard', %w(sheep)*5)
         }
 
@@ -496,5 +496,71 @@ describe Game do
     end
 
     it 'victory points'
+  end
+
+  describe 'trading with other players' do
+    before do
+      @game.turn = 6
+      @game.state = :postroll
+      @game.active_player.must_equal @player1
+    end
+
+    it 'allows making trade requests if both players have the resources' do
+      @player1.ore = 2
+      @player1.wheat = 2
+      @player2.sheep = 2
+      @player2.brick = 1
+
+      @game.perform_action(@player1, 'request_trade', [@player2.color, %w(ore ore wheat), %w(sheep sheep brick)])
+      @game.perform_action(@player2, 'accept_trade')
+
+      @player1.ore.must_equal 0
+      @player1.wheat.must_equal 1
+      @player1.sheep.must_equal 2
+      @player1.brick.must_equal 1
+
+      @player2.ore.must_equal 2
+      @player2.wheat.must_equal 1
+      @player2.sheep.must_equal 0
+      @player2.brick.must_equal 0
+    end
+
+    it 'raises an error if the requesting or accepting player lacks resources' do
+      raises('you do not have enough wheat') { @game.perform_action(@player1, 'request_trade', [@player2.color, %w(wheat), %w(sheep)]) }
+
+      @player1.wheat = 1
+      @game.perform_action(@player1, 'request_trade', [@player2.color, %w(wheat), %w(sheep)])
+
+      raises('you do not have enough sheep') { @game.perform_action(@player2, 'accept_trade') }
+
+      @player2.sheep = 1
+      @player1.wheat = 0
+
+      raises('you do not have enough wheat') { @game.perform_action(@player2, 'accept_trade') }
+
+      @player1.wheat = 1
+      @game.perform_action(@player2, 'accept_trade')
+
+      @player1.wheat.must_equal 0
+      @player1.sheep.must_equal 1
+
+      @player2.wheat.must_equal 1
+      @player2.sheep.must_equal 0
+
+      @game.trade_requests[@player2.color].must_equal nil
+    end
+
+    it 'expires trade requests at end of turn' do
+      @game.trade_requests[@player2.color].must_equal nil
+
+      @player1.wheat = 1
+      @game.perform_action(@player1, 'request_trade', [@player2.color, %w(wheat), %w(sheep)])
+
+      @game.trade_requests[@player2.color].wont_equal nil
+
+      @game.perform_action(@player1, 'pass_turn')
+
+      @game.trade_requests[@player2.color].must_equal nil
+    end
   end
 end

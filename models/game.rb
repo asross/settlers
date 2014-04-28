@@ -2,13 +2,13 @@ class Game < Catan
   STATES = [:preroll, :postroll, :robbing1, :robbing2, :start_turn1, :start_turn2, :road_building1, :road_building2, :discard]
   FREE_ROAD_STATES = [:start_turn2, :road_building1, :road_building2]
   DEV_CARD_ACTIONS = %w(monopoly knight year_of_plenty road_building)
-  ACTIONS = %w(roll build_settlement build_city build_road buy_development_card trade_in pass_turn move_robber rob_player discard) + DEV_CARD_ACTIONS
+  ACTIONS = %w(roll build_settlement build_city build_road buy_development_card trade_in pass_turn move_robber rob_player discard request_trade accept_trade) + DEV_CARD_ACTIONS
   COLORS = %w(aqua deeppink gold lightcoral thistle burlywood azure lawngreen)
 
   attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable
   attr_reader :state
   attr_reader :longest_road_player, :largest_army_player
-  
+
   def initialize(opts={})
     opts[:side_length] ||= 3
     opts[:n_players] ||= 3
@@ -37,11 +37,18 @@ class Game < Catan
 
   def available_actions(player)
     return %w(discard) if should_discard?(player)
-    return [] unless player == active_player  # eventually, could "accept trade request"
-    
+
+    if player != active_player
+      if trade_requests[player.color]
+        return %w(accept_trade)
+      else
+        return []
+      end
+    end
+
     dev_card_actions(player) + case state
     when :preroll     then %w(roll)
-    when :postroll    then %w(build_settlement build_city build_road buy_development_card trade_in pass_turn)
+    when :postroll    then %w(build_settlement build_city build_road buy_development_card trade_in pass_turn request_trade)
     when :robbing1    then %w(move_robber)
     when :robbing2    then %w(rob_player)
     when :start_turn1 then %w(build_settlement)
@@ -67,7 +74,7 @@ class Game < Catan
     end
 
     # ugh -- some actions need to be player specific.
-    if action == 'discard'
+    if %w(discard accept_trade).include?(action)
       args = [player]+args
     end
 
@@ -86,6 +93,9 @@ class Game < Catan
     @state = s
   end
 
+  def trade_requests
+    @trade_requests ||= {}
+  end
 
   private
 
@@ -187,7 +197,32 @@ class Game < Catan
   def pass_turn
     @turn += 1
     @dev_card_played = false
+    @trade_requests = {}
     self.state = :preroll
+  end
+
+  def request_trade(color, my_resources, your_resources)
+    active_player.assert_we_have(my_resources)
+    trade_requests[color] = [my_resources, your_resources]
+  end
+
+  def accept_trade(accepting_player)
+   active_player_resources, accepting_player_resources = trade_requests[accepting_player.color]
+
+   active_player.assert_we_have(active_player_resources)
+   accepting_player.assert_we_have(accepting_player_resources)
+
+   active_player_resources.each do |resource|
+     active_player.increment(resource, -1)
+     accepting_player.increment(resource, 1)
+   end
+
+   accepting_player_resources.each do |resource|
+     active_player.increment(resource, 1)
+     accepting_player.increment(resource, -1)
+   end
+
+   trade_requests.delete(accepting_player.color)
   end
 
   DEV_CARD_ACTIONS.each do |card|

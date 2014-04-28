@@ -131,15 +131,19 @@ class Player < Catan
     card
   end
 
-  def discard(*resources)
-    ncards = resource_cards.count
-    error 'no need to discard' unless ncards > 7
-    error "must discard exactly #{ncards/2} cards" unless resources.count == (ncards/2)
+  def assert_we_have(resources)
     missing = []
     RESOURCE_CARDS.each do |type|
       missing << type unless resources.count{|r| r == type} <= resource_cards.count{|r| r == type}
     end
-    error "you do not have enough #{missing.join(' or ')} to discard" unless missing.size == 0
+    error "you do not have enough #{missing.join(' or ')}" unless missing.size == 0
+  end
+
+  def discard(*resources)
+    ncards = resource_cards.count
+    error 'no need to discard' unless ncards > 7
+    error "must discard exactly #{ncards/2} cards" unless resources.count == (ncards/2)
+    assert_we_have(resources)
 
     resources.each do |resource|
       increment(resource, -1)
