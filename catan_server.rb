@@ -38,7 +38,7 @@ class CatanServer < Sinatra::Base
     begin
       @game.perform_action(current_player, data['action'], data['args'])
       broadcast('action', html: erb(:board))
-      @game.messages << [current_player.color, "I performed #{data['action']}!"]
+      @game.messages << "** #{current_player.color} performed #{data['action']}!"
       broadcast('message', html: erb(:messages))
       status 200
     rescue CatanError => e
