@@ -68,7 +68,7 @@
         <button id='<%= action %>'> <%= action.to_s.gsub('_', ' ') %> </button>
       <% end %>
 
-      <div class='widget' id='year-of-plenty-widget'>
+      <div class='widget' id='year_of_plenty-widget'>
         <%= erb :resource_select, locals: { name: 'resource1' } %>
         <%= erb :resource_select, locals: { name: 'resource2' } %>
         <button id='year-of-plenty-submit'>submit</button>
@@ -79,7 +79,7 @@
         <button id='monopoly-submit'>submit</button>
       </div>
 
-      <div class='widget' id='trade-widget'>
+      <div class='widget' id='trade_in-widget'>
         <%= erb :resource_select, locals: { name: 'resource1' } %>
         &mdash;&gt;
         <%= erb :resource_select, locals: { name: 'resource2' } %>
@@ -94,7 +94,7 @@
         <button id='discard-submit'>submit</button>
       </div>
 
-      <div class='widget' id='request-trade-widget'>
+      <div class='widget' id='request_trade-widget'>
         My:
         <div class='my-resources'>
           <% Player::RESOURCE_CARDS.each do |resource| %>

@@ -105,11 +105,11 @@
     color: #2518b5;
     cursor: pointer;
   }
-  <% %w(trade year-of-plenty monopoly discard request-trade).each do |action| %>
-    #<%= action %>-widget {
-      margin-top: 1em;
-      display: none;
-    }
+  .widget {
+    margin-top: 1em;
+    display: none;
+  }
+  <% Game::ACTIONS.each do |action| %>
     body.<%= action %>-select #<%= action %>-widget {
       display: block;
     }

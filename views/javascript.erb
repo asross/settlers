@@ -16,31 +16,13 @@
     // %w(roll build_settlement build_city build_road trade_in pass_turn move_robber rob_player)
     <% Game::ACTIONS.each do |action| %>
       $(document).on('click', '#<%= action %>', function() {
-        <% %w(hex road city player trade monopoly year-of-plenty discard request-trade).each do |type| %>
-          $('body').removeClass('<%= type %>-select');
-        <% end %>
         window.currentAction = '<%= action %>';
+        $('body').removeClass();
         <% case action
-           when 'build_settlement', 'build_city' %>
-          $('body').addClass('city-select');
-        <% when 'build_road' %>
-          $('body').addClass('road-select');
-        <% when 'move_robber' %>
-          $('body').addClass('hex-select');
-        <% when 'rob_player' %>
-          $('body').addClass('player-select');
-        <% when 'trade_in' %>
-          $('body').addClass('trade-select');
-        <% when 'discard' %>
-          $('body').addClass('discard-select');
-        <% when 'monopoly' %>
-          $('body').addClass('monopoly-select');
-        <% when 'year_of_plenty' %>
-          $('body').addClass('year-of-plenty-select');
-        <% when 'request_trade' %>
-          $('body').addClass('request-trade-select');
-        <% when *%w(roll pass_turn knight road_building buy_development_card accept_trade) %>
+          when *%w(roll pass_turn knight road_building buy_development_card accept_trade) %>
           performAction('<%= action %>', []);
+        <% else %>
+          $('body').addClass('<%= action %>-select');
         <% end %>
         fixChatHeight();
       });
@@ -61,9 +43,7 @@
         <% if ENV['RELOAD_AFTER_ACTIONS'] %>
           window.location.reload(true);
         <% end %>
-        <% %w(hex road city player trade monopoly year-of-plenty discard request-trade).each do |type| %>
-          $('body').removeClass('<%= type %>-select');
-        <% end %>
+        $('body').removeClass();
       }).error(function(jqXHR, textStatus, errorThrown) {
         console.log(jqXHR.responseText);
         $('#error').text(jqXHR.responseText);
