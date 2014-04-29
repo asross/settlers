@@ -9,10 +9,23 @@
   <% players_width = 300 %>
   <% total_hex_width = 2*margin + (@game.board.size + @game.board.side_length)*width %>
   <% watercolor = 'cornflowerblue' %>
+  <% dev_card_width = 25 %>
   body {
     margin: 0;
     background-color: #ccc;
   }
+  .resource-list li {
+    display: inline-block;
+    margin-right: <%= dev_card_width %>px;
+  }
+  .resource-image-wrapper {
+    float: left;
+    width: <%= dev_card_width/5.0 %>px;
+  }
+  .resource-image-wrapper img {
+    width: <%= dev_card_width %>px;
+  }
+
   #hexes {
     background-color: <%= watercolor %>;
     width: <%= total_hex_width %>px;

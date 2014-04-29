@@ -30,11 +30,17 @@
   </select>
 
   <div class='info'>
-    <ul>
+    <ul class='resource-list'>
       <% Player::RESOURCE_CARDS.each do |resource| %>
-        <li>
-        <%= player.send(resource) %>
-        <%= resource %>
+        <% n = player.send(resource) %>
+        <% if n > 0 %>
+        <li class='clearfix'>
+          <% n.times do %>
+            <div class='resource-image-wrapper'>
+              <img src='images/<%= resource %>.png'>
+            </div>
+          <% end %>
+        <% end %>
         </li>
       <% end %>
     </ul>
