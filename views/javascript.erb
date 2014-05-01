@@ -105,13 +105,13 @@
     });
 
     $(document).on('click', '.tile, .number', function() {
-      if ($('body').hasClass('hex-select')) {
+      if ($('body').hasClass('move_robber-select')) {
         performAction(window.currentAction, [$(this).closest('.hex').data('coords')]);
       }
     });
 
     $(document).on('click', '.player .name', function() {
-      if ($('body').hasClass('player-select')) {
+      if ($('body').hasClass('rob_player-select')) {
         performAction(window.currentAction, $(this).closest('.player').data('color'));
       }
     });
