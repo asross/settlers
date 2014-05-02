@@ -124,10 +124,10 @@
       data = response[1];
       if (event == 'action') {
         $('#board').html(data.html);
-        fixChatHeight();
       } else if (event == 'message') {
         $('#message-area').html(data.html);
       }
+      fixChatHeight();
     }
   });
 </script>
