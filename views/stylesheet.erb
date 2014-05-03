@@ -2,7 +2,7 @@
   <% height = 100.0 %>
   <% width = height/Math.sqrt(3) %>
   <% margin = 5 + height/4.0 %>
-  <% road_height = 10 %>
+  <% road_height = height/10.0 %>
   <% city_height = 25 %>
   <% port_height = 20 %>
   <% city_city_height = city_height + 10 %>
@@ -67,15 +67,22 @@
     margin-left: <%= margin %>px;
   }
   .road-marker, .road {
-    position: relative;
-    top: <%= -road_height/2.0 %>px;
+    position: absolute;
     height: <%= road_height %>px;
-    width: <%= width - road_height %>px;
-    margin: 0 auto;
+    width: <%= width %>px;
     z-index: 2;
   }
   .road-marker.botleft, .road.botleft {
-    top: <%= height - road_height/2.0 %>px;
+    top: <%= height - width/2.0 %>px;
+    left: <%= -width/4.0 %>px;
+  }
+  .road-marker.topleft, .road.topleft {
+    top: <%= width/2.0 - road_height %>px;
+    left: <%= -width/4.0 %>px;
+  }
+  .road-marker.top, .road.top {
+    top: <%= -road_height/2.0 %>px;
+    left: <%= width/2.0 %>px;
   }
   .city-marker, .city, .settlement {
     float: left;
@@ -190,18 +197,23 @@
     position: relative;
     top: <%= - height/2.0 + port_height %>px;
   }
-  <% %w(top topright botright bottom botleft topleft).each_with_index do |direction, i| %>
-    .port.<%= direction %> {
-      -webkit-transform: rotateZ(<%= i*60 %>deg);
-      -moz-transform: rotateZ(<%= i*60 %>deg);
-    }
-    <% if direction.start_with?('bot') %>
-      .port.<%= direction %> .label {
-        -webkit-transform: scaleX(-1) scaleY(-1);
-        -moz-transform: scaleX(-1) scaleY(-1);
+
+  <% %w(port road road-marker).each do |rotated| %>
+    <% %w(top topright botright bottom botleft topleft).each_with_index do |direction, i| %>
+      .<%= rotated %>.<%= direction %> {
+        -webkit-transform: rotateZ(<%= i*60 %>deg);
+        -moz-transform: rotateZ(<%= i*60 %>deg);
       }
     <% end %>
   <% end %>
+
+  <% %w(botright bottom botleft).each do |direction| %>
+    .port.<%= direction %> .label {
+      -webkit-transform: scaleX(-1) scaleY(-1);
+      -moz-transform: scaleX(-1) scaleY(-1);
+    }
+  <% end %>
+
   .robbed {
     color: black;
     font-weight: bold;

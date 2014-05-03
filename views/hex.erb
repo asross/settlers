@@ -4,16 +4,16 @@
 <% botleft = [hex.x-1, hex.y+1] %>
 
 <div class='hex' data-coords='<%= here %>'>
+  <%= erb :road, layout: false, locals: { coords: [botleft, here], klass: 'botleft' } %>
+  <%= erb :road, layout: false, locals: { coords: [topleft, here], klass: 'topleft' } %>
+  <%= erb :road, layout: false, locals: { coords: [top, here], klass: 'top' } %>
   <div class='tile first <%= hex.type %>'>
-    <%= erb :road, layout: false, locals: { coords: [botleft, here], botleft: true } %>
   </div>
   <div class='tile second <%= hex.type %>'>
     <%= erb :city, layout: false, locals: { coords: [topleft, botleft, here] } %>
-    <%= erb :road, layout: false, locals: { coords: [topleft, here] } %>
   </div>
   <div class='tile third <%= hex.type %>'>
     <%= erb :city, layout: false, locals: { coords: [topleft, top, here] } %>
-    <%= erb :road, layout: false, locals: { coords: [top, here] } %>
   </div>
   <% if hex.robbed %>
     <div class='number robbed'> r </div>
