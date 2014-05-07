@@ -75,21 +75,21 @@ describe 'board.erb' do
   it 'displays errors' do
     $game.state = :postroll
     @board.roads << Road.new(h(1,3), h(2,3), 'red')
+    @player1.wood = 1
+    @player1.brick = 1
+    @player1.wheat = 1
+    @player1.sheep = 1
     visit '/?color=red'
 
     find('#build_road').click
     click_on_coords([4,1],[5,1])
     within('#error') { page.must_have_content 'Road not buildable' }
-    click_on_coords([1,4],[2,3])
-    within('#error') { page.must_have_content 'Not enough resources' }
 
     find('#build_settlement').click
     click_on_coords([1,5],[2,5],[2,4])
     within('#error') { page.must_have_content 'No road leading' }
     click_on_coords([2,3],[1,3],[2,2])
     within('#error') { page.must_have_content 'Too close to existing' }
-    click_on_coords([2,3],[1,3],[1,4])
-    within('#error') { page.must_have_content 'Not enough resources' }
   end
 
   it 'allows robber moving' do

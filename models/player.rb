@@ -131,12 +131,19 @@ class Player < Catan
     card
   end
 
-  def assert_we_have(resources)
-    missing = []
-    RESOURCE_CARDS.each do |type|
+  def has_resources?(resources)
+    missing(resources).empty?
+  end
+
+  def missing(resources)
+    RESOURCE_CARDS.each_with_object([]) do |type, missing|
       missing << type unless resources.count{|r| r == type} <= resource_cards.count{|r| r == type}
     end
-    error "you do not have enough #{missing.join(' or ')}" unless missing.size == 0
+  end
+
+  def assert_we_have(resources)
+    m = missing(resources)
+    error "you do not have enough #{m.join(' or ')}" unless m.size == 0
   end
 
   def discard(*resources)

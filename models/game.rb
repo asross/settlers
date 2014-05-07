@@ -319,4 +319,27 @@ class Game < Catan
   def h(x, y)
     @board.hexes[x][y]
   end
+
+  def can_build_settlement?(player)
+    round <= 1 || player.has_resources?(%w(wheat brick sheep wood))
+  end
+
+  def can_build_road?(player)
+    FREE_ROAD_STATES.include?(state) || player.has_resources?(%w(wood brick))
+  end
+
+  def can_buy_development_card?(player)
+    player.has_resources?(%w(sheep ore wheat))
+  end
+
+  def can_build_city?(player)
+    player.has_resources?(%w(wheat wheat ore ore ore))
+  end
+
+  def can_trade_in?(player)
+    Player::RESOURCE_CARDS.any? do |resource|
+      player.trade_in_ratio_for(resource) <= player.send(resource)
+    end
+  end
+
 end
