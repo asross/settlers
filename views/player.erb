@@ -48,7 +48,7 @@
       <% if request_to_me = @game.trade_requests[player.color] %>
         <div class='trade-request'>
           <%= @game.active_player.color %>
-          is offering their
+          is offering
           <%= erb :resource_list, locals: { resources: request_to_me[0] } %>
           for your
           <%= erb :resource_list, locals: { resources: request_to_me[1] } %>
