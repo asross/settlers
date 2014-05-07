@@ -234,6 +234,12 @@ describe 'board.erb' do
       click_button 'submit'
     end
 
+    within('.trade-request') do
+      page.must_have_content 'currently offering'
+      page_must_display_resources(1, 'ore')
+      page_must_display_resources(1, 'brick')
+    end
+
     visit "/?color=white"
 
     within('.trade-request') do
