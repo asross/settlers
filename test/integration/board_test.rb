@@ -103,7 +103,7 @@ describe 'board.erb' do
     find('#rob_player').click
     find(".player[data-color='#{@player3.color}'] .name").click
     within(".player[data-color='red']") do
-      page.must_have_content '1 ore'
+      page_must_display_resources(1, 'ore')
     end
     @player3.ore.must_equal 0
   end
@@ -158,7 +158,7 @@ describe 'board.erb' do
     select 'sheep', from: 'resource2'
     find('#trade-submit').click
     within('.player[data-color="red"]') do
-      page.must_have_content '1 sheep'
+      page_must_display_resources(1, 'sheep')
     end
   end
 
@@ -198,8 +198,8 @@ describe 'board.erb' do
     select 'wood', from: 'resource2'
     find('#year-of-plenty-submit').click
     within('.player[data-color="red"]') do
-      page.must_have_content '1 ore'
-      page.must_have_content '1 wood'
+      page_must_display_resources(1, 'ore')
+      page_must_display_resources(1, 'wood')
     end
   end
 
@@ -212,7 +212,7 @@ describe 'board.erb' do
     select 'brick', from: 'resource'
     find('#monopoly-submit').click
     within('.player[data-color="red"]') do
-      page.must_have_content '5 brick'
+      page_must_display_resources(5, 'brick')
     end
   end
 
@@ -224,7 +224,7 @@ describe 'board.erb' do
 
     click_button 'request trade'
 
-    within('#request-trade-widget') do
+    within('#request_trade-widget') do
       within('.my-resources') do
         fill_in 'ore', with: 1
       end
@@ -236,20 +236,29 @@ describe 'board.erb' do
 
     visit "/?color=white"
 
-    page.must_have_content "red is offering their 1 ore for your 1 brick"
+    within('.trade-request') do
+      page.must_have_content "red is offering their"
+      page_must_display_resources(1, 'ore')
+      page_must_display_resources(1, 'brick')
+    end
+
     click_button 'accept trade'
 
     within('.player[data-color="white"]') do
-      page.must_have_content '0 brick'
-      page.must_have_content '1 ore'
+      page_must_display_resources(0, 'brick')
+      page_must_display_resources(1, 'ore')
     end
 
     visit '/?color=red'
 
     within('.player[data-color="red"]') do
-      page.must_have_content '0 ore'
-      page.must_have_content '1 brick'
+      page_must_display_resources(1, 'brick')
+      page_must_display_resources(0, 'ore')
     end
+  end
+
+  def page_must_display_resources(count, resource)
+    page.must_have_css ".resource-image-wrapper[data-resource='#{resource}']", count: count
   end
 
   def click_on_coords(*coords)

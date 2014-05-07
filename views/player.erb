@@ -30,20 +30,7 @@
   </select>
 
   <div class='info'>
-    <ul class='resource-list'>
-      <% Player::RESOURCE_CARDS.each do |resource| %>
-        <% n = player.send(resource) %>
-        <% if n > 0 %>
-        <li class='clearfix'>
-          <% n.times do %>
-            <div class='resource-image-wrapper'>
-              <img src='images/<%= resource %>.png'>
-            </div>
-          <% end %>
-        <% end %>
-        </li>
-      <% end %>
-    </ul>
+    <%= erb :resource_list, locals: { resources: player.resource_cards } %>
 
     <% if player.development_cards.any? %>
       <ul class='clearfix'>
@@ -56,20 +43,18 @@
       </ul>
     <% end %>
 
-    <%
-      def list_resources(resources)
-        counts = Player::RESOURCE_CARDS.map{|r| [r, resources.count{|rr| rr == r }]}.select{|r, count| count > 0 }
-        counts.map{|r, count| "#{count} #{r}"}.join(', ')
-      end
-    %>
-
     <div class='buttons'>
+
       <% if request = @game.trade_requests[player.color] %>
-        <% their_resources, your_resources = request %>
-        <p>
-        <%= @game.active_player.color %> is offering their <%= list_resources(their_resources) %> for your <%= list_resources(your_resources) %>
-        </p>
+        <div class='trade-request'>
+          <%= @game.active_player.color %>
+          is offering their
+          <%= erb :resource_list, locals: { resources: request[0] } %>
+          for your
+          <%= erb :resource_list, locals: { resources: request[1] } %>
+        </div>
       <% end %>
+
       <% @game.available_actions(player).each do |action| %>
         <button id='<%= action %>'> <%= action.to_s.gsub('_', ' ') %> </button>
       <% end %>
