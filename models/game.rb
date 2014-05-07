@@ -198,6 +198,7 @@ class Game < Catan
     @turn += 1
     @dev_card_played = false
     @trade_requests = {}
+    @last_roll = nil
     self.state = :preroll
   end
 
