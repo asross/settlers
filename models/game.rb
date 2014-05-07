@@ -1,8 +1,24 @@
 class Game < Catan
-  STATES = [:preroll, :postroll, :robbing1, :robbing2, :start_turn1, :start_turn2, :road_building1, :road_building2, :discard]
   FREE_ROAD_STATES = [:start_turn2, :road_building1, :road_building2]
   DEV_CARD_ACTIONS = %w(monopoly knight year_of_plenty road_building)
-  ACTIONS = %w(roll build_settlement build_city build_road buy_development_card trade_in move_robber rob_player discard request_trade accept_trade cancel_trade reject_trade pass_turn) + DEV_CARD_ACTIONS
+  STATES_TO_ACTIONS = {
+    :preroll => %w(roll knight),
+    :postroll => DEV_CARD_ACTIONS + %w(
+      build_settlement build_city build_road buy_development_card
+      trade_in request_trade
+      accept_trade reject_trade cancel_trade
+      pass_turn
+    ),
+    :robbing1 => %w(move_robber),
+    :robbing2 => %w(rob_player),
+    :start_turn1 => %w(build_settlement),
+    :start_turn2 => %w(build_road),
+    :road_building1 => %w(build_road),
+    :road_building2 => %w(build_road),
+    :discard => %w(discard)
+  }
+  STATES = STATES_TO_ACTIONS.keys
+  ACTIONS = STATES_TO_ACTIONS.values.flatten.uniq
   COLORS = %w(aqua deeppink gold lightcoral thistle burlywood azure lawngreen)
 
   attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable
@@ -35,38 +51,14 @@ class Game < Catan
     end
   end
 
+
   def available_actions(player)
-    return %w(discard) if should_discard?(player)
-
-    if player != active_player
-      if trade_requests[player.color]
-        return %w(accept_trade reject_trade)
+    STATES_TO_ACTIONS[state].select do |action|
+      if respond_to?("can_#{action}?", true)
+        send("can_#{action}?", player)
       else
-        return []
+        player == active_player
       end
-    end
-
-    actions = dev_card_actions(player)
-    actions += %w(cancel_trade) unless trade_requests.empty?
-    actions + case state
-    when :preroll     then %w(roll)
-    when :postroll    then %w(build_settlement build_city build_road buy_development_card trade_in request_trade pass_turn)
-    when :robbing1    then %w(move_robber)
-    when :robbing2    then %w(rob_player)
-    when :start_turn1 then %w(build_settlement)
-    when *FREE_ROAD_STATES then %w(build_road)
-    else []
-    end
-  end
-
-  def dev_card_actions(player)
-    return [] if @dev_card_played
-    cards = playable_dev_cards.map{|c| c.type.to_s }.uniq
-
-    case state
-    when :preroll then %w(knight) & cards
-    when :postroll then cards
-    else []
     end
   end
 
@@ -147,16 +139,10 @@ class Game < Catan
     @discards_this_turn ||= []
   end
 
-  def should_discard?(player)
-    state == :discard &&
-      player.resource_cards.count > 7 &&
-      !discards_this_turn.include?(player)
-  end
-
   def discard(player, *resources)
     player.discard(*resources)
     discards_this_turn << player
-    if players.none?(&method(:should_discard?))
+    if players.none?(&method(:can_discard?))
       @discards_this_turn = nil
       self.state = :robbing1
     end
@@ -236,6 +222,23 @@ class Game < Catan
     trade_requests.delete(rejecting_player.color)
   end
 
+  def can_discard?(player)
+    player.resource_cards.count > 7 && !discards_this_turn.include?(player)
+  end
+
+  def can_accept_trade?(player)
+    trade_requests[player.color]
+  end
+
+  def can_reject_trade?(player)
+    trade_requests[player.color]
+  end
+
+  def can_cancel_trade?(player)
+    return false unless player == active_player
+    trade_requests.size > 0
+  end
+
   DEV_CARD_ACTIONS.each do |card|
     class_eval <<-RUBY
       def #{card}(*args)
@@ -244,6 +247,12 @@ class Game < Catan
         card.played = true
         recalculate_largest_army if card.knight?
         @dev_card_played = true
+      end
+
+      def can_#{card}?(player)
+        return false unless player == active_player
+        return false if @dev_card_played
+        playable_dev_cards.detect(&:#{card}?)
       end
     RUBY
   end
