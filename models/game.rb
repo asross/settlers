@@ -1,6 +1,7 @@
 class Game < Catan
   FREE_ROAD_STATES = [:start_turn2, :road_building1, :road_building2]
   DEV_CARD_ACTIONS = %w(monopoly knight year_of_plenty road_building)
+  OFF_TURN_ACTIONS = %w(discard accept_trade reject_trade)
   STATES_TO_ACTIONS = {
     :preroll => %w(roll knight),
     :postroll => DEV_CARD_ACTIONS + %w(
@@ -52,11 +53,15 @@ class Game < Catan
   end
 
   def available_actions(player)
-    STATES_TO_ACTIONS[state].select do |action|
-      if respond_to?("can_#{action}?", true)
-        send("can_#{action}?", player)
-      else
-        player == active_player
+    STATES_TO_ACTIONS[state].select do |act|
+      correct_turn = (player == active_player || OFF_TURN_ACTIONS.include?(act))
+
+      if correct_turn
+        if respond_to? "can_#{act}?", true
+          send("can_#{act}?", player)
+        else
+          true
+        end
       end
     end
   end
@@ -229,7 +234,6 @@ class Game < Catan
   end
 
   def can_cancel_trade?(player)
-    return false unless player == active_player
     trade_requests.size > 0
   end
 
@@ -244,7 +248,6 @@ class Game < Catan
       end
 
       def can_#{card}?(player)
-        return false unless player == active_player
         return false if @dev_card_played
         playable_dev_cards.detect(&:#{card}?)
       end
