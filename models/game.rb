@@ -51,7 +51,6 @@ class Game < Catan
     end
   end
 
-
   def available_actions(player)
     STATES_TO_ACTIONS[state].select do |action|
       if respond_to?("can_#{action}?", true)
@@ -67,12 +66,7 @@ class Game < Catan
       error "#{player.color} cannot perform #{action} at this time"
     end
 
-    # ugh -- some actions need to be player specific.
-    if %w(discard accept_trade reject_trade).include?(action)
-      args = [player]+args
-    end
-
-    send(action, *args)
+    send(action, *([player]+Array(args)))
   end
 
   def display_points(player)
@@ -97,7 +91,7 @@ class Game < Catan
     2 + rand(6) + rand(6)
   end
 
-  def roll
+  def roll(player)
     @last_roll = random_dieroll
     @board.rolled(@last_roll)
     if @last_roll == 7
@@ -111,22 +105,22 @@ class Game < Catan
     end
   end
 
-  def rob_player(color)
+  def rob_player(robbing_player, color)
     robbee = @robbable.detect{|p| p.color == color}
     error "invalid selection #{color} (must pick one of #{@robbable.join(', ')})" unless robbee
-    active_player.steal_from(robbee)
+    robbing_player.steal_from(robbee)
     @robbable = nil
     self.state = @pre_knight_state || :postroll
     @pre_knight_state = nil
   end
 
-  def move_robber(v)
-    robbable = @board.move_robber_to(*v, active_player)
+  def move_robber(player, v)
+    robbable = @board.move_robber_to(*v, player)
     case robbable.size
     when 0
       self.state = :postroll
     when 1
-      active_player.steal_from(robbable.first)
+      player.steal_from(robbable.first)
       self.state = @pre_knight_state || :postroll
       @pre_knight_state = nil
     else
@@ -148,8 +142,8 @@ class Game < Catan
     end
   end
 
-  def build_road(v1, v2)
-    active_player.build_road(h(*v1), h(*v2), FREE_ROAD_STATES.include?(state))
+  def build_road(player, v1, v2)
+    player.build_road(h(*v1), h(*v2), FREE_ROAD_STATES.include?(state))
     recalculate_longest_road
 
     if state == :start_turn2
@@ -162,27 +156,27 @@ class Game < Catan
     end
   end
 
-  def build_city(v1, v2, v3)
-    active_player.build_city(h(*v1), h(*v2), h(*v3))
+  def build_city(player, v1, v2, v3)
+    player.build_city(h(*v1), h(*v2), h(*v3))
   end
 
-  def build_settlement(v1, v2, v3)
-    active_player.build_settlement(h(*v1), h(*v2), h(*v3), round == 0, round == 1)
+  def build_settlement(player, v1, v2, v3)
+    player.build_settlement(h(*v1), h(*v2), h(*v3), round == 0, round == 1)
     recalculate_longest_road # settlement building might break an existing road
 
     self.state = :start_turn2 if state == :start_turn1
   end
 
-  def buy_development_card
-    card = active_player.buy_development_card
+  def buy_development_card(player)
+    card = player.buy_development_card
     card.turn_purchased = turn
   end
 
-  def trade_in(r1, r2)
-    active_player.trade_in(r1, r2)
+  def trade_in(player, r1, r2)
+    player.trade_in(r1, r2)
   end
 
-  def pass_turn
+  def pass_turn(player)
     @turn += 1
     @dev_card_played = false
     @trade_requests = {}
@@ -190,8 +184,8 @@ class Game < Catan
     self.state = :preroll
   end
 
-  def request_trade(color, my_resources, your_resources)
-    active_player.assert_we_have(my_resources)
+  def request_trade(player, color, my_resources, your_resources)
+    player.assert_we_have(my_resources)
     trade_requests[color] = [my_resources, your_resources]
   end
 
@@ -214,12 +208,12 @@ class Game < Catan
    trade_requests.delete(accepting_player.color)
   end
 
-  def cancel_trade
+  def cancel_trade(player)
     trade_requests.clear
   end
 
-  def reject_trade(rejecting_player)
-    trade_requests.delete(rejecting_player.color)
+  def reject_trade(player)
+    trade_requests.delete(player.color)
   end
 
   def can_discard?(player)
@@ -241,7 +235,7 @@ class Game < Catan
 
   DEV_CARD_ACTIONS.each do |card|
     class_eval <<-RUBY
-      def #{card}(*args)
+      def #{card}(player, *args)
         card = playable_dev_cards.detect(&:#{card}?)
         play_#{card}(*args)
         card.played = true

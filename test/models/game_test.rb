@@ -401,12 +401,12 @@ describe Game do
       @player3.development_cards << new_knight
       @player3.development_cards << new_knight
 
-      2.times { @game.send(:pass_turn) }
+      2.times { @game.send(:pass_turn, nil) }
       @game.state = :postroll
       @game.perform_action(@player3, 'knight')
       @game.largest_army_player.must_equal @player1
 
-      3.times { @game.send(:pass_turn) }
+      3.times { @game.send(:pass_turn, nil) }
       @game.state = :postroll
       @game.perform_action(@player3, 'knight')
       @game.largest_army_player.must_equal @player3
