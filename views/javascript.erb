@@ -18,7 +18,7 @@
       $(document).on('click', '#<%= action %>', function() {
         window.currentAction = '<%= action %>';
         $('body').removeClass();
-        <% if %w(roll pass_turn knight road_building buy_development_card accept_trade).include?(action) %>
+        <% if %w(roll pass_turn knight road_building buy_development_card accept_trade reject_trade cancel_trade).include?(action) %>
           performAction('<%= action %>', []);
         <% else %>
           $('body').addClass('<%= action %>-select');

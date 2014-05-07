@@ -562,5 +562,25 @@ describe Game do
 
       @game.trade_requests[@player2.color].must_equal nil
     end
+
+    it 'allows canceling of trade requests' do
+      @player1.wheat = 1
+
+      @game.perform_action(@player1, 'request_trade', [@player2.color, %w(wheat), %w(sheep)])
+      @game.trade_requests[@player2.color].wont_equal nil
+
+      @game.perform_action(@player1, 'cancel_trade')
+      @game.trade_requests[@player2.color].must_equal nil
+    end
+
+    it 'allows rejection of trade requests' do
+      @player1.wheat = 1
+
+      @game.perform_action(@player1, 'request_trade', [@player2.color, %w(wheat), %w(sheep)])
+      @game.trade_requests[@player2.color].wont_equal nil
+
+      @game.perform_action(@player2, 'reject_trade')
+      @game.trade_requests[@player2.color].must_equal nil
+    end
   end
 end

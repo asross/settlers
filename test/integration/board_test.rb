@@ -216,50 +216,68 @@ describe 'board.erb' do
     end
   end
 
-  it 'allows trading' do
-    $game.state = :postroll
-    @player1.ore = 1
-    @player2.brick = 1
-    visit '/?color=red'
+  describe 'trading' do
+    before do
+      $game.state = :postroll
+      @player1.ore = 1
+      @player2.brick = 1
+      visit '/?color=red'
+      click_button 'request trade'
 
-    click_button 'request trade'
-
-    within('#request_trade-widget') do
-      within('.my-resources') do
-        fill_in 'ore', with: 1
+      within('#request_trade-widget') do
+        within('.my-resources') do
+          fill_in 'ore', with: 1
+        end
+        within('.your-resources') do
+          fill_in 'brick', with: 1
+        end
+        click_button 'submit'
       end
-      within('.your-resources') do
-        fill_in 'brick', with: 1
+
+      within('.trade-request') do
+        page.must_have_content 'currently offering'
+        page_must_display_resources(1, 'ore')
+        page_must_display_resources(1, 'brick')
       end
-      click_button 'submit'
     end
 
-    within('.trade-request') do
-      page.must_have_content 'currently offering'
-      page_must_display_resources(1, 'ore')
-      page_must_display_resources(1, 'brick')
+    it 'allows accepting' do
+      visit "/?color=white"
+
+      within('.trade-request') do
+        page.must_have_content "red is offering their"
+        page_must_display_resources(1, 'ore')
+        page_must_display_resources(1, 'brick')
+      end
+
+      click_button 'accept trade'
+
+      within('.player[data-color="white"]') do
+        page_must_display_resources(0, 'brick')
+        page_must_display_resources(1, 'ore')
+      end
+
+      visit '/?color=red'
+
+      within('.player[data-color="red"]') do
+        page_must_display_resources(1, 'brick')
+        page_must_display_resources(0, 'ore')
+      end
     end
 
-    visit "/?color=white"
-
-    within('.trade-request') do
-      page.must_have_content "red is offering their"
-      page_must_display_resources(1, 'ore')
-      page_must_display_resources(1, 'brick')
+    it 'allows canceling' do
+      page.must_have_css '.trade-request'
+      click_button 'cancel_trade'
+      page.wont_have_css '.trade-request'
     end
 
-    click_button 'accept trade'
-
-    within('.player[data-color="white"]') do
-      page_must_display_resources(0, 'brick')
-      page_must_display_resources(1, 'ore')
-    end
-
-    visit '/?color=red'
-
-    within('.player[data-color="red"]') do
-      page_must_display_resources(1, 'brick')
-      page_must_display_resources(0, 'ore')
+    it 'allows rejecting of trading' do
+      visit '/?color=white'
+      page.must_have_css '.trade-request'
+      click_button 'reject_trade'
+      page.wont_have_css '.trade-request'
+      visit '/?color=red'
+      page.wont_have_css '.trade-request'
     end
   end
 
