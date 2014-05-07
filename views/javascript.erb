@@ -18,7 +18,7 @@
       $(document).on('click', '#<%= action %>', function() {
         window.currentAction = '<%= action %>';
         $('body').removeClass();
-        <% if %w(knight road_building).include?(action) || Game.instance_method(action).arity == 1 %>
+        <% if Game.instance_method(action).arity == 1 %>
           performAction('<%= action %>', []);
         <% else %>
           $('body').addClass('<%= action %>-select');

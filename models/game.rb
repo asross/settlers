@@ -237,28 +237,32 @@ class Game < Catan
     trade_requests.size > 0
   end
 
-  DEV_CARD_ACTIONS.each do |card|
+  def find_development_card(type)
+    active_player.development_cards.detect{|c| c.playable_on_turn?(turn) && c.type == type }
+  end
+
+  def self.development_card(card_type, &block)
+    params = block.parameters.map(&:last).join(', ')
+
+    define_method "play_#{card_type}", block
+
     class_eval <<-RUBY
-      def #{card}(player, *args)
-        card = playable_dev_cards.detect(&:#{card}?)
-        play_#{card}(*args)
-        card.played = true
-        recalculate_largest_army if card.knight?
+      def #{card_type}(#{params})
+        find_development_card(:#{card_type}).tap do |card|
+          play_#{card_type}(#{params})
+          card.played = true
+          recalculate_largest_army if card.knight?
+        end
         @dev_card_played = true
       end
 
-      def can_#{card}?(player)
-        return false if @dev_card_played
-        playable_dev_cards.detect(&:#{card}?)
+      def can_#{card_type}?(player)
+        !@dev_card_played && find_development_card(:#{card_type})
       end
     RUBY
   end
 
-  def playable_dev_cards
-    active_player.development_cards.select{|c| c.playable_on_turn?(turn) }
-  end
-
-  def play_monopoly(resource)
+  development_card :monopoly do |player, resource|
     players.each do |player|
       n = player.send(resource)
       player.increment(resource, -n)
@@ -266,17 +270,17 @@ class Game < Catan
     end
   end
 
-  def play_knight
+  development_card :knight do |player|
     @pre_knight_state = state
     self.state = :robbing1
   end
 
-  def play_year_of_plenty(resource1, resource2)
+  development_card :year_of_plenty do |player, resource1, resource2|
     active_player.increment(resource1, 1)
     active_player.increment(resource2, 1)
   end
 
-  def play_road_building
+  development_card :road_building do |player|
     case active_player.roads.count
     when Player::MAX_ROADS
       # Player cannot build more roads, so the card should do nothing.
