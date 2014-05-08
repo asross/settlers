@@ -4,30 +4,27 @@
 <div class='<%= div_class %>' data-color='<%= player.color %>'>
   <span style='float: right;'><a href='/?color=<%= player.color %>'>be</a></span>
   <span class='name'><%= player.color %></span>
+
   <%
-    def pluralize(l, n)
-      str = "#{n} #{l}"
-      str += 's' if n != 1
-      str
-    end
-    ncards = player.development_cards.count{|c| !c.played }
-    nknights = player.knights_played
-    nresources = player.resource_cards.count
-    data = []
-    data << pluralize('resource', nresources)
-    data << pluralize('card', ncards) if ncards > 0
-    data << pluralize('knight', nknights) if nknights > 0
-    data << pluralize('VP', @game.display_points(player))
-    data << 'longest road' if player == @game.longest_road_player
-    data << 'largest army' if player == @game.largest_army_player
+    public_player_data = {
+      dev_card: player.development_cards.count{|c| !c.played },
+      knight: player.knights_played,
+      resource_card: player.resource_cards.count
+    }.select{|k,v| v > 0}
   %>
-  <select>
-    <% data.each do |datum| %>
-      <option>
-        <%= datum %>
-      </option>
+  <ul class='public-data clearfix'>
+    <% public_player_data.each do |img_src, number| %>
+      <li>
+        <img class='public-data-image' src="images/<%= img_src %>.png">x<%= number %>&nbsp;
+      </li>
     <% end %>
-  </select>
+    <% if player == @game.longest_road_player %>
+      <li>LR</li>
+    <% end %>
+    <% if player == @game.largest_army_player %>
+      <li>LA</li>
+    <% end %>
+  </ul>
 
   <div class='info'>
     <%= erb :resource_list, locals: { resources: player.resource_cards } %>

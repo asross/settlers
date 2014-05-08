@@ -25,6 +25,19 @@
   .resource-image-wrapper img {
     width: <%= dev_card_width %>px;
   }
+  
+  #players .player .name {
+    float: left;
+  }
+  .public-data {
+    margin: 0;
+  }
+  .public-data li {
+    float: left;
+  }
+  .public-data .public-data-image {
+    width: <%= dev_card_width/2.0 %>px;
+  }
 
   #hexes {
     background-color: <%= watercolor %>;
@@ -303,6 +316,7 @@
     cursor: pointer;
   }
   #players .player.active .name {
+    text-decoration: underline;
     font-weight: bold;
   }
   #players .player .info {
