@@ -45,24 +45,6 @@
 
     <div class='buttons'>
 
-      <% if request_to_me = @game.trade_requests[player.color] %>
-        <div class='trade-request'>
-          <%= @game.active_player.color %>
-          is offering
-          <%= erb :resource_list, locals: { resources: request_to_me[0] } %>
-          for your
-          <%= erb :resource_list, locals: { resources: request_to_me[1] } %>
-        </div>
-      <% elsif player == @game.active_player && request_from_me = @game.trade_requests.first %>
-        <div class='trade-request'>
-          <% other_player, resources = request_from_me %>
-          currently offering <%= other_player %> your
-          <%= erb :resource_list, locals: { resources: resources[0] } %>
-          for their
-          <%= erb :resource_list, locals: { resources: resources[1] } %>
-        </div>
-      <% end %>
-
       <% @game.available_actions(player).each do |action| %>
         <button id='<%= action %>'> <%= action.to_s.gsub('_', ' ') %> </button>
       <% end %>
@@ -118,4 +100,14 @@
       </div>
     </div>
   </div>
+
+  <% if player == @game.active_player && request = @game.trade_requests.first %>
+    <div class='trade-request'>
+      <% other_player, resources = request %>
+      <span style='float: left;'> is offering </span>
+      <%= erb :resource_list, locals: { resources: resources[0] } %>
+      <span style='float: left;'> for <%= other_player %>'s </span>
+      <%= erb :resource_list, locals: { resources: resources[1] } %>
+    </div>
+  <% end %>
 </div>
