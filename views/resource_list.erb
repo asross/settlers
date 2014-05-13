@@ -1,14 +1,10 @@
-<ul class='resource-list'>
-  <% Player::RESOURCE_CARDS.each do |resource| %>
-    <% n = resources.count{|r| r == resource } %>
-    <% if n > 0 %>
-    <li class='clearfix'>
-      <% n.times do %>
-        <div class='resource-image-wrapper' data-resource='<%= resource %>'>
-          <img src='images/<%= resource %>.png'>
-        </div>
-      <% end %>
-    <% end %>
-    </li>
-  <% end %>
-</ul>
+<%
+  card_data = []
+  Player::RESOURCE_CARDS.each do |resource|
+    n = resources.count{|r| r == resource }
+    if n > 0
+      card_data << [resource, n]
+    end
+  end
+%>
+<%= erb :card_list, locals: { card_data: card_data } %>
