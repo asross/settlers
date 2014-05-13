@@ -5,17 +5,20 @@
   <span style='float: right;'><a href='/?color=<%= player.color %>'>be</a></span>
   <span class='name'><%= player.color %></span>
 
-  <%
-    public_player_data = {
-      dev_card: player.development_cards.count{|c| !c.played },
-      knight: player.knights_played,
-      resource_card: player.resource_cards.count
-    }.select{|k,v| v > 0}
-  %>
   <ul class='public-data clearfix'>
-    <% public_player_data.each do |img_src, number| %>
+    <% if player.resource_cards.count > 0 %>
       <li class='public-datum'>
-        <img class='public-data-image' src="images/<%= img_src %>.png">x<%= number %>&nbsp;
+        <img class='public-data-image' src="images/resource_card.png">x<%= player.resource_cards.count %>&nbsp;
+      </li>
+    <% end %>
+    <% if (dev_cards = player.development_cards.count(&:unplayed?)) > 0 %>
+      <li class='public-datum'>
+        <img class='public-data-image' src="images/dev_card.png">x<%= dev_cards %>&nbsp;
+      </li>
+    <% end %>
+    <% if player.knights_played > 0 %>
+      <li>
+        <img class='public-data-image' src="images/knight.png">x<%= player.knights_played %>&nbsp;
       </li>
     <% end %>
     <% if player == @game.longest_road_player %>
@@ -29,11 +32,11 @@
   <div class='info'>
     <%= erb :resource_list, locals: { resources: player.resource_cards } %>
 
-    <% if player.development_cards.any? %>
+    <% cards = player.development_cards.select(&:unplayed?) %>
+    <% if cards.any? %>
       <ul class='clearfix'>
-        <% player.development_cards.sort_by(&:type).each do |card| %>
+        <% cards.sort_by(&:type).each do |card| %>
           <% klass = "dev-card #{card.type}" %>
-          <% klass += ' used' if card.played %>
           <% klass += ' new' if card.turn_purchased == @game.turn && card.type != :victory_point %>
           <li class='<%= klass %>'><%= card.type.to_s.gsub('_', ' ') %></li>
         <% end %>

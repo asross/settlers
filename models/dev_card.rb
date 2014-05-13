@@ -23,4 +23,8 @@ class DevCard < Catan
     true
   end
 
+  def unplayed?
+    !played
+  end
+
 end
