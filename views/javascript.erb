@@ -49,10 +49,29 @@
       });
     }
 
+    $(document).on('submit', 'form[action="/messages"]', function(event) {
+      data = {}
+      form = $(event.currentTarget);
+      form.find('input').each(function() {
+        data[$(this).attr('name')] = $(this).val();
+      });
+      $.ajax({
+        url: '/messages',
+        type: 'POST',
+        data: data
+      }).success(function(data, textStatus, jqXHR) {
+        <% if ENV['RELOAD_AFTER_ACTIONS'] %>
+          window.location.reload(true);
+        <% end %>
+        form.find('input[type="text"]').val('');
+      });
+      return false;
+    });
+
     $(document).on('mouseenter', '.city-marker, .road-marker', function() {
       coords = $(this).data('coords');
       for (i = 0; i < coords.length; i++) hex(coords[i]).addClass('hover');
-    })
+    });
 
     $(document).on('mouseleave', '.city-marker, .road-marker', function () {
       coords = $(this).data('coords');
