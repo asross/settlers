@@ -40,6 +40,17 @@ class Game < Catan
     @state = :start_turn1
   end
 
+  def points_to_win
+    10
+  end
+
+  def winner?(player)
+    points = player.points
+    points += 2 if player == longest_road_player
+    points += 2 if player == largest_army_player
+    points >= points_to_win
+  end
+
   def round
     turn / players.size
   end
@@ -72,13 +83,6 @@ class Game < Catan
     end
 
     send(action, *([player]+Array(args)))
-  end
-
-  def display_points(player)
-    total = player.points
-    total += 2 if player == longest_road_player
-    total += 2 if player == largest_army_player
-    total
   end
 
   def state=(s)

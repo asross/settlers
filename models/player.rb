@@ -57,7 +57,7 @@ class Player < Catan
   end
 
   def points
-    settlements.count + 2*cities.count
+    settlements.count + 2*cities.count + development_cards.count(&:victory_point?)
   end
 
   def trade_in_ratio_for(resource)

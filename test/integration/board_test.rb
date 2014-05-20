@@ -279,6 +279,20 @@ describe 'board.erb' do
     end
   end
 
+  it 'recognizes the winner (and his/her VPs)' do
+    @board.settlements << Settlement.new(h(4,4), h(4,3), h(5,3), @player2)
+    @board.settlements << Settlement.new(h(4,3), h(3,4), h(3,3), @player2)
+    @player2.development_cards = [ DevCard.new(:victory_point) ]*8
+
+    @player2.points.must_equal 10
+
+    visit '/?color=red'
+
+    page.must_have_css ".winner[data-color='#{@player2.color}']"
+    page.must_have_css '.winner li', text: 'x8', count: 2
+    page.must_have_css '.winner img[src*="victory_point"]'
+  end
+
   def page_must_display_resources(count, resource)
     page.must_have_css ".resource-image-wrapper[data-resource='#{resource}']", count: count
   end

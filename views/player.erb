@@ -1,5 +1,6 @@
 <% div_class = 'player' %>
 <% div_class += ' active' if player == @game.active_player %>
+<% div_class += ' winner' if @game.winner?(player) %>
 
 <div class='<%= div_class %>' data-color='<%= player.color %>'>
   <span style='float: right;'><a href='/?color=<%= player.color %>'>be</a></span>
@@ -19,6 +20,12 @@
     <% if player.knights_played > 0 %>
       <li>
         <img class='public-data-image' src="images/knight.png">x<%= player.knights_played %>&nbsp;
+      </li>
+    <% end %>
+    <% vps = player.development_cards.count(&:victory_point?) %>
+    <% if @game.winner?(player) && vps > 0 %>
+      <li>
+        <img class='public-data-image' src="images/victory_point.png">x<%= vps %>&nbsp;
       </li>
     <% end %>
     <% if player == @game.longest_road_player %>
