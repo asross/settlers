@@ -64,15 +64,15 @@ class Game < Catan
 
   def available_actions(player)
     STATES_TO_ACTIONS[state].select do |act|
-      correct_turn = (player == active_player || OFF_TURN_ACTIONS.include?(act))
+      # only the active player can perform most actions
+      next unless player == active_player || OFF_TURN_ACTIONS.include?(act)
 
-      if correct_turn
-        if respond_to? "can_#{act}?", true
-          send("can_#{act}?", player)
-        else
-          true
-        end
-      end
+      # if there is a method to determine whether this action can be performed,
+      # call it to help filter
+      next unless !respond_to?("can_#{act}?", true) || send("can_#{act}?", player)
+
+      # if we pass both of these tests, the action is available
+      true
     end
   end
 
@@ -81,7 +81,7 @@ class Game < Catan
       error "#{player.color} cannot perform #{action} at this time"
     end
 
-    send(action, *([player]+Array(args)))
+    send(action, player, *args)
   end
 
   def trade_requests
