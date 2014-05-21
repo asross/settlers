@@ -18,10 +18,6 @@ To run tests, `ruby test.rb`
 
 ## TODO
 
-- Endgame
-    * Handling victory points
-    * Recognizing the winner
-- Trading
 - Text-based client
 - Running more than one game at a time
 
