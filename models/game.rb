@@ -88,6 +88,10 @@ class Game < Catan
     @trade_requests ||= {}
   end
 
+  def discards_this_turn
+    @discards_this_turn ||= []
+  end
+
   private
 
   def random_dieroll
@@ -130,10 +134,6 @@ class Game < Catan
       @robbable = robbable
       @state = :robbing2
     end
-  end
-
-  def discards_this_turn
-    @discards_this_turn ||= []
   end
 
   def discard(player, *resources)
@@ -217,22 +217,6 @@ class Game < Catan
 
   def reject_trade(player)
     trade_requests.delete(player.color)
-  end
-
-  def can_discard?(player)
-    player.resource_cards.count > 7 && !discards_this_turn.include?(player)
-  end
-
-  def can_accept_trade?(player)
-    trade_requests[player.color]
-  end
-
-  def can_reject_trade?(player)
-    trade_requests[player.color]
-  end
-
-  def can_cancel_trade?(player)
-    trade_requests.size > 0
   end
 
   def find_development_card(type)
@@ -340,4 +324,19 @@ class Game < Catan
     end
   end
 
+  def can_discard?(player)
+    player.resource_cards.count > 7 && !discards_this_turn.include?(player)
+  end
+
+  def can_accept_trade?(player)
+    trade_requests[player.color]
+  end
+
+  def can_reject_trade?(player)
+    trade_requests[player.color]
+  end
+
+  def can_cancel_trade?(player)
+    trade_requests.size > 0
+  end
 end
