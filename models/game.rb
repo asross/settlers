@@ -22,8 +22,7 @@ class Game < Catan
   ACTIONS = STATES_TO_ACTIONS.values.flatten.uniq
   COLORS = %w(aqua deeppink gold lightcoral thistle burlywood azure lawngreen)
 
-  attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable
-  attr_reader :state
+  attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable, :state
   attr_reader :longest_road_player, :largest_army_player
 
   def initialize(opts={})
@@ -85,11 +84,6 @@ class Game < Catan
     send(action, *([player]+Array(args)))
   end
 
-  def state=(s)
-    raise ArgumentError, "invalid state #{s}" unless STATES.include?(s)
-    @state = s
-  end
-
   def trade_requests
     @trade_requests ||= {}
   end
@@ -105,12 +99,12 @@ class Game < Catan
     @board.rolled(@last_roll)
     if @last_roll == 7
       if players.any?{|p| p.resource_cards.count > 7}
-        self.state = :discard
+        @state = :discard
       else
-        self.state = :robbing1
+        @state = :robbing1
       end
     else
-      self.state = :postroll
+      @state = :postroll
     end
   end
 
@@ -119,7 +113,7 @@ class Game < Catan
     error "invalid selection #{color} (must pick one of #{@robbable.join(', ')})" unless robbee
     robbing_player.steal_from(robbee)
     @robbable = nil
-    self.state = @pre_knight_state || :postroll
+    @state = @pre_knight_state || :postroll
     @pre_knight_state = nil
   end
 
@@ -127,14 +121,14 @@ class Game < Catan
     robbable = @board.move_robber_to(*v, player)
     case robbable.size
     when 0
-      self.state = :postroll
+      @state = :postroll
     when 1
       player.steal_from(robbable.first)
-      self.state = @pre_knight_state || :postroll
+      @state = @pre_knight_state || :postroll
       @pre_knight_state = nil
     else
       @robbable = robbable
-      self.state = :robbing2
+      @state = :robbing2
     end
   end
 
@@ -147,7 +141,7 @@ class Game < Catan
     discards_this_turn << player
     if players.none?(&method(:can_discard?))
       @discards_this_turn = nil
-      self.state = :robbing1
+      @state = :robbing1
     end
   end
 
@@ -157,11 +151,11 @@ class Game < Catan
 
     if state == :start_turn2
       @turn += 1
-      self.state = (round >= 2) ? :preroll : :start_turn1
+      @state = (round >= 2) ? :preroll : :start_turn1
     elsif state == :road_building1
-      self.state = :road_building2
+      @state = :road_building2
     else
-      self.state = :postroll
+      @state = :postroll
     end
   end
 
@@ -173,7 +167,7 @@ class Game < Catan
     player.build_settlement(h(*v1), h(*v2), h(*v3), round == 0, round == 1)
     recalculate_longest_road # settlement building might break an existing road
 
-    self.state = :start_turn2 if state == :start_turn1
+    @state = :start_turn2 if state == :start_turn1
   end
 
   def buy_development_card(player)
@@ -190,7 +184,7 @@ class Game < Catan
     @dev_card_played = false
     @trade_requests = {}
     @last_roll = nil
-    self.state = :preroll
+    @state = :preroll
   end
 
   def request_trade(player, color, my_resources, your_resources)
@@ -276,7 +270,7 @@ class Game < Catan
 
   development_card :knight do |player|
     @pre_knight_state = state
-    self.state = :robbing1
+    @state = :robbing1
   end
 
   development_card :year_of_plenty do |player, resource1, resource2|
@@ -289,9 +283,9 @@ class Game < Catan
     when Player::MAX_ROADS
       # Player cannot build more roads, so the card should do nothing.
     when Player::MAX_ROADS - 1
-      self.state = :road_building2
+      @state = :road_building2
     else
-      self.state = :road_building1
+      @state = :road_building1
     end
   end
 
