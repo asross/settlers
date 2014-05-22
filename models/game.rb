@@ -223,53 +223,54 @@ class Game < Catan
     active_player.development_cards.detect{|c| c.playable_on_turn?(turn) && c.type == type }
   end
 
-  def self.development_card(card_type, &block)
-    params = block.parameters.map(&:last).join(', ')
-
-    define_method "play_#{card_type}", block
-
-    class_eval <<-RUBY
-      def #{card_type}(#{params})
-        find_development_card(:#{card_type}).tap do |card|
-          play_#{card_type}(#{params})
-          card.played = true
-          recalculate_largest_army if card.knight?
-        end
-        @dev_card_played = true
-      end
-
-      def can_#{card_type}?(player)
-        !@dev_card_played && find_development_card(:#{card_type})
-      end
-    RUBY
+  def play_development_card(card_type)
+    card = find_development_card(card_type)
+    yield
+    card.played = true
+    @dev_card_played = true
   end
 
-  development_card :monopoly do |player, resource|
-    players.each do |player|
-      n = player.send(resource)
-      player.increment(resource, -n)
-      active_player.increment(resource, n)
+  DevCard::TYPES.each do |card_type|
+    define_method "can_#{card_type}?" do |player|
+      !@dev_card_played && find_development_card(card_type)
     end
   end
 
-  development_card :knight do |player|
-    @pre_knight_state = state
-    @state = :robbing1
+  def monopoly(player, resource)
+    play_development_card(:monopoly) do
+      players.each do |player|
+        n = player.send(resource)
+        player.increment(resource, -n)
+        active_player.increment(resource, n)
+      end
+    end
   end
 
-  development_card :year_of_plenty do |player, resource1, resource2|
-    active_player.increment(resource1, 1)
-    active_player.increment(resource2, 1)
+  def knight(player)
+    play_development_card(:knight) do
+      @pre_knight_state = state
+      @state = :robbing1
+    end
+    recalculate_largest_army
   end
 
-  development_card :road_building do |player|
-    case active_player.roads.count
-    when Player::MAX_ROADS
-      # Player cannot build more roads, so the card should do nothing.
-    when Player::MAX_ROADS - 1
-      @state = :road_building2
-    else
-      @state = :road_building1
+  def year_of_plenty(player, resource1, resource2)
+    play_development_card(:year_of_plenty) do
+      active_player.increment(resource1, 1)
+      active_player.increment(resource2, 1)
+    end
+  end
+
+  def road_building(player)
+    play_development_card(:road_building) do
+      case active_player.roads.count
+      when Player::MAX_ROADS
+        # Player cannot build more roads, so the card should do nothing.
+      when Player::MAX_ROADS - 1
+        @state = :road_building2
+      else
+        @state = :road_building1
+      end
     end
   end
 
