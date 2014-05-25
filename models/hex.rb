@@ -2,11 +2,9 @@ class Hex < Catan
   TYPES = %w(ore brick sheep wheat wood desert water)
 
   TYPES.each do |type|
-    class_eval <<-RUBY
-      def #{type}?
-        type == "#{type}"
-      end
-    RUBY
+    define_method "#{type}?" do
+      @type == type
+    end
   end
 
   attr_accessor :x, :y, :number, :type, :robbed, :port_type, :port_direction
