@@ -1,10 +1,10 @@
 class Game < Catan
   FREE_ROAD_STATES = [:start_turn2, :road_building1, :road_building2]
-  DEV_CARD_ACTIONS = %w(monopoly knight year_of_plenty road_building)
   OFF_TURN_ACTIONS = %w(discard accept_trade reject_trade)
   STATES_TO_ACTIONS = {
     :preroll => %w(roll knight),
-    :postroll => DEV_CARD_ACTIONS + %w(
+    :postroll => %w(
+      monopoly knight year_of_plenty road_building
       build_settlement build_city build_road buy_development_card
       trade_in request_trade
       accept_trade reject_trade cancel_trade
