@@ -23,7 +23,7 @@ class Game < Catan
   COLORS = %w(aqua deeppink gold lightcoral thistle burlywood azure lawngreen)
 
   attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable, :state
-  attr_reader :longest_road_player, :largest_army_player
+  attr_reader :longest_road_player, :largest_army_player, :trade_requests, :discards_this_turn
 
   def initialize(opts={})
     opts[:side_length] ||= 3
@@ -37,6 +37,8 @@ class Game < Catan
     @turn = 0
     @messages = []
     @state = :start_turn1
+    @trade_requests = {}
+    @discards_this_turn = []
   end
 
   def points_to_win
@@ -82,14 +84,6 @@ class Game < Catan
     end
 
     send(action, player, *args)
-  end
-
-  def trade_requests
-    @trade_requests ||= {}
-  end
-
-  def discards_this_turn
-    @discards_this_turn ||= []
   end
 
   private
@@ -140,7 +134,7 @@ class Game < Catan
     player.discard(*resources)
     discards_this_turn << player
     if players.none?(&method(:can_discard?))
-      @discards_this_turn = nil
+      @discards_this_turn = []
       @state = :robbing1
     end
   end
@@ -238,10 +232,10 @@ class Game < Catan
 
   def monopoly(player, resource)
     play_development_card(:monopoly) do
-      players.each do |player|
-        n = player.send(resource)
-        player.increment(resource, -n)
-        active_player.increment(resource, n)
+      players.each do |robbed|
+        n = robbed.send(resource)
+        robbed.increment(resource, -n)
+        player.increment(resource, n)
       end
     end
   end
@@ -256,14 +250,14 @@ class Game < Catan
 
   def year_of_plenty(player, resource1, resource2)
     play_development_card(:year_of_plenty) do
-      active_player.increment(resource1, 1)
-      active_player.increment(resource2, 1)
+      player.increment(resource1, 1)
+      player.increment(resource2, 1)
     end
   end
 
   def road_building(player)
     play_development_card(:road_building) do
-      case active_player.roads.count
+      case player.roads.count
       when Player::MAX_ROADS
         # Player cannot build more roads, so the card should do nothing.
       when Player::MAX_ROADS - 1
