@@ -53,7 +53,7 @@ describe Game do
         end
 
         it 'saves message indicating action' do
-          @game.messages.last.must_equal "** #{@player1.color} performed build_road!"
+          @game.messages.last.must_equal "** #{@player1.color} performed build road!"
         end
       end
     end
@@ -427,6 +427,7 @@ describe Game do
       @player1.wheat.must_equal 4
       @player2.wheat.must_equal 0
       @player3.wheat.must_equal 0
+      @game.messages.must_include "** #{@player1.color} played monopoly for wheat"
     end
 
     it 'year of plenty' do

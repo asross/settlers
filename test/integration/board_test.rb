@@ -160,6 +160,7 @@ describe 'board.erb' do
     within('.player[data-color="red"]') do
       page_must_display_resources(1, 'sheep')
     end
+    page.must_have_content "** red traded in 4 wheat for 1 sheep"
   end
 
   it 'allows turn passing' do

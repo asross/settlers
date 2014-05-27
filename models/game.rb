@@ -71,7 +71,9 @@ class Game < Catan
 
       # if there is a method to determine whether this action can be performed,
       # call it to help filter
-      next unless !respond_to?("can_#{act}?", true) || send("can_#{act}?", player)
+      if respond_to?("can_#{act}?", true)
+        next unless send("can_#{act}?", player)
+      end
 
       # if we pass both of these tests, the action is available
       true
@@ -85,7 +87,11 @@ class Game < Catan
 
     send(action, player, *args)
 
-    @messages << "** #{player.color} performed #{action}!"
+    if respond_to?("message_for_#{action}", true)
+      @messages << send("message_for_#{action}", player, *args)
+    else
+      @messages << "** #{player.color} performed #{action.gsub('_', ' ')}!"
+    end
   end
 
   private
@@ -175,6 +181,10 @@ class Game < Catan
     player.trade_in(r1, r2)
   end
 
+  def message_for_trade_in(player, r1, r2)
+    "** #{player.color} traded in #{player.trade_in_ratio_for(r1)} #{r1} for 1 #{r2}"
+  end
+
   def pass_turn(player)
     @turn += 1
     @dev_card_played = false
@@ -186,6 +196,10 @@ class Game < Catan
   def request_trade(player, color, my_resources, your_resources)
     player.assert_we_have(my_resources)
     trade_requests[color] = [my_resources, your_resources]
+  end
+
+  def message_for_request_trade(player, color, my_resources, your_resources)
+    "** #{player.color} is offering #{color} a trade"
   end
 
   def accept_trade(accepting_player)
@@ -242,6 +256,10 @@ class Game < Catan
     end
   end
 
+  def message_for_monopoly(player, resource)
+    "** #{player.color} played monopoly for #{resource}"
+  end
+
   def knight(player)
     play_development_card(:knight) do
       @pre_knight_state = state
@@ -255,6 +273,10 @@ class Game < Catan
       player.increment(resource1, 1)
       player.increment(resource2, 1)
     end
+  end
+
+  def message_for_year_of_plenty(player, resource1, resource2)
+    "** #{player.color} played year of plenty for #{resource1} and #{resource2}"
   end
 
   def road_building(player)
