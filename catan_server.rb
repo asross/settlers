@@ -30,7 +30,6 @@ class CatanServer < Sinatra::Base
   post '/messages' do
     @game.messages << [current_player.color, params['message']]
     broadcast('message', html: erb(:messages))
-    redirect request.referer
   end
 
   post '/actions' do
@@ -38,7 +37,6 @@ class CatanServer < Sinatra::Base
     begin
       @game.perform_action(current_player, data['action'], data['args'])
       broadcast('action', html: erb(:board))
-      @game.messages << "** #{current_player.color} performed #{data['action']}!"
       broadcast('message', html: erb(:messages))
       status 200
     rescue CatanError => e

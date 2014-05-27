@@ -51,6 +51,10 @@ describe Game do
           @game.active_player.must_equal @player2
           @game.available_actions(@player2).must_equal %w(build_settlement)
         end
+
+        it 'saves message indicating action' do
+          @game.messages.last.must_equal "** #{@player1.color} performed build_road!"
+        end
       end
     end
   end

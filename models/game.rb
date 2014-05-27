@@ -84,6 +84,8 @@ class Game < Catan
     end
 
     send(action, player, *args)
+
+    @messages << "** #{player.color} performed #{action}!"
   end
 
   private
