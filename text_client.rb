@@ -36,9 +36,6 @@ class NestedHashie
   end
 end
 
-class ClientBoard < NestedHashie
-end
-
 EM.run {
   ws = Faye::WebSocket::Client.new(WS_URL)
 
@@ -48,9 +45,9 @@ EM.run {
 
   ws.onmessage = lambda do |event|
     `clear`
-    data = JSON.parse(event.data).last['data']
-    board = ClientBoard.new(data['board'])
-    print_board(board, board.size)
+    @game = NestedHashie.new(JSON.parse(event.data).last['data'])
+    puts "LAST ROLL: #{@game.last_roll}"
+    print_board(@game.board, @game.board.size)
   end
 
   ws.onclose = lambda do |event|
