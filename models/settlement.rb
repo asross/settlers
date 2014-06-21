@@ -7,6 +7,14 @@ class Settlement
     @size = 1
   end
 
+  def as_json
+    {
+      hexes: hexes.map(&:as_json),
+      color: color,
+      size: size
+    }
+  end
+
   def color
     player.color
   end

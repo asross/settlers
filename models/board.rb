@@ -68,6 +68,15 @@ class Board < Catan
     @development_cards = cards.map{|c| DevCard.new(c) }
   end
 
+  def as_json
+    {
+      settlements: settlements.map(&:as_json),
+      roads: roads.map(&:as_json),
+      hexes: hexes.map{|row| row.map(&:as_json) },
+      size: size
+    }
+  end
+
   def rolled(roll)
     settlements.each{|s| s.rolled(roll) }
   end
