@@ -36,8 +36,8 @@ class CatanServer < Sinatra::Base
     data = JSON.parse(params[:data])
     begin
       @game.perform_action(current_player, data['action'], data['args'])
-      broadcast('action', html: erb(:board))
-      broadcast('message', html: erb(:messages))
+      broadcast('action', html: erb(:board), data: @game.as_json)
+      broadcast('message', html: erb(:messages), data: @game.as_json)
       status 200
     rescue CatanError => e
       body e.message

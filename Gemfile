@@ -3,6 +3,7 @@ source "https://rubygems.org"
 gem 'sinatra'
 gem 'em-websocket'
 gem 'thin'
+gem 'faye-websocket'
 gem 'pry'
 
 group :test do

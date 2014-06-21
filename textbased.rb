@@ -1,11 +1,3 @@
-require_relative 'models/catan'
-Dir.glob('./models/*.rb').each { |f| require f }
-
-
-side_length = ENV.fetch('SIDE_LENGTH', 3).to_i
-$board = Board.new(side_length: side_length)
-
-
 #2 situations for settlements:
 #settlement should go to bottom left
 #   true iff y, y+1, y+1 -- goes on bottom of y
@@ -54,51 +46,34 @@ def print_board(board, size)
     end
   end
   if true
-    for city in cities
+    cities.each do |city|
       y0 = city.hexes[0].y; x0 = city.hexes[0].x
       y1 = city.hexes[1].y; x1 = city.hexes[1].x
       y2 = city.hexes[2].y; x2 = city.hexes[2].x
-      letter = "#{city.color.capitalize[0..0]}"
-      if letter == "B"
-        symbol = colorize("B#{city.size}", "1;37;46")
-      elsif letter == "R"
-        symbol = colorize("R#{city.size}", "1;37;41")
-      end
+      sym = red("#{city.color.capitalize[0]}#{city.size}")
       if y0 + y1 + y2 - 3*[y0,y1,y2].min == 2
         # put it on the bottom left
         i = [y0,y1,y2].index([y0,y1,y2].min)
-        hex_attributes[city.hexes[i].x][city.hexes[i].y].botleft = symbol
-        #hex_attributes[city.hexes[i].x][city.hexes[i].y].botleft = "#{city.color.capitalize[0..0]}#{city.size}"
+        hex_attributes[city.hexes[i].x][city.hexes[i].y].botleft = sym
       else
         # put it on the bottom right
         i = [x0+y0,x1+y1,x2+y2].index([x0+y0,x1+y1,x2+y2].min)
-        hex_attributes[city.hexes[i].x][city.hexes[i].y].botright = symbol
-        #hex_attributes[city.hexes[i].x][city.hexes[i].y].botright = "#{city.color.capitalize[0..0]}#{city.size}"
+        hex_attributes[city.hexes[i].x][city.hexes[i].y].botright = sym
       end
     end
     for road in roads
+      sym = red(road.color.downcase[0])
       y0 = road.hexes[0].y; x0 = road.hexes[0].x
       y1 = road.hexes[1].y; x1 = road.hexes[1].x
-      letter = "#{road.color.downcase[0..0]}"
-      if letter == "b"
-        coloring = "1;36"
-        #symbol = colorize(" ", "1;37;46")
-      elsif letter == "r"
-        coloring = "1;31"
-        #symbol = colorize(" ", "1;37;41")
-      end
       if x0 == x1 # bottom
         i = [y0, y1].index([y0, y1].min)
-        hex_attributes[road.hexes[i].x][road.hexes[i].y].bottom = colorize("o", coloring)#symbol
-        #hex_attributes[road.hexes[i].x][road.hexes[i].y].bottom = "#{road.color.downcase[0..0]}"
+        hex_attributes[road.hexes[i].x][road.hexes[i].y].bottom = sym
       elsif y0 == y1 # lefttop
         i = [x0, x1].index([x0, x1].max)
-        hex_attributes[road.hexes[i].x][road.hexes[i].y].lefttop = colorize("o", coloring) #symbol
-        #hex_attributes[road.hexes[i].x][road.hexes[i].y].lefttop = "#{road.color.downcase[0..0]}"
+        hex_attributes[road.hexes[i].x][road.hexes[i].y].lefttop = sym
       else # leftbot
         i = [y0, y1].index([y0, y1].min)
-        hex_attributes[road.hexes[i].x][road.hexes[i].y].leftbot = colorize("o", coloring)#symbol
-        #hex_attributes[road.hexes[i].x][road.hexes[i].y].leftbot = "#{road.color.downcase[0..0]}"
+        hex_attributes[road.hexes[i].x][road.hexes[i].y].leftbot = sym
       end
     end
   end
@@ -177,5 +152,3 @@ def hex_lines(re, no, robbed, attributes, i, j)
   end
   return [l1, l2, l3, l4]
 end
-
-print_board($board, $board.size)
