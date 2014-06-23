@@ -32,7 +32,15 @@ class NestedHashie
       result = NestedHashie.new(result) if result.is_a?(Hash)
       result = NestedArray.new(result).array if result.is_a?(Array)
       result
+    else
+      @h.send(method, *args)
     end
+  end
+end
+
+class NilClass
+  def any?
+    false
   end
 end
 
@@ -45,13 +53,36 @@ EM.run {
 
   ws.onmessage = lambda do |event|
     `clear`
-    @game = NestedHashie.new(JSON.parse(event.data).last['data'])
-    puts "LAST ROLL: #{@game.last_roll}"
-    print_board(@game.board, @game.board.size)
+    $game = NestedHashie.new(JSON.parse(event.data).last['data'])
+    $color = $game.players.map(&:color).sample unless $color
+    puts "COLOR: #{$color}"
+    puts "LAST ROLL: #{$game.last_roll}"
+    print_board($game.board, $game.board.size)
   end
 
   ws.onclose = lambda do |event|
     p [:close, event.code, event.reason]
     ws = nil
   end
+
+  Thread.new {
+    while true
+      while $game && (actions = $game.available_actions[$color]).any?
+        if $input
+          puts "would be choosing #{actions[$input.to_i]}"
+          $input = nil
+          $getting = false
+          break
+        elsif $getting
+          sleep 0.01
+        else
+          $getting = true
+          actions.each_with_index { |action, i| puts "#{i}: #{action}" }
+          print 'choose: '
+          Thread.new { $input = gets }
+        end
+      end
+      sleep 0.01
+    end
+  }
 }
