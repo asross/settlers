@@ -314,9 +314,8 @@
   button:hover:enabled {
     cursor: pointer;
   }
-  #players .player.active .name {
-    text-decoration: underline;
-    font-weight: bold;
+  #players .player.active .name:before {
+    content: '*';
   }
   #players .player.winner .name:after {
     content: ' (winner!)';
@@ -326,9 +325,6 @@
   }
   #players .player[data-color='<%= @current_player.color %>'] .info {
     display: block;
-  }
-  #players .player[data-color='<%= @current_player.color %>'] .public-datum {
-    display: none;
   }
 
   <% @game.board.hexes.flatten.each do |hex| %>
