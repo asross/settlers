@@ -13,6 +13,9 @@ $channel = EM::Channel.new
 class CatanServer < Sinatra::Base
   before do
     @game = $game
+    if request.env['CONTENT_TYPE'] == 'application/json'
+      params.merge!(JSON.parse(request.body.read))
+    end
   end
 
   post '/new_game' do
@@ -29,11 +32,13 @@ class CatanServer < Sinatra::Base
 
   post '/messages' do
     @game.messages << [current_player.color, params['message']]
-    broadcast('message', html: erb(:messages))
+    broadcast('message', html: erb(:messages), data: @game.as_json)
   end
 
   post '/actions' do
-    data = JSON.parse(params[:data])
+    data = params['data']
+    data = JSON.parse(params['data']) if data.is_a?(String)
+
     begin
       @game.perform_action(current_player, data['action'], data['args'])
       broadcast('action', html: erb(:board), data: @game.as_json)

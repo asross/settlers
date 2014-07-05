@@ -65,21 +65,46 @@ EM.run {
     ws = nil
   end
 
+  # say message
+  # do action arguments
+  # be color
+
   Thread.new {
     while true
-      while $game && (actions = $game.available_actions[$color]).any?
+      while $game && $color
         if $input
-          puts "would be choosing #{actions[$input.to_i]}"
+          type, arg1, arg2 = $input.split('|').map(&:strip)
           $input = nil
           $getting = false
+          begin
+          case type
+          when 'say'
+            `curl -X POST -d "message=#{arg1}&color=#{$color}" #{APP_URL}/messages`
+          when 'do'
+            json = "{\"data\":{\"action\":#{arg1.inspect},\"args\":#{arg2 || []}},\"color\":#{$color.inspect}}"
+            command = "curl -XPOST -H 'Content-Type: application/json' -d '#{json}' #{APP_URL}/actions"
+            puts command
+            system command
+            sleep 0.1
+          when 'be'
+            colors = $game.players.map(&:color)
+            if colors.include?(arg1)
+              $color = arg1
+            else
+              puts "invalid color #{arg1}; valid choices are #{colors}"
+            end
+          end
+          rescue => e
+            puts e.message
+          end
           break
         elsif $getting
           sleep 0.01
         else
           $getting = true
-          actions.each_with_index { |action, i| puts "#{i}: #{action}" }
-          print 'choose: '
-          Thread.new { $input = gets }
+          puts "available actions: #{$game.available_actions[$color]}"
+          print 'say, do, or be: '
+          Thread.new { $input = gets.chomp }
         end
       end
       sleep 0.01
