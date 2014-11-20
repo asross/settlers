@@ -51,6 +51,7 @@ class Game < Catan
       trade_requests: @trade_requests,
       longest_road_player: @longest_road_player,
       largest_army_player: @largest_army_player,
+      active_player: active_player.color,
       turn: @turn
     }
   end

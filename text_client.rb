@@ -29,9 +29,8 @@ def print_state(msg='')
   puts `clear`
   puts "\e[H\e[2J"
   puts msg
-  puts "COLOR: #{$color} / #{$game.players.map(&:color)}"
-  puts "LAST ROLL: #{$game.last_roll}"
-  print_board($game.board, $game.board.size)
+  puts "LAST ROLL: #{$game.last_roll}" if $game.last_roll
+  print_board($game, $color)
   puts "available actions: #{$game.available_actions[$color]}"
   print 'say, do, or be: '
 end
@@ -55,7 +54,7 @@ end
 def game_loop
   loop do
     begin
-      send(*gets.chomp.split('|').map(&:strip))
+      send(*gets.chomp.split.map(&:strip))
     rescue => e
       puts e.message
     end

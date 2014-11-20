@@ -15,6 +15,7 @@ THISTLE = 35
 AQUA = 36
 
 COLOR_MAP = {
+  'desert' => 39,
   'wheat' => YELLOW,
   'brick' => RED,
   'sheep' => GREEN,
@@ -88,7 +89,7 @@ class HexDecorator
     elsif hex.type == 'desert'
       l1 = " #{lt} des-  "
       l2 = "#{lt}    ert "
-      l3 = "#{lb}  # #{coords} "
+      l3 = "#{lb}    #{coords} "
       l4 = " #{lb}#{bl}#{bo}#{br}"  
     elsif hex.robbed
       l1 = " #{lt}  #{coords}  "
@@ -106,7 +107,9 @@ class HexDecorator
   end
 end
 
-def print_board(board, size)
+def print_board(game, current_player)
+  board = game.board
+  size = board.size
   hexes = board.hexes
   cities = board.settlements
   roads = board.roads
@@ -162,6 +165,27 @@ def print_board(board, size)
       all_lines[2*i + 4*j+3] += hls[3]
     end
   end
+
+  #max_length = all_lines.max_by(&:length).length
+
+  all_lines.map!{|l| l.ljust(10*size+(l.length-l.gsub(/\e\[(\d+)(;\d+)*m/, '').length)) + '|  ' }
+
+  i = 2
+  game.players.each do |p|
+    all_lines[i+=1] += send(p.color, "#{'*' if game.active_player == p.color}#{p.color}#{' (you)' if current_player == p.color}")
+    all_lines[i+=1] += send(p.color, "resources: #{p.color == current_player ? p.resource_cards : p.resource_cards.count}")
+    all_lines[i+=1] += send(p.color, "dev cards: #{p.color == current_player ? p.development_cards : p.development_cards.count}")
+    i += 1
+  end
+
+  all_lines[i+=1] += "-- messages --"
+  game.messages.reverse.take(10).each do |m|
+    all_lines[i+=1] += [m].flatten.join(': ')
+  end
+  #all_lines.length.times do |i|
+    #all_lines[i] = 
+  #end
+
   for x in 3..all_lines.length-10
     puts all_lines[x]
   end
