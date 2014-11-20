@@ -45,36 +45,34 @@ def print_board(board, size)
       hex_attributes[i][j] = Hex_Attribute.new()
     end
   end
-  if true
-    cities.each do |city|
-      y0 = city.hexes[0].y; x0 = city.hexes[0].x
-      y1 = city.hexes[1].y; x1 = city.hexes[1].x
-      y2 = city.hexes[2].y; x2 = city.hexes[2].x
-      sym = red("#{city.color.capitalize[0]}#{city.size}")
-      if y0 + y1 + y2 - 3*[y0,y1,y2].min == 2
-        # put it on the bottom left
-        i = [y0,y1,y2].index([y0,y1,y2].min)
-        hex_attributes[city.hexes[i].x][city.hexes[i].y].botleft = sym
-      else
-        # put it on the bottom right
-        i = [x0+y0,x1+y1,x2+y2].index([x0+y0,x1+y1,x2+y2].min)
-        hex_attributes[city.hexes[i].x][city.hexes[i].y].botright = sym
-      end
+  cities.each do |city|
+    y0 = city.hexes[0].y; x0 = city.hexes[0].x
+    y1 = city.hexes[1].y; x1 = city.hexes[1].x
+    y2 = city.hexes[2].y; x2 = city.hexes[2].x
+    sym = send(city.color, "#{city.color.capitalize[0]}#{city.size}")
+    if y0 + y1 + y2 - 3*[y0,y1,y2].min == 2
+      # put it on the bottom left
+      i = [y0,y1,y2].index([y0,y1,y2].min)
+      hex_attributes[city.hexes[i].x][city.hexes[i].y].botleft = sym
+    else
+      # put it on the bottom right
+      i = [x0+y0,x1+y1,x2+y2].index([x0+y0,x1+y1,x2+y2].min)
+      hex_attributes[city.hexes[i].x][city.hexes[i].y].botright = sym
     end
-    for road in roads
-      sym = red(road.color.downcase[0])
-      y0 = road.hexes[0].y; x0 = road.hexes[0].x
-      y1 = road.hexes[1].y; x1 = road.hexes[1].x
-      if x0 == x1 # bottom
-        i = [y0, y1].index([y0, y1].min)
-        hex_attributes[road.hexes[i].x][road.hexes[i].y].bottom = sym
-      elsif y0 == y1 # lefttop
-        i = [x0, x1].index([x0, x1].max)
-        hex_attributes[road.hexes[i].x][road.hexes[i].y].lefttop = sym
-      else # leftbot
-        i = [y0, y1].index([y0, y1].min)
-        hex_attributes[road.hexes[i].x][road.hexes[i].y].leftbot = sym
-      end
+  end
+  for road in roads
+    sym = send(road.color, road.color.downcase[0])
+    y0 = road.hexes[0].y; x0 = road.hexes[0].x
+    y1 = road.hexes[1].y; x1 = road.hexes[1].x
+    if x0 == x1 # bottom
+      i = [y0, y1].index([y0, y1].min)
+      hex_attributes[road.hexes[i].x][road.hexes[i].y].bottom = sym
+    elsif y0 == y1 # lefttop
+      i = [x0, x1].index([x0, x1].max)
+      hex_attributes[road.hexes[i].x][road.hexes[i].y].lefttop = sym
+    else # leftbot
+      i = [y0, y1].index([y0, y1].min)
+      hex_attributes[road.hexes[i].x][road.hexes[i].y].leftbot = sym
     end
   end
   # go through all the hexes and print them
@@ -93,6 +91,12 @@ def print_board(board, size)
   end
 end
 
+def aqua(text); colorize(text, 36); end
+def thistle(text); colorize(text, 35); end
+def gold(text); yellow(text); end
+def lightcoral(text); red(text); end
+def azure(text); blue(text); end
+def lawngreen(text); colorize(text, 92); end
 
 def red(text); colorize(text, 31); end
 def green(text); colorize(text, 32); end
