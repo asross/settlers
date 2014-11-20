@@ -33,7 +33,17 @@ class Promise
     Promise.new(false) { |fulfill, _| fulfill.call(value) }
   end
 
+  def self.that(&block)
+    Promise.new do |fulfill, reject|
+      fulfill.call(yield)
+    end
+  end
+
 public
+
+  def then_promise_that(&block)
+    self.then(->(value) { Promise.that { block.call(value) } })
+  end
 
   def then(on_success, on_error = nil)
     on_success ||= ->(x) {x}

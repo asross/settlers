@@ -74,15 +74,14 @@ end
 
 def game_loop(msg = '')
   print_state(msg)
-  promise = Promise.new { |fulfill|
-    fulfill.call(gets.chomp)
-  }.then(->(value) {
-    Promise.new { |fulfill|
-      send(*value.split('|').map(&:strip))
-      fulfill.call
-    }.then(->(*__) { game_loop },
-           ->(err) { game_loop(err) })
-  })
+
+  promise = Promise.that {
+    gets.chomp
+  }.then_promise { |value|
+    send(*value.split('|').map(&:strip))
+  }.then(->(*__) { game_loop },
+         ->(err) { game_loop(err) })
+
 end
 
 EM.run {
