@@ -75,9 +75,9 @@ end
 def game_loop(msg = '')
   print_state(msg)
 
-  promise = Promise.that {
+  promise = Promise.chain {
     gets.chomp
-  }.then_promise { |value|
+  }.chain { |value|
     send(*value.split('|').map(&:strip))
   }.then(->(*__) { game_loop },
          ->(err) { game_loop(err) })

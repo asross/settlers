@@ -33,7 +33,7 @@ class Promise
     Promise.new(false) { |fulfill, _| fulfill.call(value) }
   end
 
-  def self.that(&block)
+  def self.chain(&block)
     Promise.new do |fulfill, reject|
       fulfill.call(yield)
     end
@@ -41,8 +41,10 @@ class Promise
 
 public
 
-  def then_promise_that(&block)
-    self.then(->(value) { Promise.that { block.call(value) } })
+  def chain(&block)
+    self.then(->(value) {
+      Promise.chain { block.call(value) }
+    })
   end
 
   def then(on_success, on_error = nil)
