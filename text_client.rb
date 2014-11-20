@@ -5,43 +5,23 @@ require 'pry'
 require 'json'
 require 'faye/websocket'
 require 'eventmachine'
-
 require_relative './textbased'
-require_relative './lib/promise'
 
-class NestedArray
-  attr_reader :array
-  def initialize(array)
-    @array = array.map do |el|
-      case el
-      when Array then NestedArray.new(el).array
-      when Hash then NestedHashie.new(el)
-      else el
-      end
-    end
-  end
-end
-
-class NestedHashie
+class DeepOpenStruct
   def initialize(hash)
-    @h = hash
+    hash.each { |k, v| define_singleton_method(k) { coerce(v) } }
   end
 
-  def method_missing(method, *args)
-    if @h.has_key?(method.to_s)
-      result = @h[method.to_s]
-      result = NestedHashie.new(result) if result.is_a?(Hash)
-      result = NestedArray.new(result).array if result.is_a?(Array)
-      result
-    else
-      @h.send(method, *args)
+  def [](k)
+    send(k)
+  end
+
+  def coerce(v)
+    case v
+    when Hash then DeepOpenStruct.new(v)
+    when Array then v.map(&method(:coerce))
+    else v
     end
-  end
-end
-
-class NilClass
-  def any?
-    false
   end
 end
 
@@ -72,16 +52,15 @@ def be(arg1, *_)
   end
 end
 
-def game_loop(msg = '')
-  print_state(msg)
-
-  promise = Promise.chain {
-    gets.chomp
-  }.chain { |value|
-    send(*value.split('|').map(&:strip))
-  }.then(->(*__) { game_loop },
-         ->(err) { game_loop(err) })
-
+def game_loop
+  loop do
+    begin
+      send(*gets.chomp.split('|').map(&:strip))
+    rescue => e
+      puts e.message
+    end
+    print_state
+  end
 end
 
 EM.run {
@@ -93,14 +72,11 @@ EM.run {
 
   ws.onmessage = lambda do |event|
     first_time = $game.nil?
-    $game = NestedHashie.new(JSON.parse(event.data).last['data'])
+    $game = DeepOpenStruct.new(JSON.parse(event.data).last['data'])
     $color ||= $game.players.map(&:color).sample
 
-    if first_time
-      game_loop
-    else
-      print_state
-    end
+    print_state
+    Thread.new { game_loop } if first_time
   end
 
   ws.onclose = lambda do |event|
