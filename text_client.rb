@@ -29,7 +29,7 @@ def print_state(msg='')
   puts `clear`
   puts "\e[H\e[2J"
   puts msg
-  puts "COLOR: #{$color}"
+  puts "COLOR: #{$color} / #{$game.players.map(&:color)}"
   puts "LAST ROLL: #{$game.last_roll}"
   print_board($game.board, $game.board.size)
   puts "available actions: #{$game.available_actions[$color]}"
