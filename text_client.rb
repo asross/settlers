@@ -9,7 +9,9 @@ require_relative './textbased'
 
 class DeepOpenStruct
   def initialize(hash)
-    hash.each { |k, v| define_singleton_method(k) { coerce(v) } }
+    hash.each { |k, v| define_singleton_method(k) {
+      instance_variable_get(:"@#{k}") || instance_variable_set(:"@#{k}", coerce(v))
+    } }
   end
 
   def [](k)
