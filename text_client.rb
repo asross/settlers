@@ -38,10 +38,12 @@ end
 def say(arg1, *_)
   `curl -X POST -d "message=#{arg1}&color=#{$color}" #{APP_URL}/messages`
 end
-def do(arg1, arg2)
+
+def do(arg1, arg2=[])
   json = "{\"data\":{\"action\":#{arg1.inspect},\"args\":#{arg2 || []}},\"color\":#{$color.inspect}}"
   `curl -XPOST -H 'Content-Type: application/json' -d '#{json}' #{APP_URL}/actions`
 end
+
 def be(arg1, *_)
   colors = $game.players.map(&:color)
   if colors.include?(arg1)
