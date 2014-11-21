@@ -177,7 +177,7 @@ def print_board(game, current_player)
 
   all_lines.map!{|l| l.ljust(10*size+(l.length-l.gsub(/\e\[(\d+)(;\d+)*m/, '').length)) + '|  ' }
 
-  i = 2
+  i = 6
   game.players.each do |p|
     all_lines[i+=1] += send(p.color, "#{'*' if game.active_player == p.color}#{p.color}#{' (you)' if current_player == p.color}")
     all_lines[i+=1] += send(p.color, "resources: #{p.color == current_player ? p.resource_cards : p.resource_cards.count}")
@@ -189,11 +189,9 @@ def print_board(game, current_player)
   game.messages.reverse.take(10).each do |m|
     all_lines[i+=1] += [m].flatten.join(': ')
   end
-  #all_lines.length.times do |i|
-    #all_lines[i] = 
-  #end
 
-  for x in 3..all_lines.length-10
+  for x in 7..all_lines.length-15
     puts all_lines[x]
   end
+  puts
 end
