@@ -82,10 +82,17 @@ class HexDecorator
     lb = leftbot
     lt = lefttop
     if hex.type == 'water'
-      l1 = " #{lt} #{blue("~~~~~")} "
-      l2 = "#{lt} #{blue("~~~~~~~")}"
-      l3 = "#{lb}  #{blue("~~~~~")} "
-      l4 = " #{lb}#{bl}#{bo}#{br}"    
+      if hex.port_type
+        l1 = " #{lt} #{blue("~~~~~")} "
+        l2 = "#{lt} #{blue("~#{hex.port_type[0..4].ljust(5, '~')}~")}"
+        l3 = "#{lb}  #{blue("~~~~~")} "
+        l4 = " #{lb}#{bl}#{bo}#{br}"
+      else
+        l1 = " #{lt} #{blue("~~~~~")} "
+        l2 = "#{lt} #{blue("~~~~~~~")}"
+        l3 = "#{lb}  #{blue("~~~~~")} "
+        l4 = " #{lb}#{bl}#{bo}#{br}"
+      end
     elsif hex.type == 'desert'
       l1 = " #{lt} des-  "
       l2 = "#{lt}    ert "
