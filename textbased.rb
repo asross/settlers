@@ -149,7 +149,7 @@ def print_board(game, current_player)
   for road in roads
     y0 = road.hexes[0].y; x0 = road.hexes[0].x
     y1 = road.hexes[1].y; x1 = road.hexes[1].x
-    sym = send(road.color, road.color.downcase[0])
+    sym = send(road.color, '^')
 
     if x0 == x1 # bottom
       i = [y0, y1].index([y0, y1].min)
