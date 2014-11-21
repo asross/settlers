@@ -30,7 +30,7 @@ end
 def print_state(msg='')
   puts `clear`
   puts "\e[H\e[2J"
-  puts msg
+  puts msg if msg.to_s.length > 0
   puts "LAST ROLL: #{$game.last_roll}" if $game.last_roll
   print_board($game, $color)
   puts "available actions: #{$game.available_actions[$color]}"
