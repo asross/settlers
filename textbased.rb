@@ -26,7 +26,8 @@ COLOR_MAP = {
   'gold' => YELLOW,
   'lightcoral' => RED,
   'azure' => BLUE,
-  'lawngreen' => LIGHTGREEN
+  'lawngreen' => LIGHTGREEN,
+  'thistle' => THISTLE
 }
 
 def colorize(text, color_code)
@@ -34,11 +35,11 @@ def colorize(text, color_code)
 end
 
 def aqua(text); colorize(text, 36); end
-def thistle(text); colorize(text, 35); end
-def gold(text); yellow(text); end
+def thistle(text); colorize(text, THISTLE); end
+def gold(text); colorize(text, YELLOW); end
 def lightcoral(text); red(text); end
 def azure(text); blue(text); end
-def lawngreen(text); colorize(text, 92); end
+def lawngreen(text); colorize(text, LIGHTGREEN); end
 
 def red(text); colorize(text, 31); end
 def green(text); colorize(text, 32); end
@@ -57,7 +58,7 @@ class HexDecorator
     @bottom = "_"
     @leftbot = "\\"
     @lefttop = "/"
-  end 
+  end
 
   def color(text)
     colorize(text, COLOR_MAP[hex.type])
@@ -97,12 +98,12 @@ class HexDecorator
       l1 = " #{lt} des-  "
       l2 = "#{lt}    ert "
       l3 = "#{lb}    #{coords} "
-      l4 = " #{lb}#{bl}#{bo}#{br}"  
+      l4 = " #{lb}#{bl}#{bo}#{br}"
     elsif hex.robbed
       l1 = " #{lt}  #{coords}  "
       l2 = "#{lt}  #{re} "
       l3 = "#{lb}    #{colorize("R", "1;37;40")}   "
-      l4 = " #{lb}#{bl}#{bo}#{br}"    
+      l4 = " #{lb}#{bl}#{bo}#{br}"
     else
       l1 = " #{lt}  #{coords}  "
       l2 = "#{lt}  #{re} "
