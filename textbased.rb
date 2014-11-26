@@ -48,6 +48,17 @@ def blue(text); colorize(text, 34); end
 def darkgreen(text); colorize(text, "1;32"); end
 def bold(text); colorize(text, "1;30"); end
 
+class String
+  def cjust(n, padder, pad_at_start=true)
+    if length >= n
+      return self
+    else
+      new_string = (pad_at_start ? "#{padder}#{self}" : "#{self}#{padder}")
+      new_string.cjust(n, padder, !pad_at_start)
+    end
+  end
+end
+
 class HexDecorator
   attr_reader :hex
   attr_accessor :botleft, :botright, :bottom, :leftbot, :lefttop
@@ -85,9 +96,17 @@ class HexDecorator
     if hex.type == 'water'
       if hex.port_type
         l1 = " #{lt} #{blue("~~~~~")} "
-        l2 = "#{lt} #{blue("~#{hex.port_type[0..4].ljust(5, '~')}~")}"
+        l2 = "#{lt} #{blue("~#{hex.port_type[0..4].cjust(5, '~')}~")}"
         l3 = "#{lb}  #{blue("~~~~~")} "
         l4 = " #{lb}#{bl}#{bo}#{br}"
+        case hex.port_direction
+        when 'botleft' then l2[7] = "*" and l3[8] = "*"
+        when 'bottom' then l3[8] = "*" and l3[12] = "*"
+        when 'top' then l1[8] = "*" and l1[12] = "*"
+        when 'topright' then l1[12] = "*" and l2[13] = "*"
+        when 'topleft' then l1[8] = "*" and l2[7] = "*"
+        when 'botright' then l2[13] = "*" and l3[12] = "*"
+        end
       else
         l1 = " #{lt} #{blue("~~~~~")} "
         l2 = "#{lt} #{blue("~~~~~~~")}"
