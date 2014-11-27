@@ -6,8 +6,6 @@ of Catan!
 
 Play Settlers of Catan on your home computer with your friends by running the server on one machine and having others connect to it either through a web or text interface.
 
-[See a demo here.](http://ec2-54-200-74-203.us-west-2.compute.amazonaws.com:4567/)
-
 ## Setup
 
 1. `bundle`
@@ -17,7 +15,9 @@ Play Settlers of Catan on your home computer with your friends by running the se
 
 To run tests, `ruby test.rb`
 
-## If you aren't convinced
+## Demo
+
+[Play a demo here.](http://ec2-54-200-74-203.us-west-2.compute.amazonaws.com:4567/)
 
 ![catantextbased2](https://cloud.githubusercontent.com/assets/1022564/5211443/8d9ffdc8-75b0-11e4-9cd7-adefd60d93b3.gif)
 
