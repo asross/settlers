@@ -14,7 +14,7 @@ BLUE = 34
 THISTLE = 35
 AQUA = 36
 
-COLOR_MAP = {
+COLOR_CODES = {
   'desert' => 39,
   'wheat' => YELLOW,
   'brick' => RED,
@@ -30,23 +30,13 @@ COLOR_MAP = {
   'thistle' => THISTLE
 }
 
+def paint(color, text)
+  colorize(text, COLOR_CODES[color])
+end
+
 def colorize(text, color_code)
   "\e[#{color_code}m#{text}\e[0m"
 end
-
-def aqua(text); colorize(text, 36); end
-def thistle(text); colorize(text, THISTLE); end
-def gold(text); colorize(text, YELLOW); end
-def lightcoral(text); red(text); end
-def azure(text); blue(text); end
-def lawngreen(text); colorize(text, LIGHTGREEN); end
-
-def red(text); colorize(text, 31); end
-def green(text); colorize(text, 32); end
-def yellow(text); colorize(text, "1;33"); end
-def blue(text); colorize(text, 34); end
-def darkgreen(text); colorize(text, "1;32"); end
-def bold(text); colorize(text, "1;30"); end
 
 class String
   def cjust(n, padder, pad_at_start=true)
@@ -72,7 +62,7 @@ class HexDecorator
   end
 
   def color(text)
-    colorize(text, COLOR_MAP[hex.type])
+    paint(hex.type, text)
   end
 
   def no
@@ -95,9 +85,9 @@ class HexDecorator
     lt = lefttop
     if hex.type == 'water'
       if hex.port_type
-        l1 = " #{lt} #{blue("~~~~~")} "
-        l2 = "#{lt} #{blue("~#{hex.port_type[0..4].cjust(5, '~')}~")}"
-        l3 = "#{lb}  #{blue("~~~~~")} "
+        l1 = " #{lt} #{color("~~~~~")} "
+        l2 = "#{lt} #{color("~#{hex.port_type[0..4].cjust(5, '~')}~")}"
+        l3 = "#{lb}  #{color("~~~~~")} "
         l4 = " #{lb}#{bl}#{bo}#{br}"
         case hex.port_direction
         when 'botleft' then l2[7] = "*" and l3[8] = "*"
@@ -108,9 +98,9 @@ class HexDecorator
         when 'botright' then l2[13] = "*" and l3[12] = "*"
         end
       else
-        l1 = " #{lt} #{blue("~~~~~")} "
-        l2 = "#{lt} #{blue("~~~~~~~")}"
-        l3 = "#{lb}  #{blue("~~~~~")} "
+        l1 = " #{lt} #{color("~~~~~")} "
+        l2 = "#{lt} #{color("~~~~~~~")}"
+        l3 = "#{lb}  #{color("~~~~~")} "
         l4 = " #{lb}#{bl}#{bo}#{br}"
       end
     elsif hex.type == 'desert'
@@ -155,21 +145,20 @@ def print_board(game, current_player)
     y0 = city.hexes[0].y; x0 = city.hexes[0].x
     y1 = city.hexes[1].y; x1 = city.hexes[1].x
     y2 = city.hexes[2].y; x2 = city.hexes[2].x
-    sym = send(city.color, "#{city.color.capitalize[0]}#{city.size}")
-    if y0 + y1 + y2 - 3*[y0,y1,y2].min == 2
-      # put it on the bottom left
+    sym = paint(city.color, "#{city.color.capitalize[0]}#{city.size}")
+
+    if y0 + y1 + y2 - 3*[y0,y1,y2].min == 2 # bottom left
       i = [y0,y1,y2].index([y0,y1,y2].min)
       hex_attributes[city.hexes[i].x][city.hexes[i].y].botleft = sym
-    else
-      # put it on the bottom right
+    else # bottom right
       i = [x0+y0,x1+y1,x2+y2].index([x0+y0,x1+y1,x2+y2].min)
       hex_attributes[city.hexes[i].x][city.hexes[i].y].botright = sym
     end
   end
-  for road in roads
+  roads.each do |road|
     y0 = road.hexes[0].y; x0 = road.hexes[0].x
     y1 = road.hexes[1].y; x1 = road.hexes[1].x
-    sym = send(road.color, '^')
+    sym = paint(road.color, '@')
 
     if x0 == x1 # bottom
       i = [y0, y1].index([y0, y1].min)
@@ -199,9 +188,9 @@ def print_board(game, current_player)
 
   i = 6
   game.players.each do |p|
-    all_lines[i+=1] += send(p.color, "#{'*' if game.active_player == p.color}#{p.color}#{' (you)' if current_player == p.color}")
-    all_lines[i+=1] += send(p.color, "resources: #{p.color == current_player ? p.resource_cards : p.resource_cards.count}")
-    all_lines[i+=1] += send(p.color, "dev cards: #{p.color == current_player ? p.development_cards : p.development_cards.count}")
+    all_lines[i+=1] += paint(p.color, "#{'*' if game.active_player == p.color}#{p.color}#{' (you)' if current_player == p.color}")
+    all_lines[i+=1] += paint(p.color, "resources: #{p.color == current_player ? p.resource_cards : p.resource_cards.count}")
+    all_lines[i+=1] += paint(p.color, "dev cards: #{p.color == current_player ? p.development_cards : p.development_cards.count}")
     i += 1
   end
 
