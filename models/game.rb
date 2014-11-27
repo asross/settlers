@@ -20,7 +20,7 @@ class Game < Catan
   }
   STATES = STATES_TO_ACTIONS.keys
   ACTIONS = STATES_TO_ACTIONS.values.flatten.uniq
-  COLORS = %w(aqua deeppink gold lightcoral thistle burlywood azure lawngreen)
+  COLORS = %w(aqua gold lightcoral thistle azure lawngreen)
 
   attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable, :state
   attr_reader :longest_road_player, :largest_army_player, :trade_requests, :discards_this_turn
@@ -39,6 +39,21 @@ class Game < Catan
     @state = :start_turn1
     @trade_requests = {}
     @discards_this_turn = []
+  end
+
+  def as_json
+    {
+      board: @board.as_json,
+      players: @players.map(&:as_json),
+      messages: @messages,
+      last_roll: @last_roll,
+      available_actions: @players.each_with_object({}) {|p,h| h[p.color] = available_actions(p) },
+      trade_requests: @trade_requests,
+      longest_road_player: @longest_road_player,
+      largest_army_player: @largest_army_player,
+      active_player: active_player.color,
+      turn: @turn
+    }
   end
 
   def points_to_win
@@ -85,7 +100,7 @@ class Game < Catan
 
     send(action, player, *args)
 
-    @messages << "** #{player.color} performed #{action}!"
+    @messages << "#{player.color} performed #{action}!"
   end
 
   private

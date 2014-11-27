@@ -1,4 +1,5 @@
-require_relative '../catan_server.rb'
+ENV['APP_ENV'] = 'test'
+require_relative '../app.rb'
 ENV['RELOAD_AFTER_ACTIONS'] = '1'
 require 'minitest'
 require 'minitest/pride'

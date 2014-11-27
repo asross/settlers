@@ -16,6 +16,14 @@ class DevCard < Catan
     @played = false
   end
 
+  def as_json
+    {
+      type: type,
+      played: played,
+      turn_purchased: turn_purchased
+    }
+  end
+
   def playable_on_turn?(turn)
     return false if victory_point?
     return false if turn == turn_purchased

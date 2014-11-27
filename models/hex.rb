@@ -23,6 +23,18 @@ class Hex < Catan
     @robbed = robbed
   end
 
+  def as_json
+    {
+      x: x,
+      y: y,
+      number: number,
+      type: type,
+      robbed: robbed,
+      port_type: port_type,
+      port_direction: port_direction
+    }
+  end
+
   def coordinates
     [x, y]
   end

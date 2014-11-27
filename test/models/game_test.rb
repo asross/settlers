@@ -20,6 +20,23 @@ describe Game do
     @game.available_actions(@player3).must_equal []
   end
 
+  it 'can be dumped to json' do
+    @game.perform_action(@player1, 'build_settlement', [[3,3],[3,2],[2,3]])
+    @game.perform_action(@player1, 'build_road', [[3,3],[3,2]])
+
+    json = @game.as_json
+
+    json[:available_actions].must_equal({"viridian"=>[], "cerulean"=>["build_settlement"], "alabaster"=>[]})
+    assert_similar(
+      json[:board][:settlements].first[:hexes].map{|h| h.values_at(:x, :y)},
+      [[3,3],[3,2],[2,3]]
+    )
+    assert_similar(
+      json[:board][:roads].first[:hexes].map{|h| h.values_at(:x, :y)},
+      [[3, 3], [3, 2]]
+    )
+  end
+
   describe 'round 1' do
     describe '#build_settlement' do
       before do
@@ -53,7 +70,7 @@ describe Game do
         end
 
         it 'saves message indicating action' do
-          @game.messages.last.must_equal "** #{@player1.color} performed build_road!"
+          @game.messages.last.must_equal "#{@player1.color} performed build_road!"
         end
       end
     end
