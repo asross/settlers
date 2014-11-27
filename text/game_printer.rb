@@ -1,33 +1,17 @@
-#2 situations for settlements:
-#settlement should go to bottom left
-#   true iff y, y+1, y+1 -- goes on bottom of y
-#settlement should go to bottom right
-#   true iff y, y, y+1 --- goes on bottom of y with minimum x
-#
-GRAY = "1;90"
-RED = 31
-GREEN = 32
-DARKGREEN = "1;32"
-LIGHTGREEN = 92
-YELLOW = "1;33"
-BLUE = 34
-THISTLE = 35
-AQUA = 36
-
 COLOR_CODES = {
   'desert' => 39,
-  'wheat' => YELLOW,
-  'brick' => RED,
-  'sheep' => GREEN,
-  'ore' => GRAY,
-  'wood' => DARKGREEN,
-  'water' => BLUE,
-  'aqua' => AQUA,
-  'gold' => YELLOW,
-  'lightcoral' => RED,
-  'azure' => BLUE,
-  'lawngreen' => LIGHTGREEN,
-  'thistle' => THISTLE
+  'wheat' => "1;33",
+  'brick' => 31,
+  'sheep' => 32,
+  'ore' => "1;90",
+  'wood' => "1;32",
+  'water' => 34,
+  'aqua' => 36,
+  'gold' => "1;33",
+  'lightcoral' => 31,
+  'azure' => 34,
+  'lawngreen' => 92,
+  'thistle' => 35,
 }
 
 def paint(color, text)
