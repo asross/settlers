@@ -20,7 +20,7 @@ class Game < Catan
   }
   STATES = STATES_TO_ACTIONS.keys
   ACTIONS = STATES_TO_ACTIONS.values.flatten.uniq
-  COLORS = %w(aqua deeppink gold lightcoral thistle burlywood azure lawngreen)
+  COLORS = %w(aqua gold lightcoral thistle azure lawngreen)
 
   attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable, :state
   attr_reader :longest_road_player, :largest_army_player, :trade_requests, :discards_this_turn
