@@ -13,13 +13,13 @@ Play Settlers of Catan on your home computer with your friends by running the se
 1. `bundle`
 2. `ruby app.rb`
 3. Visit `localhost:4567`
+4. Or run `ruby text/text_client.rb`
 
 To run tests, `ruby test.rb`
 
-## TODO
+## If you aren't convinced
 
-- Text-based client
-- Running more than one game at a time
+![catantextbased2](https://cloud.githubusercontent.com/assets/1022564/5211443/8d9ffdc8-75b0-11e4-9cd7-adefd60d93b3.gif)
 
 ## License
 
