@@ -5,6 +5,8 @@ EM.run do
     ws.onopen {
       sid = $channel.subscribe { |msg| ws.send msg }
 
+      $channel.push JSON.generate(['action', { data: $game.as_json }])
+
       ws.onclose {
         $channel.unsubscribe(sid)
       }
