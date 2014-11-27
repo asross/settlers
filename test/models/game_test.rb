@@ -70,7 +70,7 @@ describe Game do
         end
 
         it 'saves message indicating action' do
-          @game.messages.last.must_equal "** #{@player1.color} performed build_road!"
+          @game.messages.last.must_equal "#{@player1.color} performed build_road!"
         end
       end
     end
