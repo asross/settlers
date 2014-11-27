@@ -11,6 +11,14 @@ class Player < Catan
     RESOURCE_CARDS.each{|r| send("#{r}=", 0) }
   end
 
+  def as_json
+    {
+      color: @color,
+      development_cards: @development_cards.map(&:as_json),
+      resource_cards: resource_cards
+    }
+  end
+
   def inspect
     "<Player: #{color}>"
   end

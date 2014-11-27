@@ -41,6 +41,21 @@ class Game < Catan
     @discards_this_turn = []
   end
 
+  def as_json
+    {
+      board: @board.as_json,
+      players: @players.map(&:as_json),
+      messages: @messages,
+      last_roll: @last_roll,
+      available_actions: @players.each_with_object({}) {|p,h| h[p.color] = available_actions(p) },
+      trade_requests: @trade_requests,
+      longest_road_player: @longest_road_player,
+      largest_army_player: @largest_army_player,
+      active_player: active_player.color,
+      turn: @turn
+    }
+  end
+
   def points_to_win
     10
   end
