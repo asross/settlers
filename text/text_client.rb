@@ -5,34 +5,15 @@ require 'pry'
 require 'json'
 require 'faye/websocket'
 require 'eventmachine'
-require_relative './textbased'
-
-class DeepOpenStruct
-  def initialize(hash)
-    hash.each { |k, v| define_singleton_method(k) {
-      instance_variable_get(:"@#{k}") || instance_variable_set(:"@#{k}", coerce(v))
-    } }
-  end
-
-  def [](k)
-    send(k)
-  end
-
-  def coerce(v)
-    case v
-    when Hash then DeepOpenStruct.new(v)
-    when Array then v.map(&method(:coerce))
-    else v
-    end
-  end
-end
+require_relative './deep_open_struct'
+require_relative './game_printer'
 
 def print_state(msg='')
   puts `clear`
   puts "\e[H\e[2J"
   puts msg if msg.to_s.length > 0
   puts "LAST ROLL: #{$game.last_roll}" if $game.last_roll
-  print_board($game, $color)
+  print_game($game, $color)
   puts "available actions: #{$game.available_actions[$color]}"
   print 'say, do, or be: '
 end

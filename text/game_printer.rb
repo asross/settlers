@@ -124,7 +124,7 @@ class HexDecorator
   end
 end
 
-def print_board(game, current_player)
+def print_game(game, current_player)
   board = game.board
   size = board.size
   hexes = board.hexes
