@@ -90,14 +90,12 @@ class Board < Catan
     error 'cannot pick same location' if hex == robbed_hex
     robbed_hex.robbed = false
     hex.robbed = true
-    robbable = []
-    for s in settlements
+    settlements.each_with_object([]) do |s, robbable|
       next unless s.hexes.include?(hex)
       next if s.player == player
       next if robbable.include? s.player
       robbable << s.player
     end
-    robbable
   end
 
   def size
@@ -115,13 +113,11 @@ class Board < Catan
   end
 
   def roads_to(hex1, hex2, hex3, color)
-    result = []
-    for road in roads
+    roads.each_with_object([]) do |road, nearby_roads|
       next unless road.color == color
       next unless [hex1, hex2, hex3].permutation(2).include?(road.hexes)
-      result << road
+      nearby_roads << road
     end
-    result
   end
 
   def settlement_at(hex1, hex2, hex3)
