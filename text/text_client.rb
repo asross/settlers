@@ -8,6 +8,7 @@ require 'eventmachine'
 require_relative './deep_open_struct'
 require_relative './game_printer'
 require 'net/http'
+require 'readline'
 
 def print_state(msg='')
   puts `clear`
@@ -19,11 +20,11 @@ def print_state(msg='')
   puts "LAST ROLL: #{$game.last_roll}" if $game.last_roll
   print_game($game, $color)
   puts "available actions: #{$game.available_actions[$color]}"
-  print 'say, do, or be: '
 end
 
 def say(arg1, *_)
   Net::HTTP.post_form(URI("#{APP_URL}/messages"), message: arg1, color: $color)
+  sleep 0.1
   false
 end
 
@@ -34,6 +35,7 @@ def do(arg1, arg2=nil)
   elsif response.code =~ /^5/
     raise "Internal server error"
   end
+  sleep 0.1
   false
 end
 
@@ -52,8 +54,12 @@ def game_loop
     error_message = ''
     should_print = true
     begin
-      input = gets.chomp
-      should_print = send(*input.split.map(&:strip)) if input.length > 0
+      input = Readline.readline('say, do, or be: ', true)
+      if input.length > 0
+        args = input.split.map(&:strip)
+        raise "must start with 'do', 'say', or 'be'" unless %w(do say be).include?(args[0])
+        should_print = send(*args)
+      end
     rescue => e
       error_message = e.message
     end
