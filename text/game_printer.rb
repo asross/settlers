@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 COLOR_CODES = {
   'desert' => 39,
   'wheat' => "1;33",
@@ -6,12 +8,22 @@ COLOR_CODES = {
   'ore' => "1;90",
   'wood' => "1;32",
   'water' => 34,
-  'aqua' => 36,
-  'gold' => "1;33",
+
   'lightcoral' => 31,
+  'lawngreen' => 32,
+  'gold' => 33,
   'azure' => 34,
-  'lawngreen' => 92,
   'thistle' => 35,
+  'aqua' => 36,
+}
+
+BG_COLOR_CODES = {
+  'lightcoral' => '1;37;41',
+  'lawngreen' => '1;37;42',
+  'gold' => '1;37;43',
+  'azure' => '1;37;44',
+  'thistle' => '1;37;45',
+  'aqua' => '1;37;46',
 }
 
 def paint(color, text)
@@ -62,9 +74,21 @@ class HexDecorator
   end
 
   def hex_lines
-    bl = botleft
-    br = botright
-    bo = "#{bottom} #{bottom}"
+    bl = (botleft == '  ' ? " #{bottom}" : botleft)
+    br = (botright == '  ' ? "#{bottom} " : botright)
+    if bottom != '_'
+      if botright == '  ' && botleft == '  '
+        bo = bottom*3
+      elsif botright == '  '
+        bo = " #{bottom}#{bottom}"
+      elsif botleft == '  '
+        bo = "#{bottom}#{bottom} "
+      else
+        bo = " #{bottom} "
+      end
+    else
+      bo = bottom*3
+    end
     lb = leftbot
     lt = lefttop
     if hex.type == 'water'
@@ -129,7 +153,7 @@ def print_game(game, current_player)
     y0 = city.hexes[0].y; x0 = city.hexes[0].x
     y1 = city.hexes[1].y; x1 = city.hexes[1].x
     y2 = city.hexes[2].y; x2 = city.hexes[2].x
-    sym = paint(city.color, "#{city.color.capitalize[0]}#{city.size}")
+    sym = colorize("⌂#{city.size}", BG_COLOR_CODES[city.color])
 
     if y0 + y1 + y2 - 3*[y0,y1,y2].min == 2 # bottom left
       i = [y0,y1,y2].index([y0,y1,y2].min)
@@ -142,17 +166,16 @@ def print_game(game, current_player)
   roads.each do |road|
     y0 = road.hexes[0].y; x0 = road.hexes[0].x
     y1 = road.hexes[1].y; x1 = road.hexes[1].x
-    sym = paint(road.color, '@')
 
     if x0 == x1 # bottom
       i = [y0, y1].index([y0, y1].min)
-      hex_attributes[road.hexes[i].x][road.hexes[i].y].bottom = sym
+      hex_attributes[road.hexes[i].x][road.hexes[i].y].bottom = colorize('_', BG_COLOR_CODES[road.color])
     elsif y0 == y1 # lefttop
       i = [x0, x1].index([x0, x1].max)
-      hex_attributes[road.hexes[i].x][road.hexes[i].y].lefttop = sym
+      hex_attributes[road.hexes[i].x][road.hexes[i].y].lefttop = colorize('/', BG_COLOR_CODES[road.color])
     else # leftbot
       i = [y0, y1].index([y0, y1].min)
-      hex_attributes[road.hexes[i].x][road.hexes[i].y].leftbot = sym
+      hex_attributes[road.hexes[i].x][road.hexes[i].y].leftbot = colorize('\\', BG_COLOR_CODES[road.color])
     end
   end
   # go through all the hexes and print them
