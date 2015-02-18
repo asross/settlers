@@ -7,11 +7,15 @@ require 'faye/websocket'
 require 'eventmachine'
 require_relative './deep_open_struct'
 require_relative './game_printer'
+require 'net/http'
 
 def print_state(msg='')
   puts `clear`
   puts "\e[H\e[2J"
-  puts msg if msg.to_s.length > 0
+  if msg.to_s.length > 0
+    puts msg
+    puts
+  end
   puts "LAST ROLL: #{$game.last_roll}" if $game.last_roll
   print_game($game, $color)
   puts "available actions: #{$game.available_actions[$color]}"
@@ -19,12 +23,18 @@ def print_state(msg='')
 end
 
 def say(arg1, *_)
-  `curl -X POST -d "message=#{arg1}&color=#{$color}" #{APP_URL}/messages`
+  Net::HTTP.post_form(URI("#{APP_URL}/messages"), message: arg1, color: $color)
+  false
 end
 
-def do(arg1, arg2=[])
-  json = "{\"data\":{\"action\":#{arg1.inspect},\"args\":#{arg2 || []}},\"color\":#{$color.inspect}}"
-  `curl -XPOST -H 'Content-Type: application/json' -d '#{json}' #{APP_URL}/actions`
+def do(arg1, arg2=nil)
+  response = Net::HTTP.post_form(URI("#{APP_URL}/actions"), data: { 'action' => arg1, 'args' => JSON.parse(arg2||'[]') }.to_json, color: $color)
+  if response.code =~ /^4/
+    raise response.body
+  elsif response.code =~ /^5/
+    raise "Internal server error"
+  end
+  false
 end
 
 def be(arg1, *_)
@@ -34,16 +44,20 @@ def be(arg1, *_)
   else
     raise "invalid color #{arg1}; valid choices are #{colors}"
   end
+  true
 end
 
 def game_loop
   loop do
+    error_message = ''
+    should_print = true
     begin
-      send(*gets.chomp.split.map(&:strip))
+      input = gets.chomp
+      should_print = send(*input.split.map(&:strip)) if input.length > 0
     rescue => e
-      puts e.message
+      error_message = e.message
     end
-    print_state
+    print_state(error_message) if should_print
   end
 end
 
