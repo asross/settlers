@@ -26,6 +26,8 @@ BG_COLOR_CODES = {
   'aqua' => '1;37;46',
 }
 
+NUMBER_CHARS = " ①②③④⑤⑥⑦⑧⑨⑩⑪⑫"
+
 def paint(color, text)
   colorize(text, COLOR_CODES[color])
 end
@@ -62,7 +64,7 @@ class HexDecorator
   end
 
   def no
-    color(hex.number.to_s.ljust 2)
+    color NUMBER_CHARS[hex.number].rjust 2
   end
 
   def re
