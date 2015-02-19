@@ -65,8 +65,8 @@ def game_loop
 
     begin
       case action
-      when 'do' then _do(*args); sleep 0.1
-      when 'say' then say(*args); sleep 0.1
+      when 'do' then _do(*args)
+      when 'say' then say(*args)
       when 'be' then be(*args); print_state
       else raise "must start with 'do', 'say', or 'be'"
       end
@@ -89,7 +89,12 @@ EM.run {
     $color ||= $game.players.map(&:color).sample
 
     print_state
-    Thread.new { game_loop } if first_time
+
+    if first_time
+      Thread.new { game_loop }
+    else
+      print 'say, do, or be: '
+    end
   end
 
   ws.onclose = lambda do |event|
