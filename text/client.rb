@@ -10,60 +10,69 @@ require_relative './game_printer'
 require 'net/http'
 require 'readline'
 
+Readline.completion_append_character = " "
+
+def set_completions(list)
+  Readline.completion_proc = proc { |s| list.grep(/^#{Regexp.escape(s)}/) }
+end
+
 def print_state(msg='')
   puts `clear`
   puts "\e[H\e[2J"
-  if msg.to_s.length > 0
-    puts msg
-    puts
-  end
+  puts "#{msg}\n" if msg.to_s.length > 0
   puts "LAST ROLL: #{$game.last_roll}" if $game.last_roll
   print_game($game, $color)
   puts "available actions: #{$game.available_actions[$color]}"
 end
 
-def say(arg1, *_)
-  Net::HTTP.post_form(URI("#{APP_URL}/messages"), message: arg1, color: $color)
-  sleep 0.1
-  false
+def say(message, *)
+  Net::HTTP.post_form(URI("#{APP_URL}/messages"),
+    color: $color,
+    message: message
+  )
 end
 
-def do(arg1, arg2=nil)
-  response = Net::HTTP.post_form(URI("#{APP_URL}/actions"), data: { 'action' => arg1, 'args' => JSON.parse(arg2||'[]') }.to_json, color: $color)
+def _do(action, args=nil)
+  response = Net::HTTP.post_form(URI("#{APP_URL}/actions"),
+    color: $color,
+    data: {
+      'action' => action,
+      'args' => JSON.parse(args||'[]')
+    }.to_json
+  )
+
   if response.code =~ /^4/
     raise response.body
   elsif response.code =~ /^5/
     raise "Internal server error"
   end
-  sleep 0.1
-  false
 end
 
-def be(arg1, *_)
+def be(arg1, *)
   colors = $game.players.map(&:color)
-  if colors.include?(arg1)
-    $color = arg1
-  else
+  unless colors.include?(arg1)
     raise "invalid color #{arg1}; valid choices are #{colors}"
   end
-  true
+  $color = arg1
 end
 
 def game_loop
   loop do
-    error_message = ''
-    should_print = true
+    set_completions(%w(say do be) + $game.players.map(&:color) + $game.available_actions[$color])
+    input = Readline.readline('say, do, or be: ', true)
+    next unless input.length > 0
+    action, *args = input.split.map(&:strip)
+
     begin
-      input = Readline.readline('say, do, or be: ', true)
-      if input.length > 0
-        args = input.split.map(&:strip)
-        raise "must start with 'do', 'say', or 'be'" unless %w(do say be).include?(args[0])
-        should_print = send(*args)
+      case action
+      when 'do' then _do(*args); sleep 0.1
+      when 'say' then say(*args); sleep 0.1
+      when 'be' then be(*args); print_state
+      else raise "must start with 'do', 'say', or 'be'"
       end
     rescue => e
-      error_message = e.message
+      print_state(e.message)
     end
-    print_state(error_message) if should_print
   end
 end
 

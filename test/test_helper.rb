@@ -1,5 +1,5 @@
 ENV['APP_ENV'] = 'test'
-require_relative '../app.rb'
+require_relative '../server.rb'
 ENV['RELOAD_AFTER_ACTIONS'] = '1'
 require 'minitest'
 require 'minitest/pride'
