@@ -114,9 +114,10 @@ class HexDecorator
         l4 = " #{lb}#{bl}#{bo}#{br}"
       end
     elsif hex.type == 'desert'
-      l1 = " #{lt} des-  "
-      l2 = "#{lt}    ert "
-      l3 = "#{lb}    #{coords} "
+      l1 = " #{lt}  #{coords}  "
+      l2 = "#{lt}  desert"
+      l3 = "#{lb}        "
+      l3 = "#{lb}    #{colorize("R", "1;37;40")}   " if hex.robbed
       l4 = " #{lb}#{bl}#{bo}#{br}"
     elsif hex.robbed
       l1 = " #{lt}  #{coords}  "
