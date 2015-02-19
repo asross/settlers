@@ -94,7 +94,13 @@ class Game < Catan
   end
 
   def perform_action(player, action, args=[])
-    unless available_actions(player).include?(action)
+    avail = available_actions(player)
+
+    unless ACTIONS.include?(action)
+      error "invalid action #{action.inspect}. #{avail.any?? "Available actions are #{avail}" : ""}"
+    end
+
+    unless avail.include?(action)
       error "#{player.color} cannot perform #{action} at this time"
     end
 
