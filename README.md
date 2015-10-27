@@ -17,13 +17,19 @@ To run tests, `ruby test.rb`
 
 ## Demo
 
-[Play a demo here.](http://ec2-54-200-74-203.us-west-2.compute.amazonaws.com:4567/)
+[Play a demo here.](http://54.200.205.31:4567:4567)
+
+If you clone this repository, you can also connect to this server using the text interface by running:
+
+```
+APP_URL=http://54.200.205.31:4567 WS_URL=http://54.200.205.31:8080 ruby text/client.rb
+```
 
 ![catantextbased2](https://cloud.githubusercontent.com/assets/1022564/5211443/8d9ffdc8-75b0-11e4-9cd7-adefd60d93b3.gif)
 
 ## License
 
-Copyright (c) 2013 Andrew Ross
+Copyright (c) 2015 Andrew Ross
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
