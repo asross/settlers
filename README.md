@@ -25,7 +25,7 @@ If you clone this repository, you can also connect to this server using the text
 APP_URL=http://54.200.205.31:4567 WS_URL=http://54.200.205.31:8080 ruby text/client.rb
 ```
 
-![catantextbased2](https://cloud.githubusercontent.com/assets/1022564/5211443/8d9ffdc8-75b0-11e4-9cd7-adefd60d93b3.gif)
+![settlers](https://cloud.githubusercontent.com/assets/1022564/10851499/d192053e-7f01-11e5-839d-b19237b8b6c5.gif)
 
 ## License
 
