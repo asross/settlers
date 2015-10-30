@@ -17,7 +17,7 @@ To run tests, `ruby test.rb`
 
 ## Demo
 
-[Play a demo here.](http://54.200.205.31:4567:4567)
+[Play a demo here.](http://ec2-54-200-205-31.us-west-2.compute.amazonaws.com:4567)
 
 If you clone this repository, you can also connect to this server using the text interface by running:
 
