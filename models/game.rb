@@ -106,10 +106,19 @@ class Game < Catan
 
     send(action, player, *args)
 
-    @messages << "#{player.color} performed #{action}!"
+    @messages << message_for(player, action, args) #"#{player.color} performed #{action}!"
   end
 
   private
+
+  def message_for(player, action, args)
+    case action
+    when "request_trade"
+      "#{player.color} offered their #{args[1]} for #{args[0]}'s #{args[2]}"
+    else
+      "#{player.color} performed #{action}!"
+    end
+  end
 
   def random_dieroll
     2 + rand(6) + rand(6)
