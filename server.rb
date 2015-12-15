@@ -19,9 +19,7 @@ class CatanServer < Sinatra::Base
   end
 
   post '/new_game' do
-    board_size = (params[:game][:board_size] || 3).to_i
-    n_players = (params[:game][:n_players] || 3).to_i
-    $game = Game.new(side_length: board_size, n_players: n_players)
+    $game = Game.new(side_length: new_game_param(:board_size), n_players: new_game_param(:n_players))
     redirect '/'
   end
 
@@ -56,6 +54,14 @@ class CatanServer < Sinatra::Base
 
   def broadcast(event, data)
     $channel.push JSON.generate([event, data])
+  end
+
+  def new_game_param(param)
+    value = params[:game][param]
+    return [[value.to_i, 2].max, 20].min if value && value != ''
+    raise
+  rescue
+    3
   end
 end
 
