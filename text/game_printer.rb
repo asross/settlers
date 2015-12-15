@@ -2,11 +2,11 @@
 
 COLOR_CODES = {
   'desert' => 39,
-  'wheat' => "1;33",
+  'wheat' => 33,
   'brick' => 31,
-  'sheep' => 32,
-  'ore' => "1;90",
-  'wood' => "1;32",
+  'sheep' => 92,
+  'ore' => 37,
+  'wood' => 32,
   'water' => 34,
 
   'lightcoral' => 31,
@@ -18,12 +18,12 @@ COLOR_CODES = {
 }
 
 BG_COLOR_CODES = {
-  'lightcoral' => '1;37;41',
-  'lawngreen' => '1;37;42',
-  'gold' => '1;37;43',
-  'azure' => '1;37;44',
-  'thistle' => '1;37;45',
-  'aqua' => '1;37;46',
+  'lightcoral' => '1;97;41',
+  'lawngreen' => '1;97;42',
+  'gold' => '1;97;43',
+  'azure' => '1;97;44',
+  'thistle' => '1;97;45',
+  'aqua' => '1;97;46',
 }
 
 NUMBER_CHARS = " ①②③④⑤⑥⑦⑧⑨⑩⑪⑫"
@@ -115,14 +115,14 @@ class HexDecorator
       end
     elsif hex.type == 'desert'
       l1 = " #{lt}  #{coords}  "
-      l2 = "#{lt}  desert"
+      l2 = "#{lt}  #{color('desert')}"
       l3 = "#{lb}        "
-      l3 = "#{lb}    #{colorize("R", "1;37;40")}   " if hex.robbed
+      l3 = "#{lb}    #{colorize("R", "1;97;40")}   " if hex.robbed
       l4 = " #{lb}#{bl}#{bo}#{br}"
     elsif hex.robbed
       l1 = " #{lt}  #{coords}  "
       l2 = "#{lt}  #{re} "
-      l3 = "#{lb}    #{colorize("R", "1;37;40")}   "
+      l3 = "#{lb}    #{colorize("R", "1;97;40")}   "
       l4 = " #{lb}#{bl}#{bo}#{br}"
     else
       l1 = " #{lt}  #{coords}  "
@@ -133,6 +133,12 @@ class HexDecorator
 
     [l1, l2, l3, l4]
   end
+end
+
+def print_dev_card(card)
+  s = card.type
+  s = "#{s} (used)" if card.played
+  s
 end
 
 def print_game(game, current_player)
@@ -200,7 +206,7 @@ def print_game(game, current_player)
   game.players.each do |p|
     all_lines[i+=1] += paint(p.color, "#{'*' if game.active_player == p.color}#{p.color}#{' (you)' if current_player == p.color}")
     all_lines[i+=1] += paint(p.color, "resources: #{p.color == current_player ? p.resource_cards : p.resource_cards.count}")
-    all_lines[i+=1] += paint(p.color, "dev cards: #{p.color == current_player ? p.development_cards : p.development_cards.count}")
+    all_lines[i+=1] += paint(p.color, "dev cards: #{p.color == current_player ? p.development_cards.map(&method(:print_dev_card)) : p.development_cards.count}")
     i += 1
   end
 
