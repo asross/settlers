@@ -4,22 +4,25 @@ of Catan!
 
 ## Summary
 
-Play Settlers of Catan on your home computer with your friends by running the server on one machine and having others connect to it either through a web or text interface.
+This repository started off in 2011 as a way to teach myself Ruby, but it's morphed into a PORO-based implementation of Settlers of Catan with very hacky HTML and text-based web interfaces on top.
 
-## Setup
-
-1. `bundle`
-2. `ruby server.rb`
-3. Visit `http://localhost:4567`
-4. Or run `ruby text/client.rb` with a `GAME_URL`
-
-To run tests, `ruby test.rb`
+It supports multiple games and websocket-based board updates, but doesn't have any authentication or authorization logic, so any user can perform actions as any player (in any game). It's best for friendly play on a local network :)
 
 ## Demo
 
-[Play a demo here.](https://ruby-settlers.herokuapp.com)
+[It's deployed here,](https://ruby-settlers.herokuapp.com) or you can watch the following instructional GIF:
 
 ![settlers](https://cloud.githubusercontent.com/assets/1022564/10851499/d192053e-7f01-11e5-839d-b19237b8b6c5.gif)
+
+## Local Setup
+
+1. Clone the repository,  `cd` into it
+1. `bundle install`
+1. `bundle exec puma -p 4567`
+1. Visit `http://localhost:4567`
+4. Or run `ruby text/client.rb` with a `GAME_URL`
+
+To run tests, `ruby test.rb`
 
 ## License
 
