@@ -1,6 +1,5 @@
-APP_URL = ENV['APP_URL'] || 'http://0.0.0.0:4567'
-WS_URL = ENV['WS_URL'] || APP_URL.sub(/^http/, 'ws')
-GAME_ID = ENV['GAME_ID'] || fail("Must pass GAME_ID")
+GAME_URL = ENV['GAME_URL'] || fail("must pass GAME_URL")
+WS_URL = ENV['WS_URL'] || GAME_URL.sub(/^http/, 'ws')
 
 require 'pry'
 require 'json'
@@ -27,14 +26,14 @@ def print_state(msg='')
 end
 
 def say(message, *)
-  Net::HTTP.post_form(URI("#{APP_URL}/games/#{GAME_ID}/messages"),
+  Net::HTTP.post_form(URI("#{GAME_URL}/messages"),
     color: $color,
     message: message
   )
 end
 
 def _do(action, args=nil)
-  response = Net::HTTP.post_form(URI("#{APP_URL}/games/#{GAME_ID}/actions"),
+  response = Net::HTTP.post_form(URI("#{GAME_URL}/actions"),
     color: $color,
     data: {
       'action' => action,
@@ -78,7 +77,7 @@ def game_loop
 end
 
 EM.run {
-  ws = Faye::WebSocket::Client.new("#{WS_URL}/#{GAME_ID}")
+  ws = Faye::WebSocket::Client.new(WS_URL)
 
   ws.on :message do |event|
     first_time = $game.nil?

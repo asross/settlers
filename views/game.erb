@@ -15,5 +15,13 @@
         <input type='hidden' name='color' value='<%= @current_player.color %>'>
       </form>
     </div>
+    <div id='text-instructions'>
+      You can also download the <a href='https://github.com/asross/settlers'>text client</a> and run:
+      <pre id='console-snippet'>GAME_URL=MY_APP_URL/games/<%= @game.id %> bundle exec ruby text/client.rb</pre>
+      <script>
+        var s = document.getElementById('console-snippet');
+        s.innerText = s.innerText.replace('MY_APP_URL', location.protocol + '//' + location.host);
+      </script>
+    </div>
   </body>
 </html>

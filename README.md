@@ -11,7 +11,7 @@ Play Settlers of Catan on your home computer with your friends by running the se
 1. `bundle`
 2. `ruby server.rb`
 3. Visit `http://localhost:4567`
-4. Or run `ruby text/client.rb`
+4. Or run `ruby text/client.rb` with a `GAME_URL`
 
 To run tests, `ruby test.rb`
 
