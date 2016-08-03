@@ -17,6 +17,8 @@ To run tests, `ruby test.rb`
 
 ## Demo
 
+[Play a demo here.](https://ruby-settlers.herokuapp.com)
+
 ![settlers](https://cloud.githubusercontent.com/assets/1022564/10851499/d192053e-7f01-11e5-839d-b19237b8b6c5.gif)
 
 ## License

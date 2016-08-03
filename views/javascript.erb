@@ -35,7 +35,7 @@
 
     function performAction(action, args) {
       $.ajax({
-        url: '/actions',
+        url: '/games/<%= @game.id %>/actions',
         type: 'POST',
         data: { color: '<%= @current_player.color %>', data: JSON.stringify({ action: action, args: args }) }
       }).success(function(data, textStatus, jqXHR) {
@@ -56,7 +56,7 @@
         data[$(this).attr('name')] = $(this).val();
       });
       $.ajax({
-        url: '/messages',
+        url: '/games/<%= @game.id %>/messages',
         type: 'POST',
         data: data
       }).success(function(data, textStatus, jqXHR) {
@@ -134,7 +134,7 @@
       }
     });
 
-    ws = new WebSocket('ws://' + location.hostname + ':8080');
+    ws = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/' + '<%= @game.id %>');
 
     ws.onmessage = function(evt) {
       response = JSON.parse(evt.data);

@@ -1,10 +1,9 @@
 source "https://rubygems.org"
 
 gem 'sinatra'
-gem 'em-websocket'
-gem 'thin'
 gem 'faye-websocket'
 gem 'pry'
+gem 'puma'
 
 group :test do
   gem 'minitest'

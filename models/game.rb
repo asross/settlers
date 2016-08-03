@@ -23,12 +23,14 @@ class Game < Catan
   COLORS = %w(aqua gold lightcoral thistle azure lawngreen)
 
   attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable, :state
-  attr_reader :longest_road_player, :largest_army_player, :trade_requests, :discards_this_turn
+  attr_reader :longest_road_player, :largest_army_player, :trade_requests, :discards_this_turn, :id, :started_at
 
   def initialize(opts={})
     opts[:side_length] ||= 3
     opts[:n_players] ||= 3
 
+    @id = opts[:id] || SecureRandom.uuid
+    @started_at = Time.now
     @board = opts[:board] || Board.new(opts)
     @players = opts[:players] || COLORS.shuffle.take(opts[:n_players]).map do |c|
       Player.new(@board, c)
@@ -43,6 +45,7 @@ class Game < Catan
 
   def as_json
     {
+      id: id,
       board: @board.as_json,
       players: @players.map(&:as_json),
       messages: @messages,
@@ -58,6 +61,10 @@ class Game < Catan
 
   def points_to_win
     10
+  end
+
+  def over?
+    players.any?(&method(:winner?))
   end
 
   def winner?(player)

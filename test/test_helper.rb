@@ -17,7 +17,7 @@ class Minitest::Test
   end
 end
 
-Capybara.app = CatanServer
+Capybara.app = Catan::Server
 
 def raises(msg, &block)
   error = assert_raises(CatanError, &block)

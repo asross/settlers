@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <title>Settlers of Catan</title>
+    <%= erb :jquery %>
+    <%= erb :minimodal %>
+  </head>
+  <body>
+    <h1>Settlers of Catan</h1>
+    <%
+      modal = "
+        <form action='/new_game' id='new-game-form' method='post'>
+          Size <input type='number' min='2' max='13' width='100%' name='game[board_size]' placeholder='size' autocomplete='off' value='3'>
+          <br>
+          Players <input type='number' min='1' max='7' name='game[n_players]' placeholder='players' autocomplete='off' value='3'>
+          <br>
+          <input type='submit'>
+          <button class='minimodal-cancel'>Cancel</button>
+        </form>
+      "
+    %>
+    <a href='#' id='new-game' data-action='minimodal' data-html="<%= modal %>">New Game</a>
+    <h2>Games</h2>
+    <ul>
+      <% @games.each do |game| %>
+        <li>
+          <a href='/games/<%= game.id %>'>
+            Game started at <%= game.started_at %> (<%= game.players.length %> players, side-length <%= game.board.side_length %>)
+          </a>
+        </li>
+      <% end %>
+    </ul>
+  </body>
+</html>

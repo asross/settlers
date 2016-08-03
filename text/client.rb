@@ -1,5 +1,6 @@
-APP_URL = ENV['APP_URL'] || 'http://localhost:4567'
-WS_URL = ENV['WS_URL'] || 'ws://localhost:8080'
+APP_URL = ENV['APP_URL'] || 'http://0.0.0.0:4567'
+WS_URL = ENV['WS_URL'] || APP_URL.sub(/^http/, 'ws')
+GAME_ID = ENV['GAME_ID'] || fail("Must pass GAME_ID")
 
 require 'pry'
 require 'json'
@@ -26,14 +27,14 @@ def print_state(msg='')
 end
 
 def say(message, *)
-  Net::HTTP.post_form(URI("#{APP_URL}/messages"),
+  Net::HTTP.post_form(URI("#{APP_URL}/games/#{GAME_ID}/messages"),
     color: $color,
     message: message
   )
 end
 
 def _do(action, args=nil)
-  response = Net::HTTP.post_form(URI("#{APP_URL}/actions"),
+  response = Net::HTTP.post_form(URI("#{APP_URL}/games/#{GAME_ID}/actions"),
     color: $color,
     data: {
       'action' => action,
@@ -77,13 +78,9 @@ def game_loop
 end
 
 EM.run {
-  ws = Faye::WebSocket::Client.new(WS_URL)
+  ws = Faye::WebSocket::Client.new("#{WS_URL}/#{GAME_ID}")
 
-  ws.onopen = lambda do |event|
-    p [:open]
-  end
-
-  ws.onmessage = lambda do |event|
+  ws.on :message do |event|
     first_time = $game.nil?
     $game = DeepOpenStruct.new(JSON.parse(event.data).last['data'])
     $color ||= $game.players.map(&:color).sample
@@ -97,7 +94,7 @@ EM.run {
     end
   end
 
-  ws.onclose = lambda do |event|
+  ws.on :close do |event|
     p [:close, event.code, event.reason]
     ws = nil
   end

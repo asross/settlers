@@ -3,7 +3,9 @@
 <% div_class += ' winner' if @game.winner?(player) %>
 
 <div class='<%= div_class %>' data-color='<%= player.color %>'>
-  <span style='float: right;'><a href='/?color=<%= player.color %>'>be</a></span>
+  <% unless player == @current_player %>
+    <span style='float: right;'><a href='/games/<%= @game.id %>?color=<%= player.color %>'>be</a></span>
+  <% end %>
   <span class='name'><%= player.color %></span>
 
   <ul class='public-data clearfix'>
