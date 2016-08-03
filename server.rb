@@ -6,7 +6,7 @@ require 'faye/websocket'
 require_relative 'models/catan'
 Dir.glob('./models/*.rb').each { |f| require f }
 
-$games = {}
+$connections_by_game = {}
 
 class Catan
   class Server < Sinatra::Base
@@ -17,7 +17,7 @@ class Catan
     end
 
     get '/' do
-      @games = $games.keys
+      @games = $connections_by_game.keys
       erb :games
     end
 
@@ -27,33 +27,30 @@ class Catan
         side_length: new_game_param(:board_size),
         n_players: new_game_param(:n_players)
       )
-      $games[new_game] = []
-      redirect "/games/#{new_game.id}?color=#{new_game.players.sample.color}"
+      $connections_by_game[new_game] = []
+      redirect_to new_game
     end
 
     get '/games/:id' do
-      @game =  $games.keys.detect { |game| game.id == params['id'] }
-      redirect '/' unless @game
-      redirect "/games/#{@game.id}?color=#{@game.players.sample.color}" unless current_player
+      redirect '/' unless current_game
+      redirect_to current_game unless current_player
       erb :game
     end
 
     post '/games/:id/messages' do
-      @game = $games.keys.detect { |game| game.id == params['id'] }
-      @game.messages << [current_player.color, params['message']]
-      broadcast('message', html: erb(:messages), data: @game.as_json)
+      current_game.messages << [current_player.color, params['message']]
+      broadcast('message', html: erb(:messages), data: current_game.as_json)
     end
 
     post '/games/:id/actions' do
-      @game = $games.keys.detect { |game| game.id == params['id'] }
       data = params['data']
       data = JSON.parse(params['data']) if data.is_a?(String)
 
       begin
-        @game.perform_action(current_player, data['action'], data['args'])
-        broadcast('action', html: erb(:board), data: @game.as_json)
-        broadcast('message', html: erb(:messages), data: @game.as_json)
-        $games.delete(game) if @game.over?
+        current_game.perform_action(current_player, data['action'], data['args'])
+        broadcast('action', html: erb(:board), data: current_game.as_json)
+        broadcast('message', html: erb(:messages), data: current_game.as_json)
+        $connections_by_game.delete(current_game) if current_game.over?
         status 200
       rescue CatanError => e
         body e.message
@@ -61,13 +58,21 @@ class Catan
       end
     end
 
+    def redirect_to(game)
+      redirect "/games/#{game.id}?color=#{game.players.sample.color}"
+    end
+
+    def current_game
+      @game ||= $connections_by_game.keys.detect{|g| g.id == params['id'] }
+    end
+
     def current_player
-      @current_player ||= @game.players.detect{|p| p.color == params['color']}
+      @player ||= current_game && current_game.players.detect{|p| p.color == params['color']}
     end
 
     def broadcast(event, data)
       message = JSON.generate([event, data])
-      $games[@game].each do |ws|
+      $connections_by_game[current_game].each do |ws|
         ws.send(message) # TODO: customize message per color
       end
     end
@@ -91,13 +96,13 @@ class Catan
     def call(env)
       if Faye::WebSocket.websocket?(env)
         ws = Faye::WebSocket.new(env)
-        game = $games.keys.detect { |g| g.id == env['REQUEST_PATH'][UUID_REGEX] }
+        game = $connections_by_game.keys.detect { |g| g.id == env['REQUEST_PATH'][UUID_REGEX] }
         ws.on :open do |event|
-          $games[game] << ws
+          $connections_by_game[game] << ws
           ws.send(JSON.generate(['action', data: game.as_json]))
         end
         ws.on :close do |event|
-          $games[game].delete(ws)
+          $connections_by_game[game].delete(ws)
           ws = nil
         end
         ws.rack_response

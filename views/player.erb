@@ -3,7 +3,7 @@
 <% div_class += ' winner' if @game.winner?(player) %>
 
 <div class='<%= div_class %>' data-color='<%= player.color %>'>
-  <% unless player == @current_player %>
+  <% unless player == @player %>
     <span style='float: right;'><a href='/games/<%= @game.id %>?color=<%= player.color %>'>be</a></span>
   <% end %>
   <span class='name'><%= player.color %></span>

@@ -37,7 +37,7 @@
       $.ajax({
         url: '/games/<%= @game.id %>/actions',
         type: 'POST',
-        data: { color: '<%= @current_player.color %>', data: JSON.stringify({ action: action, args: args }) }
+        data: { color: '<%= @player.color %>', data: JSON.stringify({ action: action, args: args }) }
       }).success(function(data, textStatus, jqXHR) {
         <% if ENV['RELOAD_AFTER_ACTIONS'] %>
           window.location.reload(true);
