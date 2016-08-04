@@ -1,3 +1,5 @@
+require_relative './dev_card'
+
 class Game < Catan
   FREE_ROAD_STATES = [:start_turn2, :road_building1, :road_building2]
   OFF_TURN_ACTIONS = %w(discard accept_trade reject_trade)
