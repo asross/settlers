@@ -21,7 +21,7 @@ class Catan
       erb :games
     end
 
-    post '/new_game' do
+    post '/games' do
       new_game = Game.new(
         id: SecureRandom.uuid,
         side_length: new_game_param(:board_size),

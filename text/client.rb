@@ -1,4 +1,5 @@
-GAME_URL = ENV['GAME_URL'] || fail("must pass GAME_URL")
+game_url = ENV['GAME_URL'] || fail("must pass GAME_URL")
+GAME_URL = game_url.sub('localhost', '0.0.0.0')
 WS_URL = ENV['WS_URL'] || GAME_URL.sub(/^http/, 'ws')
 
 require 'pry'
