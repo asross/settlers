@@ -120,6 +120,11 @@
   body.build_road-select .road-marker {
     display: block;
   }
+  body.build_road-select .road-marker:hover,
+  body.build_settlement-select .city-marker:hover {
+    background: <%= @player.color %>;
+    opacity: 0.75;
+  }
   body.move_robber-select .hex:hover .tile {
     cursor: pointer;
     background-color: #ccc;
@@ -141,9 +146,6 @@
       display: block;
     }
   <% end %>
-  .hex.hover .tile {
-    background-color: #ccc;
-  }
   .water {
     background-color: <%= watercolor %>;
   }

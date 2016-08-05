@@ -11,23 +11,23 @@
   <ul class='public-data clearfix'>
     <% if player.resource_cards.count > 0 %>
       <li class='public-datum'>
-        <img class='public-data-image' src="images/resource_card.png">x<%= player.resource_cards.count %>&nbsp;
+        <img class='public-data-image' src="/images/resource_card.png">x<%= player.resource_cards.count %>&nbsp;
       </li>
     <% end %>
     <% if (dev_cards = player.development_cards.count(&:unplayed?)) > 0 %>
       <li class='public-datum'>
-        <img class='public-data-image' src="images/dev_card.png">x<%= dev_cards %>&nbsp;
+        <img class='public-data-image' src="/images/dev_card.png">x<%= dev_cards %>&nbsp;
       </li>
     <% end %>
     <% if player.knights_played > 0 %>
       <li>
-        <img class='public-data-image' src="images/knight.png">x<%= player.knights_played %>&nbsp;
+        <img class='public-data-image' src="/images/knight.png">x<%= player.knights_played %>&nbsp;
       </li>
     <% end %>
     <% vps = player.development_cards.count(&:victory_point?) %>
     <% if @game.winner?(player) && vps > 0 %>
       <li>
-        <img class='public-data-image' src="images/victory_point.png">x<%= vps %>&nbsp;
+        <img class='public-data-image' src="/images/victory_point.png">x<%= vps %>&nbsp;
       </li>
     <% end %>
     <% if player == @game.longest_road_player %>
