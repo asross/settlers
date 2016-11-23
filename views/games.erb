@@ -3,9 +3,53 @@
     <title>Settlers of Catan</title>
     <%= erb :jquery %>
     <%= erb :minimodal %>
+    <style>
+      .cf:before, .cf:after {
+        content: " ";
+        display: table;
+      }
+      .cf:after {
+        clear: both;
+      }
+      body {
+        background: url(images/catanbox.jpg);
+        background-size: cover;
+        font-family: Helvetica;
+      }
+      body, h1 {
+        margin: 0;
+      }
+      a {
+        font-weight: bold;
+      }
+      a:hover {
+        font-weight: bolder;
+      }
+      td {
+        text-align: right;
+      }
+      .game-list-wrapper {
+        background: #ccc;
+        border: 5px solid gold;
+        box-shadow: 1px 1px black;
+        margin: 0 auto;
+        width: 33vw;
+        margin-top: 20vh;
+        max-height: 60vh;
+        overflow-y: scroll;
+        padding: 1em;
+      }
+      button, input {
+        cursor: pointer;
+      }
+      td, th {
+        padding: 5px;
+        text-align: left;
+        border-bottom: 1px solid;
+      }
+    </style>
   </head>
   <body>
-    <h1>Settlers of Catan</h1>
     <%
       modal = "
         <form action='/games' id='new-game-form' method='post'>
@@ -18,16 +62,35 @@
         </form>
       "
     %>
-    <a href='#' id='new-game' data-action='minimodal' data-html="<%= modal %>">New Game</a>
-    <h2>Games</h2>
-    <ul>
-      <% @games.each do |game| %>
-        <li>
-          <a href='/games/<%= game.id %>'>
-            Game started at <%= game.started_at %> (<%= game.players.length %> players, side-length <%= game.board.side_length %>)
-          </a>
-        </li>
-      <% end %>
-    </ul>
+    <div class='box'>
+    </div>
+    <div class='game-list-wrapper'>
+    <% if @games.length > 0 %>
+      <h1>Active Games</h1>
+      <br>
+      <table>
+        <thead>
+          <tr>
+            <th>Game</th>
+            <th>Started at</th>
+            <th>Players</th>
+            <th>Board Size</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @games.each do |game| %>
+            <tr>
+              <td><a href='/games/<%= game.id %>'>Join</a></td>
+              <td><%= game.started_at.strftime('%r') %></td>
+              <td><%= game.players.length %></td>
+              <td><%= game.board.side_length %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <br>
+    <% end %>
+    <button id='new-game' data-action='minimodal' data-html="<%= modal %>">New Game</button>
+    </div>
   </body>
 </html>
