@@ -5,7 +5,7 @@
     if (!window.minimodals[this]) {
       modal = $("<div class='minimodal'>" + $(this).data('html') + "</div>")
       modal.css('position', 'absolute');
-      modal.css('top', $(this).offset().top + $(this).height());
+      modal.css('top', $(this).offset().top + $(this).outerHeight());
       modal.css('left', $(this).offset().left);
       that = this;
       modal.find('.minimodal-cancel').click(function(e) {
@@ -32,5 +32,6 @@
     background-color: #fff;
     padding: 5px;
     border: 1px solid #ddd;
+    font-size: small;
   }
 </style>

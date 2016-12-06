@@ -13,7 +13,10 @@
   body {
     margin: 0;
     background-color: #ccc;
-    font-family: Helvetica;
+    font-family: monospace;
+  }
+  button, input {
+    font-family: monospace;
   }
   .resource-list li {
     display: inline-block;
@@ -25,6 +28,8 @@
   }
   .resource-image-wrapper img {
     width: <%= dev_card_width %>px;
+    border: 1px solid #555;
+    border-radius: 2px;
   }
   #players .player .name {
     float: left;
@@ -37,6 +42,8 @@
   }
   .public-data .public-data-image {
     width: <%= dev_card_width/2.0 %>px;
+    border: 1px solid white;
+    border-radius: 1px;
   }
   #text-instructions {
     padding: 1em;
@@ -56,7 +63,7 @@
   #back-link {
     position: absolute;
     top: 1em;
-    left: <%= total_hex_width - 90 %>px;
+    left: <%= total_hex_width - 110 %>px;
   }
   #last-roll {
     margin: 0.5em;

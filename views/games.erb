@@ -14,7 +14,7 @@
       body {
         background: url(images/catanbox.jpg);
         background-size: cover;
-        font-family: Helvetica;
+        font-family: monospace;
       }
       body, h1 {
         margin: 0;
@@ -28,8 +28,11 @@
       td {
         text-align: right;
       }
+      button, input {
+        background: beige;
+      }
       .game-list-wrapper {
-        background: #ccc;
+        background: burlywood;
         border: 5px solid gold;
         box-shadow: 1px 1px black;
         margin: 0 auto;
@@ -41,6 +44,7 @@
       }
       button, input {
         cursor: pointer;
+        font-family: monospace;
       }
       td, th {
         padding: 5px;
@@ -62,12 +66,10 @@
         </form>
       "
     %>
-    <div class='box'>
-    </div>
     <div class='game-list-wrapper'>
+    <h1>Active Games</h1>
+    <br>
     <% if @games.length > 0 %>
-      <h1>Active Games</h1>
-      <br>
       <table>
         <thead>
           <tr>
@@ -88,6 +90,10 @@
           <% end %>
         </tbody>
       </table>
+      <br>
+    <% else %>
+      None
+      <br>
       <br>
     <% end %>
     <button id='new-game' data-action='minimodal' data-html="<%= modal %>">New Game</button>
