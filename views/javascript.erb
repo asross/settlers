@@ -137,7 +137,12 @@
     function connect() {
       var ws = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/' + '<%= @game.id %>');
 
+      ws.onopen = function() {
+        console.log('Socket opened');
+      };
+
       ws.onmessage = function(evt) {
+        console.log('Socket message');
         response = JSON.parse(evt.data);
         event = response[0];
         data = response[1];
@@ -149,8 +154,8 @@
         fixChatHeight();
       };
 
-      ws.onclose = function(e) {
-        console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+      ws.onclose = function() {
+        console.log('Socket closed');
         setTimeout(function() {
           connect();
         }, 1000);
