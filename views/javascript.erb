@@ -63,8 +63,8 @@
         <% if ENV['RELOAD_AFTER_ACTIONS'] %>
           window.location.reload(true);
         <% end %>
-        form.find('input[type="text"]').val('');
       });
+      form.find('input[type="text"]').val('');
       return false;
     });
 
@@ -134,18 +134,29 @@
       }
     });
 
-    ws = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/' + '<%= @game.id %>');
+    function connect() {
+      var ws = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/' + '<%= @game.id %>');
 
-    ws.onmessage = function(evt) {
-      response = JSON.parse(evt.data);
-      event = response[0];
-      data = response[1];
-      if (event == 'action') {
-        $('#board').html(data.html);
-      } else if (event == 'message') {
-        $('#message-area').html(data.html);
-      }
-      fixChatHeight();
+      ws.onmessage = function(evt) {
+        response = JSON.parse(evt.data);
+        event = response[0];
+        data = response[1];
+        if (event == 'action') {
+          $('#board').html(data.html);
+        } else if (event == 'message') {
+          $('#message-area').html(data.html);
+        }
+        fixChatHeight();
+      };
+
+      ws.onclose = function(e) {
+        console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+        setTimeout(function() {
+          connect();
+        }, 1000);
+      };
     }
+
+    connect();
   });
 </script>

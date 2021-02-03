@@ -7,6 +7,7 @@
 
 <div id='last-roll'> <%= @game.last_roll %> </div>
 <a href='/' id='back-link'>Back to list</a>
+<a href='#' id='legend' data-action='minimodal' data-html="<%= erb :legend %>">Legend</a>
 
 <div id='hexes'>
 <% @game.board.hexes.flatten.each do |hex| %>

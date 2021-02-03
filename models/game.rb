@@ -123,7 +123,31 @@ class Game < Catan
   def message_for(player, action, args)
     case action
     when "request_trade"
-      "#{player.color} offered their #{args[1]} for #{args[0]}'s #{args[2]}"
+      r1 = args[1].size > 0 ? args[1].join("+") : 'friendship'
+      r2 = args[2].size > 0 ? args[2].join("+") : 'friendship'
+      "#{player.color} offered their #{r1} for #{args[0]}'s #{r2}"
+    when "cancel_trade"
+      "#{player.color} revoked their offer!"
+    when "accept_trade"
+      "#{player.color} accepted the offer!"
+    when "discard"
+      "#{player.color} had to discard #{args.size} cards :("
+    when /^build_[a-z]+$/
+      "#{player.color} built a #{action.split("_")[1]}!"
+    when "move_robber"
+      "#{player.color} moved the robber!"
+    when "rob_player"
+      "#{player.color} stole from #{args}!"
+    when "monopoly", "knight", "year_of_plenty", "road_building"
+      "#{player.color} played #{action.gsub("_", " ")}!"
+    when "buy_development_card"
+      "#{player.color} bought a dev card!"
+    when "trade_in"
+      "#{player.color} traded in #{args[0]} for #{args[1]}!"
+    when "pass_turn"
+      "#{player.color} passed the turn to #{active_player.color}!"
+    when "roll"
+      "#{player.color} rolled a #{@last_roll}!"
     else
       "#{player.color} performed #{action}!"
     end

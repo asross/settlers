@@ -1,0 +1,19 @@
+<ul class='legend'>
+  <% %w(wood brick ore wheat sheep water desert).each do |hex_type| %>
+    <li><span class='<%= hex_type %>'>&nbsp;&nbsp;</span> = <%= hex_type %></li>
+  <% end %>
+  <li><strong>&nbsp;r</strong> = robber</li>
+  <li><hr></li>
+
+  <% { road: %w(wood brick), settlement: %w(wood brick wheat sheep), city: %w(ore ore ore wheat wheat), dev_card: %w(ore wheat sheep) }.each do |item, cost| %>
+    <li>
+      <% cost.each do |resource| %>
+        <span class='<%= resource %>'>&nbsp;&nbsp;</span>
+      <% end %>
+      = <%= item.to_s.sub('_', ' ') %>
+    </li>
+  <% end %>
+  <li><hr></li>
+  <li><a href='#' class='minimodal-cancel'>back</a></li>
+</ul>
+

@@ -84,6 +84,7 @@ EM.run {
     first_time = $game.nil?
     $game = DeepOpenStruct.new(JSON.parse(event.data).last['data'])
     $color ||= $game.players.map(&:color).sample
+    set_completions(%w(say do be) + $game.players.map(&:color) + $game.available_actions[$color])
 
     print_state
 

@@ -65,6 +65,11 @@
     top: 1em;
     left: <%= total_hex_width - 110 %>px;
   }
+  #legend {
+    position: absolute;
+    top: 2rem;
+    left: <%= total_hex_width - 64 %>px;
+  }
   #last-roll {
     margin: 0.5em;
     font-size: 2em;
@@ -174,6 +179,15 @@
   }
   .desert {
     background-color: moccasin;
+  }
+  .legend {
+    font-size: 13px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .legend li:not(:last-child) {
+    margin-bottom: 5px;
   }
   .tile.first {
     -webkit-transform: rotateZ(60deg);
