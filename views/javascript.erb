@@ -39,9 +39,7 @@
         type: 'POST',
         data: { color: '<%= @player.color %>', data: JSON.stringify({ action: action, args: args }) }
       }).success(function(data, textStatus, jqXHR) {
-        <% if ENV['RELOAD_AFTER_ACTIONS'] %>
-          window.location.reload(true);
-        <% end %>
+        $('#board').html(data);
         $('body').removeClass();
       }).error(function(jqXHR, textStatus, errorThrown) {
         console.log(jqXHR.responseText);
@@ -60,9 +58,7 @@
         type: 'POST',
         data: data
       }).success(function(data, textStatus, jqXHR) {
-        <% if ENV['RELOAD_AFTER_ACTIONS'] %>
-          window.location.reload(true);
-        <% end %>
+        $('#message-area').html(data);
       });
       form.find('input[type="text"]').val('');
       return false;
@@ -134,15 +130,30 @@
       }
     });
 
-    function connect() {
+    function pollBoard() {
+      $.ajax({
+        url: '/games/<%= @game.id %>/board',
+        type: 'GET'
+      }).success(function(data, textStatus, jqXHR) {
+        if ($('body').attr('class').length == 0) {
+          $('#board').html(data);
+        }
+      });
+    }
+
+    setInterval(pollBoard, 1000);
+
+    function hotSocket() {
       var ws = new WebSocket(location.protocol.replace('http', 'ws') + '//' + location.host + '/' + '<%= @game.id %>');
 
-      ws.onopen = function() {
+      ws.onopen = function(d) {
         console.log('Socket opened');
+        console.log(d);
       };
 
       ws.onmessage = function(evt) {
         console.log('Socket message');
+        console.log(evt);
         response = JSON.parse(evt.data);
         event = response[0];
         data = response[1];
@@ -154,14 +165,17 @@
         fixChatHeight();
       };
 
+      ws.onerror = function(e) {
+        console.log('Socket error');
+        console.log(e);
+      }
+
       ws.onclose = function() {
         console.log('Socket closed');
-        setTimeout(function() {
-          connect();
-        }, 1000);
+        setTimeout(hotSocket, 1000);
       };
     }
 
-    connect();
+    hotSocket();
   });
 </script>

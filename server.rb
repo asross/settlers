@@ -37,9 +37,16 @@ class Catan
       erb :game
     end
 
+    get '/games/:id/board' do
+      redirect '/' unless current_game
+      redirect_to current_game unless current_player
+      erb :board
+    end
+
     post '/games/:id/messages' do
       current_game.messages << [current_player.color, params['message']]
       broadcast('message', html: erb(:messages), data: current_game.as_json)
+      erb :messages
     end
 
     post '/games/:id/actions' do
@@ -52,6 +59,7 @@ class Catan
         broadcast('message', html: erb(:messages), data: current_game.as_json)
         $connections_by_game.delete(current_game) if current_game.over?
         status 200
+        erb :board
       rescue CatanError => e
         body e.message
         status 400
