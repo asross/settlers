@@ -132,7 +132,7 @@
 
     function pollBoard() {
       $.ajax({
-        url: '/games/<%= @game.id %>/board',
+        url: '/games/<%= @game.id %>/board?color=<%= @player.color %>',
         type: 'GET'
       }).success(function(data, textStatus, jqXHR) {
         if ($('body').attr('class').length == 0) {
