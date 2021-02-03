@@ -4,6 +4,7 @@ gem 'sinatra'
 gem 'faye-websocket'
 gem 'pry'
 gem 'puma'
+gem 'rb-readline'
 
 group :test do
   gem 'minitest'
