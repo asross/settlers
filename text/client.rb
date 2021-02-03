@@ -1,6 +1,9 @@
-game_url = ENV['GAME_URL'] || fail("must pass GAME_URL")
+game_url = ENV['HOST'] || fail("must pass HOST")
 GAME_URL = game_url.sub('localhost', '0.0.0.0')
 WS_URL = ENV['WS_URL'] || GAME_URL.sub(/^http/, 'ws')
+if ENV['PLAYER'].to_s.length > 0
+  $color = ENV['PLAYER']
+end
 
 require 'pry'
 require 'json'
@@ -26,10 +29,10 @@ def print_state(msg='')
   puts "available actions: #{$game.available_actions[$color]}"
 end
 
-def say(message, *)
+def say(*msg_parts)
   Net::HTTP.post_form(URI("#{GAME_URL}/messages"),
     color: $color,
-    message: message
+    message: msg_parts.join(' ')
   )
 end
 
