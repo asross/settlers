@@ -16,7 +16,7 @@
     <%= erb :city, layout: false, locals: { coords: [topleft, top, here] } %>
   </div>
   <% if hex.robbed %>
-    <div class='number robbed'> r </div>
+    <div class='number robbed' title='<%= hex.number if hex.type != 'desert' %>'> r </div>
   <% elsif hex.port? %>
     <div class='port <%= hex.port_direction %>'>
       <div class='label'><%= hex.port_type %></div>
