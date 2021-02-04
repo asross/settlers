@@ -40,6 +40,7 @@
         data: { color: '<%= @player.color %>', data: JSON.stringify({ action: action, args: args }) }
       }).success(function(data, textStatus, jqXHR) {
         $('#board').html(data);
+        fixChatHeight();
         $('body').removeClass();
       }).error(function(jqXHR, textStatus, errorThrown) {
         console.log(jqXHR.responseText);
@@ -59,6 +60,7 @@
         data: data
       }).success(function(data, textStatus, jqXHR) {
         $('#message-area').html(data);
+        fixChatHeight();
       });
       form.find('input[type="text"]').val('');
       return false;
@@ -137,6 +139,7 @@
       }).success(function(data, textStatus, jqXHR) {
         if ($('body').attr('class').length == 0) {
           $('#board').html(data);
+          fixChatHeight();
         }
       });
     }
