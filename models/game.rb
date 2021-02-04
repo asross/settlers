@@ -25,7 +25,7 @@ class Game < Catan
   COLORS = %w(aqua gold lightcoral thistle azure lawngreen)
 
   attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable, :state
-  attr_reader :longest_road_player, :largest_army_player, :trade_requests, :discards_this_turn, :id, :started_at
+  attr_reader :longest_road_player, :largest_army_player, :trade_requests, :discards_this_turn, :id, :started_at, :action_count
 
   def initialize(opts={})
     opts[:side_length] ||= 3
@@ -39,6 +39,7 @@ class Game < Catan
     end
 
     @turn = 0
+    @action_count = 0
     @messages = []
     @state = :start_turn1
     @trade_requests = {}
@@ -57,6 +58,7 @@ class Game < Catan
       longest_road_player: @longest_road_player,
       largest_army_player: @largest_army_player,
       active_player: active_player.color,
+      action_count: @action_count,
       turn: @turn
     }
   end
@@ -116,6 +118,7 @@ class Game < Catan
     send(action, player, *args)
 
     @messages << message_for(player, action, args) #"#{player.color} performed #{action}!"
+    @action_count += 1
   end
 
   private

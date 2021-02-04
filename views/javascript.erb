@@ -4,6 +4,9 @@
   $(document).ready(function() {
     // Display latest messages first
 
+    var numMessages = <%= @game.messages.size %>;
+    var numActions = <%= @game.action_count %>;
+
     function fixChatHeight() {
       chat = document.getElementById('message-area');
       chatTop = $(chat).offset().top;
@@ -39,8 +42,13 @@
         type: 'POST',
         data: { color: '<%= @player.color %>', data: JSON.stringify({ action: action, args: args }) }
       }).success(function(data, textStatus, jqXHR) {
-        $('#board').html(data);
-        fixChatHeight();
+        var json = JSON.parse(data);
+        $('#board').html(json.html);
+        if (json.data.messages.length > numMessages) {
+          fixChatHeight();
+        }
+        numMessages = json.data.messages.length;
+        numActions = json.data.action_count;
         $('body').removeClass();
       }).error(function(jqXHR, textStatus, errorThrown) {
         console.log(jqXHR.responseText);
@@ -137,9 +145,16 @@
         url: '/games/<%= @game.id %>/board?color=<%= @player.color %>',
         type: 'GET'
       }).success(function(data, textStatus, jqXHR) {
+        var json = JSON.parse(data);
         if ($('body').attr('class').length == 0) {
-          $('#board').html(data);
-          fixChatHeight();
+          if (json.data.action_count > numActions) {
+            $('#board').html(json.html);
+          }
+          if (json.data.messages.length > numMessages) {
+            fixChatHeight();
+          }
+          numMessages = json.data.messages.length;
+          numActions = json.data.action_count;
         }
       });
     }

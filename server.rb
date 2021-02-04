@@ -40,7 +40,7 @@ class Catan
     get '/games/:id/board' do
       redirect '/' unless current_game
       redirect_to current_game unless current_player
-      erb :board
+      { html: erb(:board), data: current_game.as_json }.to_json
     end
 
     post '/games/:id/messages' do
@@ -55,11 +55,13 @@ class Catan
 
       begin
         current_game.perform_action(current_player, data['action'], data['args'])
-        broadcast('action', html: erb(:board), data: current_game.as_json)
-        broadcast('message', html: erb(:messages), data: current_game.as_json)
-        $connections_by_game.delete(current_game) if current_game.over?
+        game_json = current_game.as_json
+        board_html = erb(:board)
+        message_html = erb(:messages)
+        broadcast('action', html: board_html, data: game_json)
+        broadcast('message', html: message_html, data: game_json)
         status 200
-        erb :board
+        { html: board_html, data: game_json }.to_json
       rescue CatanError => e
         body e.message
         status 400
