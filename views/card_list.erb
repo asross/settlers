@@ -6,6 +6,11 @@
           <img src='/images/<%= card_type %>.png'>
         </div>
       <% end %>
+      <% if n >= 4 %>
+        <div class='resource-image-wrapper resource-count'>
+          x<%= n %>
+        </div>
+      <% end %>
     </li>
   <% end %>
 </ul>
