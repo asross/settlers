@@ -5,10 +5,12 @@
 <% points = player.points - (@game.winner?(player) ? 0 : vps) + (player == @game.longest_road_player ? 2 : 0) + (player == @game.largest_army_player ? 2 : 0) %>
 
 <div class='<%= div_class %>' data-color='<%= player.color %>'>
-  <% unless player == @player %>
+  <% if player == @player %>
+    <span class='name' title="It's you! You've got <%= points + vps %> victory points<%= ", but only #{points} are visible to others" if vps > 0 %>!"><%= player.color %> (<%= points %>)</span>
+  <% else %>
+    <span class='name' title="This is <%= player.color %>. They have (at least) <%= points %> victory points!"><%= player.color %> (<%= points %>)</span>
     <span style='float: right;'><a href='/games/<%= @game.id %>?color=<%= player.color %>'>be</a></span>
   <% end %>
-  <span class='name'><%= player.color %> (<%= points %>)</span>
 
   <ul class='public-data clearfix'>
     <% if player.resource_cards.count > 0 %>
@@ -22,7 +24,7 @@
       </li>
     <% end %>
     <% if player.knights_played > 0 %>
-      <li>
+      <li title="<%= player.color %> has played <%= player.knights_played %> knight(s) so far this game.">
         <img class='public-data-image' src="/images/knight.png">x<%= player.knights_played %>&nbsp;
       </li>
     <% end %>
@@ -32,10 +34,10 @@
       </li>
     <% end %>
     <% if player == @game.longest_road_player %>
-      <li>LR</li>
+      <li title="<%= player.color %> has a built a road path of length <%= player.road_length %>, giving them Longest Road and 2 points.">LR</li>
     <% end %>
     <% if player == @game.largest_army_player %>
-      <li>LA</li>
+      <li title="<%= player.color %> has played <%= player.knights_played %> knights, giving them Largest Army and 2 points.">LA</li>
     <% end %>
   </ul>
 
@@ -48,7 +50,7 @@
         <% cards.sort_by(&:type).each do |card| %>
           <% klass = "dev-card #{card.type}" %>
           <% klass += ' new' if card.turn_purchased == @game.turn && card.type != :victory_point %>
-          <li class='<%= klass %>'><%= card.type.to_s.gsub('_', ' ') %></li>
+          <li class='<%= klass %>' title="<%= DevCard::DESCS[card.type] %>"><%= card.type.to_s.gsub('_', ' ') %></li>
         <% end %>
       </ul>
     <% end %>

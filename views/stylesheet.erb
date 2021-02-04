@@ -15,6 +15,9 @@
     background-color: #ccc;
     font-family: monospace;
   }
+  *[title] {
+    cursor: help;
+  }
   button, input {
     font-family: monospace;
   }
@@ -166,7 +169,7 @@
   body.rob_player-select .player:not(.active) .name {
     text-decoration: underline;
     color: #2518b5;
-    cursor: pointer;
+    cursor: pointer !important;
     animation: blinker 1s linear infinite;
   }
   @keyframes blinker {
@@ -210,7 +213,7 @@
     margin: 0;
     padding: 0;
   }
-  .legend li:not(:last-child) {
+  .legend li:not(:last-child):not(.probability) {
     margin-bottom: 5px;
   }
   .tile.first {

@@ -366,18 +366,22 @@ class Game < Catan
   end
 
   def can_build_settlement?(player)
+    return false unless player.remaining_settlement_count > 0
     round <= 1 || player.has_resources?(%w(wheat brick sheep wood))
   end
 
   def can_build_road?(player)
+    return false unless player.remaining_road_count > 0
     FREE_ROAD_STATES.include?(state) || player.has_resources?(%w(wood brick))
   end
 
   def can_buy_development_card?(player)
+    return false unless player.remaining_dev_card_count > 0
     player.has_resources?(%w(sheep ore wheat))
   end
 
   def can_build_city?(player)
+    return false unless player.remaining_city_count > 0
     player.has_resources?(%w(wheat wheat ore ore ore))
   end
 

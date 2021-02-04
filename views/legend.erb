@@ -10,10 +10,17 @@
       <% cost.each do |resource| %>
         <span class='<%= resource %>'>&nbsp;&nbsp;</span>
       <% end %>
-      = <%= item.to_s.sub('_', ' ') %>
+      = <%= item.to_s.sub('_', ' ') %> (<%= @player.send("remaining_#{item}_count") %> left)
     </li>
   <% end %>
   <li><hr></li>
-  <li><a href='#' class='minimodal-cancel'>back</a></li>
+
+  <% (2..6).each do |roll| %>
+    <li class='probability'>p(<%= roll %>) = p(<%= 7 + (7-roll) %>) = <%= roll-1 %>/36 &#8773; <%= (100 * (roll-1)/36.0).round(1) %>%
+  <% end %>
+  <li class='probability'>p(7) = 6/36 &#8773; <%= (100 * 6/36.0).round(1) %>%
+
+  <li><hr></li>
+  <li><a href='#' class='minimodal-cancel'>close</a></li>
 </ul>
 

@@ -1,6 +1,7 @@
 class Player < Catan
   RESOURCE_CARDS = %w(brick wood sheep wheat ore)
   MAX_ROADS = 15
+  MAX_CITIES = 4
   MAX_SETTLEMENTS = 5
   attr_accessor *RESOURCE_CARDS, :color, :board, :development_cards
   
@@ -89,7 +90,7 @@ class Player < Catan
   end
 
   def build_settlement(hex1, hex2, hex3, turn1=false, turn2=false)
-    error 'Already built 5 settlements' if settlements.count >= MAX_SETTLEMENTS
+    error "Already built #{MAX_SETTLEMENTS} settlements" if settlements.count >= MAX_SETTLEMENTS
     error 'Too close to existing settlement/city' if board.settlement_near?(hex1, hex2, hex3)
     error 'Hexes are not adjacent' unless [hex1, hex2, hex3].combination(2).all?{|h1, h2| h1.adjacent?(h2) }
     error "Can't build on water" if [hex1, hex2, hex3].all? { |h| h.type == 'water' }
@@ -111,7 +112,7 @@ class Player < Catan
   end
 
   def build_road(hex1, hex2, road_is_free=false)
-    error 'Already built 15 roads' if roads.count >= MAX_ROADS
+    error "Already built #{MAX_ROADS} roads" if roads.count >= MAX_ROADS
     error 'Road not buildable there' unless board.road_buildable_at?(hex1, hex2, color)
     error 'Not enough resources to build road' unless road_is_free || (wood >= 1 && brick >= 1)
     error "Can't build on water" if [hex1, hex2].all? { |h| h.type == 'water' }
@@ -123,11 +124,28 @@ class Player < Catan
   end
 
   def build_city(hex1, hex2, hex3)
+    error "Already built #{MAX_CITIES} cities" if cities.count >= MAX_CITIES
     error 'No settlement at location' unless board.settlement_at?(hex1, hex2, hex3, color, true)
     error 'Not enough resources to build city' unless ore >= 3 && wheat >= 2
     board.settlement_at(hex1, hex2, hex3).size = 2
     @wheat -= 2
     @ore -= 3
+  end
+
+  def remaining_settlement_count
+    MAX_SETTLEMENTS - settlements.size
+  end
+
+  def remaining_city_count
+    MAX_CITIES - cities.size
+  end
+
+  def remaining_road_count
+    MAX_ROADS - roads.size
+  end
+
+  def remaining_dev_card_count
+    board.development_cards.size
   end
 
   def buy_development_card

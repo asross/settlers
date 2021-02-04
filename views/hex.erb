@@ -19,7 +19,11 @@
     <div class='number robbed' title='<%= hex.number if hex.type != 'desert' %>'> r </div>
   <% elsif hex.port? %>
     <div class='port <%= hex.port_direction %>'>
-      <div class='label'><%= hex.port_type %></div>
+      <% if hex.port_type == '3:1' %>
+        <div class='label' title='This is a 3:1 port. Building a settlement next to it lets you trade any 3 of the same resource for 1 of any other.'><%= hex.port_type %></div>
+      <% else %>
+        <div class='label' title='This is a <%= hex.port_type %> port. Building a settlement next to it lets you trade 2 <%= hex.port_type %> for 1 of any other resource.'><%= hex.port_type %></div>
+      <% end %>
     </div>
   <% else %>
     <div class='number'><%= hex.number %></div>
