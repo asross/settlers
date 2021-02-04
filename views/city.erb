@@ -4,6 +4,6 @@
   <% elsif settlement.size == 2 %>
     <div class='city' data-color='<%= settlement.color %>'></div>
   <% end %>
-<% else %>
+<% elsif @game.board.any_land?(coords) %>
   <div class='city-marker' data-coords='<%= coords %>'></div>
 <% end %>

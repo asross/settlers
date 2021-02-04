@@ -12,6 +12,10 @@ class Board < Catan
         (i+j).between?(l+1, l*3-1)
   end
 
+  def any_land?(coords)
+    coords.any? { |i,j| on_island?(i,j) }
+  end
+
   def sorted_edge_pairs
     @sorted_edge_pairs ||= begin
       edge_pairs = \

@@ -92,6 +92,7 @@ class Player < Catan
     error 'Already built 5 settlements' if settlements.count >= MAX_SETTLEMENTS
     error 'Too close to existing settlement/city' if board.settlement_near?(hex1, hex2, hex3)
     error 'Hexes are not adjacent' unless [hex1, hex2, hex3].combination(2).all?{|h1, h2| h1.adjacent?(h2) }
+    error "Can't build on water" if [hex1, hex2, hex3].all? { |h| h.type == 'water' }
     unless turn1 || turn2
       error 'No road leading to settlement' unless board.road_to?(hex1, hex2, hex3, color)
       error 'Not enough resources to build settlement' unless [sheep, wheat, brick, wood].all?{|r| r >= 1}
@@ -113,6 +114,7 @@ class Player < Catan
     error 'Already built 15 roads' if roads.count >= MAX_ROADS
     error 'Road not buildable there' unless board.road_buildable_at?(hex1, hex2, color)
     error 'Not enough resources to build road' unless road_is_free || (wood >= 1 && brick >= 1)
+    error "Can't build on water" if [hex1, hex2].all? { |h| h.type == 'water' }
     board.roads << Road.new(hex1, hex2, color)
     unless road_is_free
       @brick -= 1

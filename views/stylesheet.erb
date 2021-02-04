@@ -131,18 +131,32 @@
   body.build_settlement-select .city-marker {
     display: block;
   }
+  body.build_city-select .settlement {
+    opacity: 0.25;
+  }
   body.build_city-select .settlement:hover {
     cursor: pointer;
+    opacity: 0.75;
   }
   body.build_road-select .road-marker {
     display: block;
+  }
+  body.build_road-select .road-marker,
+  body.build_settlement-select .city-marker {
+    background: <%= @player.color %>;
+    opacity: 0.25;
   }
   body.build_road-select .road-marker:hover,
   body.build_settlement-select .city-marker:hover {
     background: <%= @player.color %>;
     opacity: 0.75;
   }
-  body.move_robber-select .hex:hover .tile {
+  body.move_robber-select .hex .tile:not(.water) {
+    box-shadow: 
+      inset 0px 11px 1px -10px #CCC,
+      inset 0px -11px 1px -10px #CCC; 
+  }
+  body.move_robber-select .hex:hover .tile:not(.water) {
     cursor: pointer;
     background-color: #ccc;
   }
@@ -153,6 +167,12 @@
     text-decoration: underline;
     color: #2518b5;
     cursor: pointer;
+    animation: blinker 1s linear infinite;
+  }
+  @keyframes blinker {
+    50% {
+      opacity: 0;
+    }
   }
   .widget {
     margin-top: 1em;

@@ -1,5 +1,5 @@
 <% if road = @game.board.road_at(*coords.map{|c| @game.send(:h, *c) }) %>
   <div class='road <%= klass %>' data-color='<%= road.color %>'></div>
-<% else %>
+<% elsif @game.board.any_land?(coords) %>
   <div class='road-marker <%= klass %>' data-coords='<%= coords %>'></div>
 <% end %>
