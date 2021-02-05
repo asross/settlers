@@ -16,7 +16,11 @@
     <%= erb :city, layout: false, locals: { coords: [topleft, top, here] } %>
   </div>
   <% if hex.robbed %>
-    <div class='number robbed' title='<%= hex.number if hex.type != 'desert' %>'> r </div>
+    <% if hex.type == 'desert' %>
+      <div class='number robbed' title='This is the robber, hanging out in the desert. When a 7 is rolled or a knight is played, the robber can be moved to another hex, where it will block resource production (and potentially allow the mover to steal a resource).'> r </div>
+    <% else %>
+      <div class='number robbed' title='The robber is currently preventing this hex from producing resources when a <%= hex.number %> is rolled.'> r </div>
+    <% end %>
   <% elsif hex.port? %>
     <div class='port <%= hex.port_direction %>'>
       <% if hex.port_type == '3:1' %>
