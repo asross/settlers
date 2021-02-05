@@ -150,7 +150,11 @@ class Game < Catan
     when "pass_turn"
       "#{player.color} passed the turn to #{active_player.color}!"
     when "roll"
-      "#{player.color} rolled a #{@last_roll}!"
+      if @last_roll == 7 && @state == :discard
+        "#{player.color} rolled a #{@last_roll}! #{players_with_many_cards.map(&:color).join(' and ')} must discard..."
+      else
+        "#{player.color} rolled a #{@last_roll}!"
+      end
     else
       "#{player.color} performed #{action}!"
     end
@@ -160,11 +164,15 @@ class Game < Catan
     2 + rand(6) + rand(6)
   end
 
+  def players_with_many_cards
+    players.select?{|p| p.resource_cards.count > 7}
+  end
+
   def roll(player)
     @last_roll = random_dieroll
     @board.rolled(@last_roll)
     if @last_roll == 7
-      if players.any?{|p| p.resource_cards.count > 7}
+      if players_with_many_cards.any?
         @state = :discard
       else
         @state = :robbing1
