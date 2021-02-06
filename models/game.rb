@@ -25,17 +25,19 @@ class Game < Catan
   COLORS = %w(aqua gold lightcoral thistle azure lawngreen)
 
   attr_accessor :messages, :board, :players, :turn, :last_roll, :robbable, :state
-  attr_reader :longest_road_player, :largest_army_player, :trade_requests, :discards_this_turn, :id, :started_at, :action_count
+  attr_reader :longest_road_player, :largest_army_player, :trade_requests, :discards_this_turn, :id, :started_at, :action_count, :max_cards, :points_to_win
 
   def initialize(opts={})
     opts[:side_length] ||= 3
     opts[:n_players] ||= 3
+    opts[:max_cards] ||= 7
+    opts[:points_to_win] ||= 10
 
     @id = opts[:id] || SecureRandom.uuid
     @started_at = Time.now
     @board = opts[:board] || Board.new(opts)
     @players = opts[:players] || COLORS.shuffle.take(opts[:n_players]).map do |c|
-      Player.new(@board, c)
+      Player.new(@board, c, max_cards: opts[:max_cards])
     end
 
     @turn = 0
@@ -44,6 +46,8 @@ class Game < Catan
     @state = :start_turn1
     @trade_requests = {}
     @discards_this_turn = []
+    @max_cards = opts[:max_cards]
+    @points_to_win = opts[:points_to_win]
   end
 
   def as_json
@@ -61,10 +65,6 @@ class Game < Catan
       action_count: @action_count,
       turn: @turn
     }
-  end
-
-  def points_to_win
-    10
   end
 
   def over?
@@ -165,7 +165,7 @@ class Game < Catan
   end
 
   def players_with_many_cards
-    players.select?{|p| p.resource_cards.count > 7}
+    players.select{|p| p.resource_cards.count > max_cards}
   end
 
   def roll(player)
@@ -400,7 +400,7 @@ class Game < Catan
   end
 
   def can_discard?(player)
-    player.resource_cards.count > 7 && !discards_this_turn.include?(player)
+    player.resource_cards.count > max_cards && !discards_this_turn.include?(player)
   end
 
   def can_accept_trade?(player)

@@ -25,7 +25,9 @@ class Catan
       new_game = Game.new(
         id: SecureRandom.uuid,
         side_length: new_game_param(:board_size),
-        n_players: new_game_param(:n_players)
+        n_players: new_game_param(:n_players),
+        max_cards: new_game_param(:max_cards),
+        points_to_win: new_game_param(:points_to_win)
       )
       $connections_by_game[new_game] = []
       redirect_to new_game

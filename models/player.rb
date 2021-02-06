@@ -4,11 +4,13 @@ class Player < Catan
   MAX_CITIES = 4
   MAX_SETTLEMENTS = 5
   attr_accessor *RESOURCE_CARDS, :color, :board, :development_cards
+  attr_reader :max_cards
   
-  def initialize(board, color)
+  def initialize(board, color, max_cards: 7)
     @board = board
     @color = color
     @development_cards = []
+    @max_cards = max_cards
     RESOURCE_CARDS.each{|r| send("#{r}=", 0) }
   end
 
@@ -176,7 +178,7 @@ class Player < Catan
 
   def discard(*resources)
     ncards = resource_cards.count
-    error 'no need to discard' unless ncards > 7
+    error 'no need to discard' unless ncards > max_cards
     error "must discard exactly #{ncards/2} cards" unless resources.count == (ncards/2)
     assert_we_have(resources)
 
