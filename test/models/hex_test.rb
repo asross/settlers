@@ -1,10 +1,6 @@
 require_relative '../test_helper'
 
 describe Hex do
-  it 'should be able to run tests' do
-    1.must_equal 1
-  end
-
   def create_hex(x, y)
     Hex.new(x, y, nil, nil, nil)
   end
@@ -31,13 +27,13 @@ describe Hex do
       strangers = [faraway1, faraway2]
 
       neighbors.each do |neighbor|
-        hex.adjacent?(neighbor).must_equal true
-        neighbor.adjacent?(hex).must_equal true
+        _(hex.adjacent?(neighbor)).must_equal true
+        _(neighbor.adjacent?(hex)).must_equal true
       end
 
       strangers.each do |stranger|
-        hex.adjacent?(stranger).must_equal false
-        stranger.adjacent?(hex).must_equal false
+        _(hex.adjacent?(stranger)).must_equal false
+        _(stranger.adjacent?(hex)).must_equal false
       end
     end
   end
@@ -53,22 +49,22 @@ describe Hex do
       topright = create_hex(4,1)
       bottomright = create_hex(4,2)
 
-      hex.directions['top'].must_equal top.coordinates
-      hex.directions['bottom'].must_equal bottom.coordinates
-      hex.directions['topleft'].must_equal topleft.coordinates
-      hex.directions['botleft'].must_equal bottomleft.coordinates
-      hex.directions['topright'].must_equal topright.coordinates
-      hex.directions['botright'].must_equal bottomright.coordinates
+      _(hex.directions['top']).must_equal top.coordinates
+      _(hex.directions['bottom']).must_equal bottom.coordinates
+      _(hex.directions['topleft']).must_equal topleft.coordinates
+      _(hex.directions['botleft']).must_equal bottomleft.coordinates
+      _(hex.directions['topright']).must_equal topright.coordinates
+      _(hex.directions['botright']).must_equal bottomright.coordinates
 
       hex.port_direction = 'top'
-      hex.port_borders?(settle(hex, top, topleft)).must_equal true
-      hex.port_borders?(settle(hex, top, topright)).must_equal true
-      hex.port_borders?(settle(hex, topleft, bottomleft)).must_equal false
+      _(hex.port_borders?(settle(hex, top, topleft))).must_equal true
+      _(hex.port_borders?(settle(hex, top, topright))).must_equal true
+      _(hex.port_borders?(settle(hex, topleft, bottomleft))).must_equal false
 
       hex.port_direction = 'bottom'
-      hex.port_borders?(settle(hex, bottom, bottomleft)).must_equal true
-      hex.port_borders?(settle(hex, bottom, bottomright)).must_equal true
-      hex.port_borders?(settle(hex, topleft, bottomleft)).must_equal false
+      _(hex.port_borders?(settle(hex, bottom, bottomleft))).must_equal true
+      _(hex.port_borders?(settle(hex, bottom, bottomright))).must_equal true
+      _(hex.port_borders?(settle(hex, topleft, bottomleft))).must_equal false
     end
   end
 end

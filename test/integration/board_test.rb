@@ -8,11 +8,13 @@ describe 'board.erb' do
     @player3 = Player.new(@board, 'blue')
     @board.settlements << Settlement.new(h(2,2), h(2,3), h(3,2), @player1)
     @board.roads << Road.new(h(2,2), h(2,3), 'red')
-    $game = Game.new(board: @board, players: [@player1, @player2, @player3])
+    $game = Game.new(id: 'test', board: @board, players: [@player1, @player2, @player3])
     $game.turn = 6
     $game.state = :preroll
+    $connections_by_game = {}
+    $connections_by_game[$game] = []
     Capybara.current_driver = Capybara.javascript_driver
-    visit '/?color=red'
+    visit "/games/test?color=red"
   end
 
   after do
@@ -21,26 +23,26 @@ describe 'board.erb' do
 
   it 'has content for the players, settlements, and roads' do
     within('#players') do
-      page.must_have_content 'red'
-      page.must_have_content 'white'
-      page.must_have_content 'blue'
+      _(page).must_have_content 'red'
+      _(page).must_have_content 'white'
+      _(page).must_have_content 'blue'
     end
-    page.must_have_css '.settlement[data-color="red"]', count: 1
-    page.must_have_css '.road[data-color="red"]', count: 1
+    _(page).must_have_css '.settlement[data-color="red"]', count: 1
+    _(page).must_have_css '.road[data-color="red"]', count: 1
   end
 
   it 'allows messaging' do
     fill_in 'message', with: 'cardamom'
     find('input[name="message"]').native.send_keys(:return)
     within('#message-area') do
-      page.must_have_content 'red: cardamom'
+      _(page).must_have_content 'red: cardamom'
     end
   end
 
   it 'allows rolling' do
     find('#roll').click
     within('#last-roll') do
-      page.must_have_content $game.last_roll
+      _(page).must_have_content $game.last_roll
     end
     assert $game.state != :preroll
   end
@@ -51,14 +53,14 @@ describe 'board.erb' do
     @player1.sheep = 1
     @player1.brick = 2
     @player1.wood = 2
-    visit '/?color=red'
+    visit '/games/test?color=red'
     find('#build_road').click
     click_on_coords([1,3],[2,3])
     find('#build_settlement').click
     click_on_coords([2,3],[1,3],[1,4])
-    page.must_have_css '.road[data-color="red"]', count: 2
-    page.must_have_css '.settlement[data-color="red"]', count: 2
-    @player1.resource_cards.must_equal []
+    _(page).must_have_css '.road[data-color="red"]', count: 2
+    _(page).must_have_css '.settlement[data-color="red"]', count: 2
+    _(@player1.resource_cards).must_equal []
   end
 
   it 'allows buying of dev cards' do
@@ -66,10 +68,10 @@ describe 'board.erb' do
     @player1.wheat = 1
     @player1.sheep = 1
     @player1.ore = 1
-    visit '/?color=red'
+    visit '/games/test?color=red'
     find('#buy_development_card').click
-    @player1.development_cards.count.must_equal 1
-    %w(ore wheat sheep).each{|r| @player1.send(r).must_equal 0 }
+    _(@player1.development_cards.count).must_equal 1
+    %w(ore wheat sheep).each{|r| _(@player1.send(r)).must_equal 0 }
   end
 
   it 'displays errors' do
@@ -79,17 +81,17 @@ describe 'board.erb' do
     @player1.brick = 1
     @player1.wheat = 1
     @player1.sheep = 1
-    visit '/?color=red'
+    visit '/games/test?color=red'
 
     find('#build_road').click
     click_on_coords([4,1],[5,1])
-    within('#error') { page.must_have_content 'Road not buildable' }
+    within('#error') { _(page).must_have_content 'Road not buildable' }
 
     find('#build_settlement').click
     click_on_coords([1,5],[2,5],[2,4])
-    within('#error') { page.must_have_content 'No road leading' }
+    within('#error') { _(page).must_have_content 'No road leading' }
     click_on_coords([2,3],[1,3],[2,2])
-    within('#error') { page.must_have_content 'Too close to existing' }
+    within('#error') { _(page).must_have_content 'Too close to existing' }
   end
 
   it 'allows robber moving' do
@@ -105,7 +107,7 @@ describe 'board.erb' do
     within(".player[data-color='red']") do
       page_must_display_resources(1, 'ore')
     end
-    @player3.ore.must_equal 0
+    _(@player3.ore).must_equal 0
   end
 
   it 'allows discarding' do
@@ -114,45 +116,45 @@ describe 'board.erb' do
     @player3.wheat = 4
     @player3.sheep = 4
     find('#roll').click
-    page.has_css?('#move_robber').must_equal false
+    _(page.has_css?('#move_robber')).must_equal false
 
-    visit "/?color=#{@player2.color}"
+    visit "/games/test?color=#{@player2.color}"
     find('#discard').click
     within('#discard-widget') do
       fill_in 'ore', with: 5
       find('#discard-submit').click
     end
-    @player2.ore.must_equal 5
+    _(@player2.ore).must_equal 5
 
-    visit "/?color=#{@player3.color}"
+    visit "/games/test?color=#{@player3.color}"
     find('#discard').click
     within('#discard-widget') do
       fill_in 'wheat', with: 2
       fill_in 'sheep', with: 2
       find('#discard-submit').click
     end
-    @player3.wheat.must_equal 2
-    @player3.sheep.must_equal 2
+    _(@player3.wheat).must_equal 2
+    _(@player3.sheep).must_equal 2
 
-    visit "/?color=#{@player1.color}"
-    page.must_have_css '#move_robber'
+    visit "/games/test?color=#{@player1.color}"
+    _(page).must_have_css '#move_robber'
   end
 
   it 'allows city building' do
     @player1.ore = 3
     @player1.wheat = 2
     $game.state = :postroll
-    visit '/?color=red'
-    page.must_have_css '.city', count: 0
+    visit '/games/test?color=red'
+    _(page).must_have_css '.city', count: 0
     find('#build_city').click
     click_on_coords([2,2],[2,3],[3,2])
-    page.must_have_css '.city', count: 1
+    _(page).must_have_css '.city', count: 1
   end
 
   it 'allows X-for-1 resource trading' do
     @player1.wheat = 4
     $game.state = :postroll
-    visit '/?color=red'
+    visit '/games/test?color=red'
     find('#trade_in').click
     select 'wheat', from: 'resource1'
     select 'sheep', from: 'resource2'
@@ -164,35 +166,35 @@ describe 'board.erb' do
 
   it 'allows turn passing' do
     $game.state = :postroll
-    visit '/?color=red'
-    page.must_have_css('.player.active[data-color="red"]')
+    visit '/games/test?color=red'
+    _(page).must_have_css('.player.active[data-color="red"]')
     find('#pass_turn').click
-    page.wont_have_css('.player.active[data-color="red"]')
-    page.must_have_css(".player.active[data-color='#{@player2.color}']")
+    _(page).wont_have_css('.player.active[data-color="red"]')
+    _(page).must_have_css(".player.active[data-color='#{@player2.color}']")
   end
 
   it 'allows playing knights' do
     $game.state = :postroll
     @player1.development_cards = [ DevCard.new(:knight) ]
-    visit '/?color=red'
+    visit '/games/test?color=red'
     find('#knight').click
-    page.wont_have_css('.player[data-color="red"] #knight')
-    page.must_have_css('.player[data-color="red"] #move_robber')
+    _(page).wont_have_css('.player[data-color="red"] #knight')
+    _(page).must_have_css('.player[data-color="red"] #move_robber')
   end
 
   it 'allows playing road building' do
     $game.state = :postroll
     @player1.development_cards = [ DevCard.new(:road_building) ]
-    visit '/?color=red'
+    visit '/games/test?color=red'
     find('#road_building').click
-    page.wont_have_css('.player[data-color="red"] #road_building')
-    page.must_have_css('.player[data-color="red"] #build_road')
+    _(page).wont_have_css('.player[data-color="red"] #road_building')
+    _(page).must_have_css('.player[data-color="red"] #build_road')
   end
 
   it 'allows playing year of plenty' do
     $game.state = :postroll
     @player1.development_cards = [ DevCard.new(:year_of_plenty) ]
-    visit '/?color=red'
+    visit '/games/test?color=red'
     find('#year_of_plenty').click
     select 'ore', from: 'resource1'
     select 'wood', from: 'resource2'
@@ -207,7 +209,7 @@ describe 'board.erb' do
     $game.state = :postroll
     @player1.development_cards = [ DevCard.new(:monopoly) ]
     @player2.brick = 5
-    visit '/?color=red'
+    visit '/games/test?color=red'
     find('#monopoly').click
     select 'brick', from: 'resource'
     find('#monopoly-submit').click
@@ -221,7 +223,7 @@ describe 'board.erb' do
       $game.state = :postroll
       @player1.ore = 1
       @player2.brick = 1
-      visit '/?color=red'
+      visit '/games/test?color=red'
       click_button 'request trade'
 
       within('#request_trade-widget') do
@@ -241,7 +243,7 @@ describe 'board.erb' do
     end
 
     it 'allows accepting' do
-      visit "/?color=white"
+      visit "/games/test?color=white"
 
       within('.trade-request') do
         page_must_display_resources(1, 'ore')
@@ -255,7 +257,7 @@ describe 'board.erb' do
         page_must_display_resources(1, 'ore')
       end
 
-      visit '/?color=red'
+      visit '/games/test?color=red'
 
       within('.player[data-color="red"]') do
         page_must_display_resources(1, 'brick')
@@ -264,18 +266,18 @@ describe 'board.erb' do
     end
 
     it 'allows canceling' do
-      page.must_have_css '.trade-request'
+      _(page).must_have_css '.trade-request'
       click_button 'cancel_trade'
-      page.wont_have_css '.trade-request'
+      _(page).wont_have_css '.trade-request'
     end
 
     it 'allows rejecting of trading' do
-      visit '/?color=white'
-      page.must_have_css '.trade-request'
+      visit '/games/test?color=white'
+      _(page).must_have_css '.trade-request'
       click_button 'reject_trade'
-      page.wont_have_css '.trade-request'
-      visit '/?color=red'
-      page.wont_have_css '.trade-request'
+      _(page).wont_have_css '.trade-request'
+      visit '/games/test?color=red'
+      _(page).wont_have_css '.trade-request'
     end
   end
 
@@ -284,17 +286,17 @@ describe 'board.erb' do
     @board.settlements << Settlement.new(h(4,3), h(3,4), h(3,3), @player2)
     @player2.development_cards = [ DevCard.new(:victory_point) ]*8
 
-    @player2.points.must_equal 10
+    _(@player2.points).must_equal 10
 
-    visit '/?color=red'
+    visit '/games/test?color=red'
 
-    page.must_have_css ".winner[data-color='#{@player2.color}']"
-    page.must_have_css '.winner li', text: 'x8', count: 2
-    page.must_have_css '.winner img[src*="victory_point"]'
+    _(page).must_have_css ".winner[data-color='#{@player2.color}']"
+    _(page).must_have_css '.winner li', text: 'x8', count: 2
+    _(page).must_have_css '.winner img[src*="victory_point"]'
   end
 
   def page_must_display_resources(count, resource)
-    page.must_have_css ".resource-image-wrapper[data-resource='#{resource}']", count: count
+    _(page).must_have_css ".resource-image-wrapper[data-resource='#{resource}']", count: count
   end
 
   def click_on_coords(*coords)

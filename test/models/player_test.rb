@@ -19,8 +19,8 @@ describe Player do
     it 'works if there are enough' do
       @player.sheep = 5
       @player.trade_in('sheep', 'wood')
-      @player.sheep.must_equal 1
-      @player.wood.must_equal 1
+      _(@player.sheep).must_equal 1
+      _(@player.wood).must_equal 1
     end
 
     it 'requires only three on a 3:1' do
@@ -29,8 +29,8 @@ describe Player do
       h(2,1).port_direction = 'bottom'
       @player.sheep = 3
       @player.trade_in('sheep', 'wood')
-      @player.sheep.must_equal 0
-      @player.wood.must_equal 1
+      _(@player.sheep).must_equal 0
+      _(@player.wood).must_equal 1
     end
 
     it 'requires only two on a 2:1 of the right type' do
@@ -39,19 +39,19 @@ describe Player do
       h(2,1).port_direction = 'bottom'
       @player.sheep = 2
       @player.trade_in('sheep', 'wood')
-      @player.sheep.must_equal 0
-      @player.wood.must_equal 1
+      _(@player.sheep).must_equal 0
+      _(@player.wood).must_equal 1
     end
 
     it 'works with cities, too' do
-      Player::RESOURCE_CARDS.each{|r| @player.trade_in_ratio_for(r).must_equal 4 }
+      Player::RESOURCE_CARDS.each{|r| _(@player.trade_in_ratio_for(r)).must_equal 4 }
       settlement = Settlement.new(h(2,1), h(2,2), h(3,1), @player)
       h(2,1).port_type = '3:1'
       h(2,1).port_direction = 'bottom'
       @board.settlements << settlement
-      Player::RESOURCE_CARDS.each{|r| @player.trade_in_ratio_for(r).must_equal 3 }
+      Player::RESOURCE_CARDS.each{|r| _(@player.trade_in_ratio_for(r)).must_equal 3 }
       settlement.size = 2
-      Player::RESOURCE_CARDS.each{|r| @player.trade_in_ratio_for(r).must_equal 3 }
+      Player::RESOURCE_CARDS.each{|r| _(@player.trade_in_ratio_for(r)).must_equal 3 }
     end
   end
 
@@ -92,29 +92,29 @@ describe Player do
       raises('Not enough resources') { @player.build_settlement(@hex1, @hex2, @hex3) }
       @player.wood = 1
       @player.build_settlement(@hex1, @hex2, @hex3)
-      @player.points.must_equal 1
-      @player.settlements.count.must_equal 1
+      _(@player.points).must_equal 1
+      _(@player.settlements.count).must_equal 1
       [:sheep, :wheat, :brick, :wood].each do |attr|
-        @player.send(attr).must_equal 0
+        _(@player.send(attr)).must_equal 0
       end
     end
 
     it "does not require roads or resources on turn1" do
       @player.build_settlement(@hex1, @hex2, @hex3, true)
-      @player.points.must_equal 1
-      @player.settlements.count.must_equal 1
-      @player.sheep.must_equal 0
-      @player.wheat.must_equal 0
-      @player.wood.must_equal 0
-      @player.brick.must_equal 0
+      _(@player.points).must_equal 1
+      _(@player.settlements.count).must_equal 1
+      _(@player.sheep).must_equal 0
+      _(@player.wheat).must_equal 0
+      _(@player.wood).must_equal 0
+      _(@player.brick).must_equal 0
     end
 
     it "awards resources on turn2" do
       @player.build_settlement(@hex1, @hex2, @hex3, false, true)
-      @player.points.must_equal 1
-      @player.settlements.count.must_equal 1
+      _(@player.points).must_equal 1
+      _(@player.settlements.count).must_equal 1
       expected_total = [@hex1, @hex2, @hex3].count{|h| Player::RESOURCE_CARDS.include?(h.type) }
-      [@player.ore, @player.sheep, @player.wheat, @player.wood, @player.brick].inject(:+).must_equal expected_total
+      _([@player.ore, @player.sheep, @player.wheat, @player.wood, @player.brick].inject(:+)).must_equal expected_total
     end
   end
 
@@ -146,15 +146,15 @@ describe Player do
       @player.wood = 1
       @player.brick = 1
       @player.build_road(@hex1, @hex2)
-      @player.brick.must_equal 0
-      @player.wood.must_equal 0
+      _(@player.brick).must_equal 0
+      _(@player.wood).must_equal 0
     end
 
     it 'does not require resources on a start turn' do
       @board.roads << Road.new(@hex1, @hex3, @player.color)
       @player.build_road(@hex1, @hex2, true)
-      @player.brick.must_equal 0
-      @player.wood.must_equal 0
+      _(@player.brick).must_equal 0
+      _(@player.wood).must_equal 0
     end
   end
 
@@ -166,18 +166,18 @@ describe Player do
     end
 
     it '#resource_cards' do
-      @player.resource_cards.must_equal %w(brick wood wood ore)
+      _(@player.resource_cards).must_equal %w(brick wood wood ore)
     end
 
     it '#steal_from' do
       other_player = Player.new(@board, 'umber')
       4.times { other_player.steal_from(@player) }
-      @player.wood.must_equal 0
-      @player.brick.must_equal 0
-      @player.ore.must_equal 0
-      other_player.wood.must_equal 2
-      other_player.brick.must_equal 1
-      other_player.ore.must_equal 1
+      _(@player.wood).must_equal 0
+      _(@player.brick).must_equal 0
+      _(@player.ore).must_equal 0
+      _(other_player.wood).must_equal 2
+      _(other_player.brick).must_equal 1
+      _(other_player.ore).must_equal 1
     end
   end
 
@@ -208,15 +208,15 @@ describe Player do
       @board.settlements << s
       @player.ore = 3
       @player.wheat = 2
-      @player.points.must_equal 1
-      @player.settlements.count.must_equal 1
-      s.size.must_equal 1
+      _(@player.points).must_equal 1
+      _(@player.settlements.count).must_equal 1
+      _(s.size).must_equal 1
       @player.build_city(@hex1, @hex2, @hex3)
-      s.size.must_equal 2
-      @player.points.must_equal 2
-      @player.ore.must_equal 0
-      @player.wheat.must_equal 0
-      @player.settlements.count.must_equal 0
+      _(s.size).must_equal 2
+      _(@player.points).must_equal 2
+      _(@player.ore).must_equal 0
+      _(@player.wheat).must_equal 0
+      _(@player.settlements.count).must_equal 0
     end
   end
 
@@ -244,9 +244,9 @@ describe Player do
       @player.wheat = 1
       @player.sheep = 1
       @player.buy_development_card
-      %w(ore wheat sheep).each{|r| @player.send(r).must_equal 0 }
-      @player.development_cards.must_equal [ card ]
-      @board.development_cards.must_equal []
+      %w(ore wheat sheep).each{|r| _(@player.send(r)).must_equal 0 }
+      _(@player.development_cards).must_equal [ card ]
+      _(@board.development_cards).must_equal []
     end
   end
 end
