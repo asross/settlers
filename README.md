@@ -12,7 +12,7 @@ It supports multiple games and websocket-based board updates, but doesn't have a
 
 [It's deployed here,](https://ruby-settlers.herokuapp.com) or you can watch the following instructional GIF:
 
-![settlers](https://cloud.githubusercontent.com/assets/1022564/10851499/d192053e-7f01-11e5-839d-b19237b8b6c5.gif)
+![settlers](./settlers-demo.gif)
 
 ## Local Setup
 
