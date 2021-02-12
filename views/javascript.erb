@@ -7,14 +7,11 @@
     var numMessages = <%= @game.messages.size %>;
     var numActions = <%= @game.action_count %>;
 
-    function fixChatHeight() {
+    function scrollChat() {
       chat = document.getElementById('message-area');
-      chatTop = $(chat).offset().top;
-      playersHeight = $('#players').height();
-      $(chat).css('height', playersHeight - chatTop - 32);
       chat.scrollTop = chat.scrollHeight;
     }
-    fixChatHeight();
+    scrollChat();
 
     // %w(roll build_settlement build_city build_road trade_in pass_turn move_robber rob_player)
     <% Game::ACTIONS.each do |action| %>
@@ -26,7 +23,6 @@
         <% else %>
           $('body').addClass('<%= action %>-select');
         <% end %>
-        fixChatHeight();
       });
     <% end %>
 
@@ -42,14 +38,14 @@
         type: 'POST',
         data: { color: '<%= @player.color %>', data: JSON.stringify({ action: action, args: args }) }
       }).success(function(data, textStatus, jqXHR) {
+        $('body').removeClass();
         var json = JSON.parse(data);
         $('#board').html(json.html);
         if (json.data.messages.length > numMessages) {
-          fixChatHeight();
+          scrollChat();
         }
         numMessages = json.data.messages.length;
         numActions = json.data.action_count;
-        $('body').removeClass();
       }).error(function(jqXHR, textStatus, errorThrown) {
         console.log(jqXHR.responseText);
         $('#error').text(jqXHR.responseText);
@@ -68,7 +64,7 @@
         data: data
       }).success(function(data, textStatus, jqXHR) {
         $('#message-area').html(data);
-        fixChatHeight();
+        scrollChat();
       });
       form.find('input[type="text"]').val('');
       return false;
@@ -146,12 +142,12 @@
         type: 'GET'
       }).success(function(data, textStatus, jqXHR) {
         var json = JSON.parse(data);
-        if ($('body').attr('class').length == 0) {
+        if (document.body.classList.length == 0) {
           if (json.data.action_count > numActions) {
             $('#board').html(json.html);
           }
           if (json.data.messages.length > numMessages) {
-            fixChatHeight();
+            scrollChat();
           }
           numMessages = json.data.messages.length;
           numActions = json.data.action_count;
@@ -180,7 +176,7 @@
         } else if (event == 'message') {
           $('#message-area').html(data.html);
         }
-        fixChatHeight();
+        scrollChat();
       };
 
       ws.onerror = function(e) {
