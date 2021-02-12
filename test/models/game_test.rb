@@ -363,6 +363,7 @@ describe Game do
       @board.settlements << Settlement.new(h(1,3), h(2,3), h(2,2), @player3)
       @player1.ore = 0
       @player2.ore = 1
+      @player3.wheat = 1
       assert_similar @game.available_actions(@player1), %w(knight roll)
       @game.perform_action(@player1, 'knight')
       _(@game.state).must_equal :robbing1
@@ -390,12 +391,32 @@ describe Game do
       _(@player2.ore).must_equal 0
     end
 
+    it 'pre-roll knight without choices because of lack of resources' do
+      @game.state = :preroll
+      ensure_robbed(1, 4)
+      @player1.development_cards << DevCard.new(:knight)
+      @board.settlements << Settlement.new(h(1,4), h(2,3), h(2,4), @player2)
+      @board.settlements << Settlement.new(h(1,3), h(2,3), h(2,2), @player3)
+      @player1.ore = 0
+      @player2.ore = 1
+      # player3 has no resources
+      assert_similar @game.available_actions(@player1), %w(knight roll)
+      @game.perform_action(@player1, 'knight')
+      _(@game.state).must_equal :robbing1
+      @game.perform_action(@player1, 'move_robber', [[2,3]])
+      _(@game.state).must_equal :preroll
+      _(@player1.ore).must_equal 1
+      _(@player2.ore).must_equal 0
+    end
+
     it 'post-roll knight' do
       @game.state = :postroll
       ensure_robbed(1, 4)
       @player1.development_cards << DevCard.new(:knight)
       @board.settlements << Settlement.new(h(1,4), h(2,3), h(2,4), @player2)
       @board.settlements << Settlement.new(h(1,3), h(2,3), h(2,2), @player3)
+      @player2.wheat = 1
+      @player3.wheat = 1
       @game.perform_action(@player1, 'knight')
       _(@game.state).must_equal :robbing1
       @game.perform_action(@player1, 'move_robber', [[2,3]])

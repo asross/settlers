@@ -98,6 +98,7 @@ class Board < Catan
       next unless s.hexes.include?(hex)
       next if s.player == player
       next if robbable.include? s.player
+      next if s.player.resource_cards.size == 0
       robbable << s.player
     end
   end

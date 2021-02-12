@@ -99,10 +99,13 @@ describe 'board.erb' do
     @board.settlements << Settlement.new(h(4,4), h(4,3), h(5,3), @player2)
     @board.settlements << Settlement.new(h(4,3), h(3,4), h(3,3), @player3)
     @player3.ore = 1
+    @player2.wheat = 1
     find('#roll').click
     find('#move_robber').click
     click_on_coords([4,3])
     find('#rob_player').click
+    _(page).must_have_css(".player.robbable[data-color='#{@player2.color}']")
+    _(page).must_have_css(".player.robbable[data-color='#{@player3.color}']")
     find(".player[data-color='#{@player3.color}'] .name").click
     within(".player[data-color='red']") do
       page_must_display_resources(1, 'ore')

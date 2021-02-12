@@ -60,6 +60,9 @@ describe Board do
       _(@board.hexes.flatten.select{|h| h.robbed }.size).must_equal 1
       player2 = Player.new(@board, 'red')
       @board.settlements << Settlement.new(h(3,3),h(2,4),h(3,4),player2)
+      _(@board.move_robber_to(3,3,player)).must_equal []
+      player2.ore = 1
+      _(@board.move_robber_to(3,4,player)).must_equal [player2]
       _(@board.move_robber_to(3,3,player)).must_equal [player2]
     end
   end
